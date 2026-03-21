@@ -4,14 +4,14 @@ var CHARS=[];
 var LANGS={
   id:{
     pickHero:'Pilih Karakter',pickHint:'Tap = pilih | 2x tap = preview video',
-    startBtn:'MULAI PERTEMPURAN',flee:'Keluar',skip:'SKIP',
+    startBtn:'MULAI PERTEMPURAN',flee:'Keluar',skip:'Lewat',
     rpsPrompt:'Tentukan Giliran',rpsHint:'Pilih salah satu',
     win:'MENANG!',lose:'KALAH',
     pickAgain:'Pilih Ulang',playAgain:'Main Lagi',
     roundStart:'Ronde',energyGain:'+50 energy',
     yourTurn:'Giliran Kamu',botTurn:'Giliran Bot...',rpsDulu:'RPS dulu!',
-    youUsed:'Kamu pakai',botUsed:'Bot pakai',damage:'damage',
-    youSkip:'Kamu skip giliran (energy tidak cukup)',botSkip:'Bot skip giliran (energy tidak cukup)',
+    youUsed:'Kamu pakai',botUsed:'Bot pakai',damage:'damage',basicAttack:'Serangan Dasar',
+    youSkip:'Energi kurang, giliranmu terlewat',botSkip:'Energi bot kurang, giliran bot terlewat',
     rpsYou:'Kamu',rpsBot:'Bot',rpsFirst:'duluan',
     rpsYouWin:'Kamu menang! Kamu duluan.',rpsBotWin:'Bot menang! Bot duluan.',rpsDraw:'Seri! Kamu duluan.',
     youWinLog:'Kamu menang di ronde',botWinLog:'Bot menang di ronde',
@@ -46,7 +46,7 @@ var LANGS={
     pickAgain:'Pick Again',playAgain:'Play Again',
     roundStart:'Round',energyGain:'+50 energy',
     yourTurn:'Your Turn',botTurn:'Bot Turn...',rpsDulu:'RPS first!',
-    youUsed:'You used',botUsed:'Bot used',damage:'damage',
+    youUsed:'You used',botUsed:'Bot used',damage:'damage',basicAttack:'Basic Attack',
     youSkip:'You skip turn (not enough energy)',botSkip:'Bot skips turn (not enough energy)',
     rpsYou:'You',rpsBot:'Bot',rpsFirst:'goes first',
     rpsYouWin:'You win! You go first.',rpsBotWin:'Bot wins! Bot goes first.',rpsDraw:'Draw! You go first.',
@@ -121,7 +121,7 @@ LANGS.es={
   rpsPrompt:'Decide el turno',rpsHint:'Elige una opcion',
   win:'VICTORIA!',lose:'DERROTA',pickAgain:'Elegir de nuevo',playAgain:'Jugar otra vez',
   roundStart:'Ronda',energyGain:'+50 energia',yourTurn:'Tu turno',botTurn:'Turno del bot...',rpsDulu:'Primero RPS!',
-  youUsed:'Usaste',botUsed:'El bot uso',damage:'de dano',youSkip:'Pasas el turno (energia insuficiente)',botSkip:'El bot pasa el turno (energia insuficiente)',
+  youUsed:'Usaste',botUsed:'El bot uso',damage:'de dano',basicAttack:'Ataque Basico',youSkip:'Pasas el turno (energia insuficiente)',botSkip:'El bot pasa el turno (energia insuficiente)',
   rpsYou:'Tu',rpsBot:'Bot',rpsFirst:'va primero',rpsYouWin:'Ganaste! Vas primero.',rpsBotWin:'El bot gana! Va primero.',rpsDraw:'Empate! Vas primero.',
   youWinLog:'Ganaste en la ronda',botWinLog:'El bot gano en la ronda',confirmFlee:'Seguro que quieres salir de la batalla?',
   langTitle:'Idioma / Language',volTitle:'Volumen',chooseLanguage:'Elegir idioma',searchLanguage:'Buscar idioma...',noLanguageResult:'No se encontro ningun idioma',
@@ -140,7 +140,7 @@ LANGS.fr={
   rpsPrompt:'Determiner le tour',rpsHint:'Choisissez une option',
   win:'VICTOIRE!',lose:'DEFAITE',pickAgain:'Rechoisir',playAgain:'Rejouer',
   roundStart:'Manche',energyGain:'+50 energie',yourTurn:'Votre tour',botTurn:'Tour du bot...',rpsDulu:'RPS d abord!',
-  youUsed:'Vous avez utilise',botUsed:'Le bot a utilise',damage:'de degats',youSkip:'Vous passez votre tour (energie insuffisante)',botSkip:'Le bot passe son tour (energie insuffisante)',
+  youUsed:'Vous avez utilise',botUsed:'Le bot a utilise',damage:'de degats',basicAttack:'Attaque de base',youSkip:'Vous passez votre tour (energie insuffisante)',botSkip:'Le bot passe son tour (energie insuffisante)',
   rpsYou:'Vous',rpsBot:'Bot',rpsFirst:'commence',rpsYouWin:'Vous gagnez! Vous commencez.',rpsBotWin:'Le bot gagne! Il commence.',rpsDraw:'Egalite! Vous commencez.',
   youWinLog:'Vous avez gagne a la manche',botWinLog:'Le bot a gagne a la manche',confirmFlee:'Voulez-vous vraiment quitter le combat?',
   langTitle:'Langue / Language',volTitle:'Volume',chooseLanguage:'Choisir la langue',searchLanguage:'Rechercher une langue...',noLanguageResult:'Aucune langue trouvee',
@@ -159,7 +159,7 @@ LANGS.zh={
   rpsPrompt:'决定出手顺序',rpsHint:'请选择一个',
   win:'胜利!',lose:'失败',pickAgain:'重新选择',playAgain:'再来一局',
   roundStart:'回合',energyGain:'+50 能量',yourTurn:'你的回合',botTurn:'机器人回合...',rpsDulu:'先来猜拳!',
-  youUsed:'你使用了',botUsed:'机器人使用了',damage:'伤害',youSkip:'你的能量不足，跳过回合',botSkip:'机器人能量不足，跳过回合',
+  youUsed:'你使用了',botUsed:'机器人使用了',damage:'伤害',basicAttack:'基础攻击',youSkip:'你的能量不足，跳过回合',botSkip:'机器人能量不足，跳过回合',
   rpsYou:'你',rpsBot:'机器人',rpsFirst:'先手',rpsYouWin:'你赢了! 你先手。',rpsBotWin:'机器人赢了! 机器人先手。',rpsDraw:'平局! 你先手。',
   youWinLog:'你在回合中获胜',botWinLog:'机器人在回合中获胜',confirmFlee:'确定要退出战斗吗?',
   langTitle:'语言 / Language',volTitle:'音量',chooseLanguage:'选择语言',searchLanguage:'搜索语言...',noLanguageResult:'未找到语言',
@@ -178,7 +178,7 @@ LANGS.ja={
   rpsPrompt:'行動順を決めよう',rpsHint:'ひとつ選んでください',
   win:'勝利!',lose:'敗北',pickAgain:'選び直す',playAgain:'もう一度',
   roundStart:'ラウンド',energyGain:'+50 エネルギー',yourTurn:'あなたのターン',botTurn:'ボットのターン...',rpsDulu:'まずはRPS!',
-  youUsed:'あなたは使った',botUsed:'ボットは使った',damage:'ダメージ',youSkip:'エネルギー不足のためターンをスキップ',botSkip:'ボットはエネルギー不足でスキップ',
+  youUsed:'あなたは使った',botUsed:'ボットは使った',damage:'ダメージ',basicAttack:'基本攻撃',youSkip:'エネルギー不足のためターンをスキップ',botSkip:'ボットはエネルギー不足でスキップ',
   rpsYou:'あなた',rpsBot:'ボット',rpsFirst:'先攻',rpsYouWin:'あなたの勝ち! あなたが先攻です。',rpsBotWin:'ボットの勝ち! ボットが先攻です。',rpsDraw:'引き分け! あなたが先攻です。',
   youWinLog:'あなたはラウンドで勝利',botWinLog:'ボットはラウンドで勝利',confirmFlee:'バトルを終了しますか?',
   langTitle:'言語 / Language',volTitle:'音量',chooseLanguage:'言語を選択',searchLanguage:'言語を検索...',noLanguageResult:'言語が見つかりません',
@@ -197,7 +197,7 @@ LANGS.pt={
   rpsPrompt:'Definir turno',rpsHint:'Escolha uma opcao',
   win:'VITORIA!',lose:'DERROTA',pickAgain:'Escolher novamente',playAgain:'Jogar novamente',
   roundStart:'Rodada',energyGain:'+50 energia',yourTurn:'Seu turno',botTurn:'Turno do bot...',rpsDulu:'RPS primeiro!',
-  youUsed:'Voce usou',botUsed:'Bot usou',damage:'de dano',youSkip:'Voce pulou o turno (energia insuficiente)',botSkip:'Bot pulou o turno (energia insuficiente)',
+  youUsed:'Voce usou',botUsed:'Bot usou',damage:'de dano',basicAttack:'Ataque Basico',youSkip:'Voce pulou o turno (energia insuficiente)',botSkip:'Bot pulou o turno (energia insuficiente)',
   rpsYou:'Voce',rpsBot:'Bot',rpsFirst:'joga primeiro',rpsYouWin:'Voce venceu! Joga primeiro.',rpsBotWin:'Bot venceu! Joga primeiro.',rpsDraw:'Empate! Voce joga primeiro.',
   youWinLog:'Voce venceu na rodada',botWinLog:'Bot venceu na rodada',confirmFlee:'Tem certeza que deseja sair da batalha?',
   langTitle:'Idioma / Language',volTitle:'Volume de Som',chooseLanguage:'Escolher idioma',searchLanguage:'Buscar idioma...',noLanguageResult:'Nenhum idioma encontrado',
@@ -271,12 +271,14 @@ function getCharDisplayName(c){return c.name}
 function normalizeCharacter(raw,index){
   var skill=(raw.skills&&raw.skills[0])||raw.skill||{};
   var maxEn=raw.maxEn!=null?raw.maxEn:(raw.max_energy!=null?raw.max_energy:300);
+  var dps=raw.dps!=null?raw.dps:(raw.DPS!=null?raw.DPS:0);
   return {
     id:raw.id!=null?raw.id:(index+1),
     name:raw.name||('Character '+(index+1)),
     role:raw.role||'fighter',
     hp:raw.hp!=null?raw.hp:1800,
     maxEn:maxEn,
+    dps:dps,
     preview:raw.preview||raw.idle||'',
     skill:{
       name:skill.name||'Skill',
@@ -304,6 +306,7 @@ async function loadCharacters(){
 /* ── STATE ── */
 var selectedId=null,battle=null,phase='rps';
 var round=0,battleEnded=false,lastSelectedId=null;
+var rpsResult=null;
 var ultCallback=null,ultEnded=false,ultWho=null;
 var tapTimer=null,tapCount=0;
 var prevScreen='screen-select';
@@ -861,6 +864,8 @@ function showPhase(p){
 
 function newRound(){
   if(battleEnded)return;
+  // Reset RPS state for the new round so we only chain turns on draws
+  rpsResult=null;
   round++;sfx('newround');
   document.getElementById('round-label').textContent=T('roundStart')+' '+round;
   document.getElementById('turn-label').textContent=T('rpsDulu');
@@ -888,12 +893,33 @@ function playerRPS(choice){
   var res=document.getElementById('rps-result');
   var winner,msg;
   var ce=T(choice),be=T(botChoice);
-  if(choice===botChoice){msg=ce+' vs '+be+' — '+T('rpsDraw');winner='player';}
-  else if(RPS_WIN[choice]===botChoice){msg=ce+' vs '+be+' — '+T('rpsYouWin');winner='player';}
-  else{msg=ce+' vs '+be+' — '+T('rpsBotWin');winner='bot';}
+  if(choice===botChoice){
+    msg=ce+' vs '+be+' — '+T('rpsDraw');
+    winner='player';
+    rpsResult='draw';
+  }else if(RPS_WIN[choice]===botChoice){
+    msg=ce+' vs '+be+' — '+T('rpsYouWin');
+    winner='player';
+    rpsResult='player';
+  }else{
+    msg=ce+' vs '+be+' — '+T('rpsBotWin');
+    winner='bot';
+    rpsResult='bot';
+  }
   res.textContent=msg;
   addLog('RPS: '+T('rpsYou')+' '+choice+' vs '+T('rpsBot')+' '+botChoice+' > '+(winner==='player'?T('rpsYou'):T('rpsBot'))+' '+T('rpsFirst'),'system');
-  setTimeout(function(){startTurn(winner)},900);
+  // RPS winner gets a free DPS hit before the turn phase
+  var opponent=winner==='player'?'bot':'player';
+  var dmg=battle&&battle[winner]?battle[winner].dps||0:0;
+  if(dmg>0){
+    addLog((winner==='player'?T('youUsed'):T('botUsed'))+' '+T('basicAttack')+' > '+dmg+' '+T('damage')+'!','skill');
+    applyBattleDamage(opponent,dmg,function(dead){
+      if(dead)endBattle(winner);
+      else setTimeout(function(){startTurn(winner);},400);
+    });
+  }else{
+    setTimeout(function(){startTurn(winner);},900);
+  }
 }
 
 function startTurn(who){
@@ -904,6 +930,9 @@ function startTurn(who){
     document.getElementById('fp-bot').classList.remove('active-turn');
     document.getElementById('turn-label').textContent=T('yourTurn');
     showPhase('action');updateSkillButton();
+    if(battle.player.curEn < battle.player.skill.cost){
+      addLog(T('notEnoughEnergyMessage'),'system');
+    }
   }else{
     document.getElementById('fp-bot').classList.add('active-turn');
     document.getElementById('fp-player').classList.remove('active-turn');
@@ -939,10 +968,16 @@ function skipTurn(){
 }
 
 function endPlayerTurn(){
-  phase='bot-turn';
-  document.getElementById('fp-player').classList.remove('active-turn');
-  document.getElementById('turn-label').textContent=T('botTurn');
-  setTimeout(botAction,800);
+  // Only let the opponent act if the RPS was a draw.
+  // If one side won the RPS, that side gets the full turn and the next round begins.
+  if(rpsResult==='draw' || rpsResult===null){
+    phase='bot-turn';
+    document.getElementById('fp-player').classList.remove('active-turn');
+    document.getElementById('turn-label').textContent=T('botTurn');
+    setTimeout(botAction,800);
+  }else{
+    newRound();
+  }
 }
 
 function botAction(){
@@ -1205,11 +1240,16 @@ handleSkipPress=function(){
 };
 
 endPlayerTurn=function(){
-  phase='bot-turn';
-  document.getElementById('fp-player').classList.remove('active-turn');
-  document.getElementById('turn-label').textContent=T('botTurn');
-  updateSkillButton();
-  setTimeout(botAction,800);
+  // Only let the opponent act if the RPS was a draw.
+  if(rpsResult==='draw' || rpsResult===null){
+    phase='bot-turn';
+    document.getElementById('fp-player').classList.remove('active-turn');
+    document.getElementById('turn-label').textContent=T('botTurn');
+    updateSkillButton();
+    setTimeout(botAction,800);
+  }else{
+    newRound();
+  }
 };
 
 botAction=function(){

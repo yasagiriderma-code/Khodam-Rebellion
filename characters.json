@@ -8,6 +8,8 @@
         "preview": "animations/yasa-idle.mp4",
         "hp": 2000,
         "role": "mage",
+        "DPS": 20,
+        "max_energy": 500,
         "skills": [
             {
                 "name": "Tombak Cahaya",
@@ -23,6 +25,8 @@
         "preview": "animations/seagoddess-idle.mp4",
         "hp": 1900,
         "role": "summoner",
+        "DPS": 21,
+        "max_energy": 500,
         "skills": [
             {
                 "name": "Dragon's Wrath",
@@ -38,6 +42,8 @@
         "preview": "animations/grizzly-idle.mp4",
         "hp": 2400,
         "role": "summoner",
+        "DPS": 16,
+        "max_energy": 300,
         "skills": [
             {
                 "name": "Grizzly's Roar",
@@ -53,6 +59,8 @@
         "preview": "animations/fox-idle.mp4",
         "hp": 1750,
         "role": "fighter",
+        "DPS": 22.5,
+        "max_energy": 300,
         "skills": [
             {
                 "name": "Fox's Dash",
@@ -68,6 +76,8 @@
         "preview": "animations/crow-idle.mp4",
         "hp": 1900,
         "role": "summoner",
+        "DPS": 21,
+        "max_energy": 700,
         "skills": [
             {
                 "name": "Crow's Swarm",
@@ -83,6 +93,8 @@
         "preview": "animations/mobilesuit-idle.mp4",
         "hp": 2700,
         "role": "tank",
+        "DPS": 13,
+        "max_energy": 500,
         "skills": [
             {
                 "name": "Mobile Suit's Energy Blast",
@@ -98,6 +110,8 @@
         "preview": "animations/yy-idle.mp4",
         "hp": 1500,
         "role": "mage",
+        "DPS": 25,
+        "max_energy": 800,
         "skills": [
             {
                 "name": "Yinyin & Yanyan Domain",
