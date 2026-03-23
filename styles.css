@@ -70,6 +70,7 @@ button {
 }
 
 #lobby,
+#matchmaking,
 #selection,
 #settings,
 #in-game,
@@ -81,6 +82,7 @@ button {
 }
 
 #lobby.show,
+#matchmaking.show,
 #selection.show,
 #settings.show,
 #in-game.show,
@@ -188,12 +190,19 @@ button {
 }
 
 #lobby header {
-    padding-top: calc(60px + var(--safe-top));
+    padding-top: calc(28px + var(--safe-top));
     text-align: center;
 }
 
+.title-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+}
+
 .title {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 6px;
@@ -243,13 +252,32 @@ button {
     position: absolute;
     left: 20px;
     right: 20px;
-    bottom: 28px;
-    padding: 18px 16px;
+    bottom: 90px;
+    padding: 14px 14px;
     border-radius: 18px;
     background: linear-gradient(to right, rgba(0, 0, 0, 0.76), rgba(0, 0, 0, 0.28));
     border: 1px solid var(--surface-border);
     backdrop-filter: blur(10px);
 }
+.player-name-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+.player-name-input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.42);
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+.player-name-input::placeholder { color: rgba(255, 255, 255, 0.6); }
 
 .lobby-preview-name {
     margin: 0;
@@ -268,11 +296,18 @@ button {
 }
 
 #lobby footer {
-    padding: 40px calc(20px + var(--safe-right)) calc(40px + var(--safe-bottom)) calc(20px + var(--safe-left));
+    padding: 30px calc(20px + var(--safe-right)) calc(30px + var(--safe-bottom)) calc(20px + var(--safe-left));
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, transparent 100%);
+}
+#lobby footer .btn-row {
+    display: flex;
+    gap: 8px;
+}
+#lobby footer .btn-row .btn-lobby {
+    width: 100%;
 }
 
 .btn-lobby {
@@ -328,6 +363,185 @@ body.theme-light #settings {
     background:
         radial-gradient(circle at top, rgba(255, 209, 102, 0.18), transparent 34%),
         linear-gradient(180deg, #f5f7fb 0%, #dde5f1 100%);
+}
+
+#matchmaking {
+    background:
+        radial-gradient(circle at top, rgba(0, 210, 255, 0.14), transparent 34%),
+        linear-gradient(180deg, #07101c 0%, #02050a 100%);
+}
+
+.matchmaking-shell {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    overflow-y: auto;
+    padding: calc(24px + var(--safe-top)) calc(18px + var(--safe-right)) calc(26px + var(--safe-bottom)) calc(18px + var(--safe-left));
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.matchmaking-header {
+    position: relative;
+    padding-right: 58px;
+}
+
+.matchmaking-kicker {
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--primary-glow);
+}
+
+.matchmaking-title {
+    margin: 6px 0 0;
+    font-family: "Cinzel", serif;
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.matchmaking-close {
+    top: 0;
+    right: 0;
+}
+
+.matchmaking-status {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 8px 0 0;
+    line-height: 1.5;
+}
+
+.match-lobby-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.matchmaking-player-card,
+.matchmaking-panel {
+    border-radius: 20px;
+    padding: 14px;
+    background: rgba(8, 16, 35, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+}
+
+.matchmaking-player-label {
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.56);
+}
+
+.matchmaking-player-name-row {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+.matchmaking-player-name-row strong {
+    font-size: 1.1rem;
+}
+
+.matchmaking-player-name-row span {
+    color: rgba(255, 255, 255, 0.72);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: right;
+}
+
+.matchmaking-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.matchmaking-panel-head h2 {
+    margin: 0;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.online-players-list,
+.incoming-challenges {
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 10px;
+    min-height: 96px;
+}
+
+.online-player-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 0.9rem;
+}
+
+.online-player-row:last-child,
+.challenge-card:last-child {
+    margin-bottom: 0;
+}
+
+.online-player-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.online-player-meta strong {
+    font-size: 1rem;
+}
+
+.online-player-note {
+    font-size: 0.76rem;
+    color: rgba(255, 255, 255, 0.58);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.challenge-btn,
+.accept-challenge-btn,
+.decline-challenge-btn {
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    padding: 6px 9px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+
+.challenge-card {
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.challenge-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.muted {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.86rem;
+    text-align: center;
 }
 
 .settings-shell {

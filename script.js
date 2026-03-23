@@ -19,6 +19,7 @@ import {
 const firebaseConfig = {
     apiKey: "AIzaSyCdJ83a2vwePAVY3tVTx4WXXIAqtcNgm_s",
     authDomain: "global-db-yasagiriderma.firebaseapp.com",
+    databaseURL: "https://global-db-yasagiriderma-default-rtdb.asia-southeast1.firebasedatabase.app/",
     projectId: "global-db-yasagiriderma",
     storageBucket: "global-db-yasagiriderma.firebasestorage.app",
     messagingSenderId: "705392456719",
@@ -30,13 +31,19 @@ const db = getDatabase(firebaseApp);
 // ─── Matchmaking / Online State ───────────────────────────────────────────────
 let isOnline = navigator.onLine;
 let myPlayerId = null;          // unique session ID
+let myPlayerName = "";
 let currentRoomId = null;       // Firebase room key
 let myRole = null;              // "host" | "guest"
 let roomRef = null;             // Firebase ref for current room
 let roomListener = null;        // active onValue listener
 let waitingListener = null;     // listener while searching
+let onlinePlayersRef = null;
+let onlinePlayersListener = null;
+let challengesRef = null;
+let challengesListener = null;
 let isSearchingMatch = false;
 let matchFound = false;
+let activeSectionId = "loading";
 
 // ─── Game State ───────────────────────────────────────────────────────────────
 let characters = [];
@@ -76,6 +83,7 @@ const loadingProgressBar     = document.getElementById("loadingProgressBar");
 const loadingStatusLabel     = document.getElementById("loadingStatusLabel");
 const loadingPercentLabel    = document.getElementById("loadingPercentLabel");
 const lobbyBgVideo           = document.getElementById("lobby-bg-video");
+const matchmakingBgVideo     = document.getElementById("matchmaking-bg-video");
 const lobbyCharacterName     = document.getElementById("lobby-character-name");
 const lobbyCharacterRole     = document.getElementById("lobby-character-role");
 const selectionTrack         = document.getElementById("selectionTrack");
@@ -84,6 +92,11 @@ const selectionSkillName     = document.getElementById("selectionSkillName");
 const startGameBtn           = document.getElementById("startGameBtn");
 const openSelectionBtn       = document.getElementById("openSelectionBtn");
 const openSettingsBtn        = document.getElementById("openSettingsBtn");
+const playerNameInput        = document.getElementById("playerNameInput");
+const quickMatchBtn          = document.getElementById("quickMatchBtn");
+const closeMatchLobbyBtn     = document.getElementById("closeMatchLobbyBtn");
+const matchmakingPlayerName  = document.getElementById("matchmakingPlayerName");
+const matchmakingCharacterName = document.getElementById("matchmakingCharacterName");
 const confirmSelectionBtn    = document.getElementById("confirmSelectionBtn");
 const closeSelectionBtn      = document.getElementById("closeSelectionBtn");
 const closeSettingsBtn       = document.getElementById("closeSettingsBtn");
@@ -201,6 +214,221 @@ function getOrCreatePlayerId() {
     return id;
 }
 
+function getPlayerName() {
+    return sessionStorage.getItem("kr_player_name") || "Pemain";
+}
+
+function setPlayerName(name) {
+    myPlayerName = name.trim().slice(0, 20) || "Pemain";
+    sessionStorage.setItem("kr_player_name", myPlayerName);
+    updateOnlinePresence();
+}
+
+async function updateOnlinePresence() {
+    if (!myPlayerId) return;
+    const name = myPlayerName || getPlayerName();
+    const playersPath = `matchmaking/online/${myPlayerId}`;
+    await set(ref(db, playersPath), {
+        id: myPlayerId,
+        name,
+        characterIndex: selectedCharacterIndex,
+        status: "available",
+        updatedAt: Date.now()
+    });
+}
+
+async function unregisterOnlinePresence() {
+    if (!myPlayerId) return;
+    await remove(ref(db, `matchmaking/online/${myPlayerId}`)).catch(() => {});
+}
+
+async function registerOnlinePresence() {
+    myPlayerId = getOrCreatePlayerId();
+    myPlayerName = getPlayerName();
+    await updateOnlinePresence();
+    const onDiscRef = ref(db, `matchmaking/online/${myPlayerId}`);
+    onDisconnect(onDiscRef).remove();
+
+    // start listeners
+    subscribeOnlinePlayers();
+    subscribeIncomingChallenges();
+    renderMatchmakingProfile();
+}
+
+function subscribeOnlinePlayers() {
+    if (onlinePlayersListener && onlinePlayersRef) {
+        off(onlinePlayersRef, "value", onlinePlayersListener);
+    }
+    onlinePlayersRef = ref(db, "matchmaking/online");
+    onlinePlayersListener = (snap) => {
+        const players = snap.val() || {};
+        renderOnlinePlayers(players);
+    };
+    onValue(onlinePlayersRef, onlinePlayersListener);
+}
+
+function subscribeIncomingChallenges() {
+    if (challengesListener && challengesRef) {
+        off(challengesRef, "value", challengesListener);
+    }
+    challengesRef = ref(db, `matchmaking/challenges/${myPlayerId}`);
+    challengesListener = (snap) => {
+        const challenges = snap.val() || {};
+        renderIncomingChallenges(challenges);
+    };
+    onValue(challengesRef, challengesListener);
+}
+
+function renderOnlinePlayers(players) {
+    const list = document.getElementById("onlinePlayersList");
+    if (!list) return;
+    list.innerHTML = "";
+    const entries = Object.entries(players || {})
+        .filter(([_, player]) => player && player.status === "available")
+        .sort(([, a], [, b]) => (a.name || "").localeCompare(b.name || ""));
+    if (entries.length === 0) {
+        list.innerHTML = `<p class='muted'>Belum ada pemain online</p>`;
+        return;
+    }
+    entries.forEach(([pid, player]) => {
+        const isSelf = pid === myPlayerId;
+        const row = document.createElement("div");
+        row.className = "online-player-row";
+        row.innerHTML = `
+            <div class="online-player-meta">
+                <strong>${player.name || "Pemain"}</strong>
+                <span class="online-player-note">${isSelf ? "Ini akun kamu" : "Siap diajak duel"}</span>
+            </div>
+            <span>${isSelf ? "" : `<button class='challenge-btn' data-target='${pid}'>Challenge</button>`}</span>
+        `;
+        list.appendChild(row);
+    });
+
+    list.querySelectorAll(".challenge-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const targetId = btn.getAttribute("data-target");
+            await sendDuelRequest(targetId);
+        });
+    });
+}
+
+function renderIncomingChallenges(challenges) {
+    const container = document.getElementById("incomingChallenges");
+    if (!container) return;
+    container.innerHTML = "";
+    const items = Object.entries(challenges || {});
+    if (items.length === 0) {
+        container.innerHTML = `<p class='muted'>Tidak ada tantangan masuk</p>`;
+        return;
+    }
+    items.forEach(([challengerId, info]) => {
+        const card = document.createElement("div");
+        card.className = "challenge-card";
+        card.innerHTML = `
+            <div><strong>${info.fromName || "Pemain"}</strong> menantang kamu</div>
+            <div class='challenge-actions'>
+                <button class='accept-challenge-btn' data-from='${challengerId}'>Terima</button>
+                <button class='decline-challenge-btn' data-from='${challengerId}'>Tolak</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+
+    container.querySelectorAll(".accept-challenge-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const challengerId = btn.getAttribute("data-from");
+            await acceptDuelRequest(challengerId);
+        });
+    });
+    container.querySelectorAll(".decline-challenge-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            const challengerId = btn.getAttribute("data-from");
+            await remove(ref(db, `matchmaking/challenges/${myPlayerId}/${challengerId}`));
+        });
+    });
+}
+
+async function sendDuelRequest(targetId) {
+    if (!targetId || targetId === myPlayerId) return;
+    await set(ref(db, `matchmaking/challenges/${targetId}/${myPlayerId}`), {
+        fromId: myPlayerId,
+        fromName: myPlayerName || getPlayerName(),
+        fromCharacterIndex: selectedCharacterIndex,
+        ts: Date.now(),
+        status: "pending"
+    });
+    showToast("Duel terkirim. Menunggu lawan menerima...");
+    const status = document.getElementById("matchmakingStatus");
+    if (status) status.textContent = "Challenge terkirim. Menunggu lawan menerima duel.";
+}
+
+async function acceptDuelRequest(challengerId) {
+    if (!challengerId || challengerId === myPlayerId) return;
+    const challengeDataSnap = await get(ref(db, `matchmaking/challenges/${myPlayerId}/${challengerId}`));
+    if (!challengeDataSnap.exists()) {
+        showToast("Tantangan tak ditemukan.");
+        return;
+    }
+    const challengeData = challengeDataSnap.val();
+    await remove(ref(db, `matchmaking/challenges/${myPlayerId}/${challengerId}`));
+    await remove(ref(db, `matchmaking/challenges/${challengerId}/${myPlayerId}`)).catch(() => {});
+
+    const roomId = push(ref(db, "rooms")).key;
+    currentRoomId = roomId;
+    myRole = "guest";
+    currentEnemyIndex = challengeData.fromCharacterIndex;
+    const activeRoomData = {
+        host: {
+            id: challengeData.fromId,
+            characterIndex: challengeData.fromCharacterIndex,
+            hp: characters[challengeData.fromCharacterIndex]?.hp || 2000,
+            bonusHp: 0
+        },
+        guest: {
+            id: myPlayerId,
+            characterIndex: selectedCharacterIndex,
+            hp: characters[selectedCharacterIndex]?.hp || 2000,
+            bonusHp: 0
+        },
+        turn: "host",
+        status: "active",
+        createdAt: Date.now()
+    };
+    await set(ref(db, `rooms/${roomId}`), activeRoomData);
+    await teardownMatchmakingPresence();
+    startOnlineBattle(roomId, "guest");
+}
+
+function renderMatchmakingProfile() {
+    if (matchmakingPlayerName) matchmakingPlayerName.textContent = myPlayerName || getPlayerName();
+    const character = getSelectedCharacter();
+    if (matchmakingCharacterName) matchmakingCharacterName.textContent = character ? character.name : "Loading...";
+}
+
+async function teardownMatchmakingPresence() {
+    await unregisterOnlinePresence();
+    if (onlinePlayersListener && onlinePlayersRef) {
+        off(onlinePlayersRef, "value", onlinePlayersListener);
+        onlinePlayersListener = null;
+    }
+    if (challengesListener && challengesRef) {
+        off(challengesRef, "value", challengesListener);
+        challengesListener = null;
+    }
+}
+
+async function showMatchmakingLobby() {
+    renderMatchmakingProfile();
+    document.getElementById("matchmakingStatus").textContent = "Lobby online aktif. Pilih lawan, kirim challenge, atau klik Match Cepat.";
+    showSection("matchmaking");
+    await registerOnlinePresence();
+}
+
+async function closeMatchmakingLobby() {
+    await teardownMatchmakingPresence();
+    showSection("lobby");
+}
+
 // ─── Online check ─────────────────────────────────────────────────────────────
 window.addEventListener("online",  () => { isOnline = true; });
 window.addEventListener("offline", () => { isOnline = false; });
@@ -212,6 +440,7 @@ async function startMatchmaking() {
         return;
     }
 
+    await teardownMatchmakingPresence();
     isSearchingMatch = true;
     matchFound = false;
     myPlayerId = getOrCreatePlayerId();
@@ -813,6 +1042,11 @@ function renderLobbyPreview() {
     lobbyBgVideo.src = getCachedAssetUrl(character.preview);
     lobbyBgVideo.muted = true;
     lobbyBgVideo.play().catch(() => {});
+    if (matchmakingBgVideo) {
+        matchmakingBgVideo.src = getCachedAssetUrl(character.preview);
+        matchmakingBgVideo.muted = true;
+        matchmakingBgVideo.play().catch(() => {});
+    }
     lobbyCharacterName.textContent = character.name;
     lobbyCharacterRole.textContent = `${character.role} - HP ${character.hp}`;
 }
@@ -954,12 +1188,16 @@ function moveSelection(step) {
 function confirmCharacterSelection() {
     selectedCharacterIndex = selectionCursor;
     renderLobbyPreview();
+    renderMatchmakingProfile();
+    updateOnlinePresence();
     showSection("lobby");
 }
 
 // ─── Section Navigation ───────────────────────────────────────────────────────
 function showSection(sectionId) {
+    const previousSectionId = activeSectionId;
     document.getElementById("lobby").classList.remove("show");
+    document.getElementById("matchmaking").classList.remove("show");
     document.getElementById("selection").classList.remove("show");
     document.getElementById("settings").classList.remove("show");
     document.getElementById("in-game").classList.remove("show");
@@ -967,6 +1205,11 @@ function showSection(sectionId) {
     hideSurrenderPrompt();
 
     document.getElementById(sectionId).classList.add("show");
+    activeSectionId = sectionId;
+
+    if (previousSectionId === "matchmaking" && sectionId !== "matchmaking") {
+        teardownMatchmakingPresence();
+    }
 
     if (sectionId === "selection") {
         selectionCursor = selectedCharacterIndex;
@@ -987,6 +1230,11 @@ function showSection(sectionId) {
         currentRoomId = null;
         myRole = null;
         renderLobbyPreview();
+        syncInGamePreviewVideos(false);
+        startBgmIfAvailable();
+    } else if (sectionId === "matchmaking") {
+        renderLobbyPreview();
+        renderMatchmakingProfile();
         syncInGamePreviewVideos(false);
         startBgmIfAvailable();
     } else if (sectionId === "settings") {
@@ -1542,9 +1790,27 @@ function syncViewportHeight() {
 
 // ─── Button Wiring ────────────────────────────────────────────────────────────
 startGameBtn.addEventListener("click", () => {
-    // Start matchmaking (online) or bot
-    startMatchmaking();
+    setPlayerName(playerNameInput ? playerNameInput.value : getPlayerName());
+    showMatchmakingLobby();
 });
+
+if (quickMatchBtn) {
+    quickMatchBtn.addEventListener("click", () => {
+        startMatchmaking();
+    });
+}
+
+if (closeMatchLobbyBtn) {
+    closeMatchLobbyBtn.addEventListener("click", () => {
+        closeMatchmakingLobby();
+    });
+}
+
+if (playerNameInput) {
+    playerNameInput.addEventListener("input", (e) => {
+        setPlayerName(e.target.value);
+    });
+}
 
 openSelectionBtn.addEventListener("click",   () => showSection("selection"));
 openSettingsBtn.addEventListener("click",    () => showSection("settings"));
@@ -1583,7 +1849,7 @@ darkModeBtn.addEventListener("click",  () => { currentTheme = "dark";  updateThe
 
 [
     startGameBtn, openSelectionBtn, openSettingsBtn, closeSelectionBtn,
-    closeSettingsBtn, confirmSelectionBtn, nextBtn, prevBtn, rematchBtn,
+    closeSettingsBtn, closeMatchLobbyBtn, confirmSelectionBtn, nextBtn, prevBtn, rematchBtn,
     saveSettingsBtn, confirmSurrenderBtn, cancelSurrenderBtn,
     lightModeBtn, darkModeBtn, backToLobbyBtn
 ].forEach((button) => bindButtonSound(button,
@@ -1597,4 +1863,8 @@ window.addEventListener("orientationchange", syncViewportHeight);
 
 syncViewportHeight();
 applySettings();
+if (playerNameInput) {
+    playerNameInput.value = getPlayerName();
+    myPlayerName = getPlayerName();
+}
 loadCharacters();

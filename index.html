@@ -30,24 +30,70 @@
 
             <div class="screen-content">
                 <header>
-                    <h1 class="title">KHODAM</h1>
-                    <div class="title" style="font-size: 1.8rem; letter-spacing: 12px;">REBELLION</div>
-                    <div class="subtitle">Aura skibidi sigma melindungimu</div>
+                    <div class="title-row">
+                        <h1 class="title">KHODAM</h1>
+                        <h1 class="title">REBELLION</h1>
+                    </div>
                 </header>
 
                 <div class="character-preview">
                     <div class="aura"></div>
                     <div class="lobby-preview-meta">
-                        <h2 id="lobby-character-name" class="lobby-preview-name">Loading...</h2>
+                        <label for="playerNameInput" class="player-name-label">Nama Kamu</label>
+                    <input id="playerNameInput" class="player-name-input" type="text" placeholder="Masukkan nama..." maxlength="20" />
+                    <h2 id="lobby-character-name" class="lobby-preview-name">Loading...</h2>
                         <div id="lobby-character-role" class="lobby-preview-role">Memuat karakter</div>
                     </div>
                 </div>
 
                 <footer>
-                    <button id="startGameBtn" class="btn-lobby btn-start">Mulai Game</button>
-                    <button id="openSelectionBtn" class="btn-lobby">Ganti Khodam</button>
-                    <button id="openSettingsBtn" class="btn-lobby">Pengaturan</button>
+                    <button id="startGameBtn" class="btn-lobby btn-start">Cari Lawan</button>
+                    <div class="btn-row">
+                        <button id="openSelectionBtn" class="btn-lobby">Ganti Khodam</button>
+                        <button id="openSettingsBtn" class="btn-lobby">Pengaturan</button>
+                    </div>
                 </footer>
+            </div>
+        </div>
+
+        <div id="matchmaking">
+            <video id="matchmaking-bg-video" class="screen-video" autoplay muted loop playsinline preload="auto"></video>
+            <div class="screen-backdrop"></div>
+            <div class="matchmaking-shell">
+                <div class="matchmaking-header">
+                    <div>
+                        <div class="matchmaking-kicker">Online Lobby</div>
+                        <h1 class="matchmaking-title">Cari Lawan</h1>
+                        <p id="matchmakingStatus" class="matchmaking-status">Temukan pemain online atau mulai cepat.</p>
+                    </div>
+                    <button id="closeMatchLobbyBtn" class="close-btn matchmaking-close" aria-label="Kembali">X</button>
+                </div>
+
+                <div class="matchmaking-player-card">
+                    <div class="matchmaking-player-label">Profil Aktif</div>
+                    <div class="matchmaking-player-name-row">
+                        <strong id="matchmakingPlayerName">Pemain</strong>
+                        <span id="matchmakingCharacterName">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="match-lobby-actions">
+                    <button id="quickMatchBtn" class="btn-lobby btn-start">Match Cepat</button>
+                </div>
+
+                <section class="matchmaking-panel">
+                    <div class="matchmaking-panel-head">
+                        <h2>Pemain Online</h2>
+                    </div>
+                    <div id="onlinePlayersList" class="online-players-list"></div>
+                </section>
+
+                <section class="matchmaking-panel">
+                    <div class="matchmaking-panel-head">
+                        <h2>Tantangan Masuk</h2>
+                    </div>
+                    <div id="incomingChallenges" class="incoming-challenges"></div>
+                </section>
             </div>
         </div>
 
