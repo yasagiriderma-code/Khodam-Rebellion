@@ -30,24 +30,42 @@
 
             <div class="screen-content">
                 <header>
-                    <h1 class="title">KHODAM</h1>
-                    <div class="title" style="font-size: 1.8rem; letter-spacing: 12px;">REBELLION</div>
-                    <div class="subtitle">Aura skibidi sigma melindungimu</div>
+                    <div class="title-row">
+                        <h1 class="title">KHODAM</h1>
+                        <h1 class="title">REBELLION</h1>
+                    </div>
                 </header>
 
                 <div class="character-preview">
                     <div class="aura"></div>
                     <div class="lobby-preview-meta">
-                        <h2 id="lobby-character-name" class="lobby-preview-name">Loading...</h2>
+                        <label for="playerNameInput" class="player-name-label">Nama Kamu</label>
+                    <input id="playerNameInput" class="player-name-input" type="text" placeholder="Masukkan nama..." maxlength="20" />
+                    <h2 id="lobby-character-name" class="lobby-preview-name">Loading...</h2>
                         <div id="lobby-character-role" class="lobby-preview-role">Memuat karakter</div>
                     </div>
                 </div>
 
                 <footer>
-                    <button id="startGameBtn" class="btn-lobby btn-start">Mulai Game</button>
-                    <button id="openSelectionBtn" class="btn-lobby">Ganti Khodam</button>
-                    <button id="openSettingsBtn" class="btn-lobby">Pengaturan</button>
+                    <button id="startGameBtn" class="btn-lobby btn-start">Mulai Lobby</button>
+                    <div class="btn-row">
+                        <button id="openSelectionBtn" class="btn-lobby">Ganti Khodam</button>
+                        <button id="openSettingsBtn" class="btn-lobby">Pengaturan</button>
+                    </div>
                 </footer>
+
+                <div id="match-lobby" class="match-lobby-overlay" aria-hidden="true">
+                    <div class="match-lobby-shell">
+                        <h2>Lobby Pertarungan</h2>
+                        <p id="matchmakingStatus" class="matchmaking-status">Temukan pemain online atau mulai cepat.</p>
+                        <div class="match-lobby-actions">
+                            <button id="quickMatchBtn" class="btn-lobby btn-start">Mulai Cepat</button>
+                            <button id="closeMatchLobbyBtn" class="btn-lobby">Tutup Lobby</button>
+                        </div>
+                        <div id="onlinePlayersList" class="online-players-list"></div>
+                        <div id="incomingChallenges" class="incoming-challenges"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
