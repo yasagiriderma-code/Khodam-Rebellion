@@ -1,0 +1,123 @@
+{
+  "characters": [
+    {
+        "id": 1,
+        "name": "Yasa",
+        "preview": "animations/yasa-idle.mp4",
+        "hp": 2000,
+        "attack": 145,
+        "role": "mage",
+        "skills": [
+            {
+                "name": "Tombak Cahaya",
+                "damage": 700,
+                "energy_cost": 150,
+                "animation": "animations/yasa-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Sea Goddess",
+        "preview": "animations/seagoddess-idle.mp4",
+        "hp": 1900,
+        "attack": 140,
+        "role": "summoner",
+        "skills": [
+            {
+                "name": "Dragon's Wrath",
+                "damage": 800,
+                "energy_cost": 150,
+                "animation": "animations/seagoddess-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Grizzly & Elfie",
+        "preview": "animations/grizzly-idle.mp4",
+        "hp": 2400,
+        "attack": 132,
+        "role": "summoner",
+        "skills": [
+            {
+                "name": "Grizzly's Roar",
+                "damage": 600,
+                "energy_cost": 120,
+                "animation": "animations/grizzly-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Fox",
+        "preview": "animations/fox-idle.mp4",
+        "hp": 1750,
+        "attack": 170,
+        "role": "fighter",
+        "skills": [
+            {
+                "name": "Fox's Dash",
+                "damage": 750,
+                "energy_cost": 120,
+                "animation": "animations/fox-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Crow",
+        "preview": "animations/crow-idle.mp4",
+        "hp": 1900,
+        "attack": 150,
+        "role": "summoner",
+        "skills": [
+            {
+                "name": "Crow's Swarm",
+                "damage": 700,
+                "energy_cost": 200,
+                "animation": "animations/crow-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Mobile Suit",
+        "preview": "animations/mobilesuit-idle.mp4",
+        "hp": 2700,
+        "attack": 120,
+        "role": "tank",
+        "skills": [
+            {
+                "name": "Mobile Suit's Energy Blast",
+                "damage": 650,
+                "energy_cost": 150,
+                "animation": "animations/mobilesuit-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Yinyin & Yanyan",
+        "preview": "animations/yy-idle.mp4",
+        "hp": 1500,
+        "attack": 185,
+        "role": "mage",
+        "skills": [
+            {
+                "name": "Yinyin & Yanyan Domain",
+                "damage": 800,
+                "energy_cost": 250,
+                "animation": "animations/yy-ultimate.mp4",
+                "use": 1
+            }
+        ]
+    }
+  ]
+}
