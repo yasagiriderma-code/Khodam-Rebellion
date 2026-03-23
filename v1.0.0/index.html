@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>KHODAM - Rebellion</title>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<!-- fullscreen background video -->
+		<video class="bg-video" autoplay muted loop playsinline src="asset/UI/flame.mp4"></video>
+		<header class="site-header">
+			<div class="nav">
+				<video class="brand-logo" autoplay muted loop playsinline src="asset/UI/logo.mp4" aria-label="Animated logo">Your browser does not support the video tag.</video>
+			</div>
+		</header>
+
+		<main class="container">
+			<section id="gallery" class="gallery" aria-label="Photo gallery">
+				<!-- Cards injected by script.js -->
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<div class="container footer-inner">made with ❤️ from Indonesia - v1.0.0</div>
+		</footer>
+
+		<!-- fullscreen overlay for image preview -->
+		<div id="overlay" class="overlay" aria-hidden="true">
+			<button id="overlayClose" class="overlay-close" aria-label="Close">×</button>
+			<video id="overlayVideo" class="overlay-media" autoplay controls playsinline></video>
+			<img id="overlayImg" class="overlay-media" src="" alt="" />
+		</div>
+
+		<script src="script.js" defer></script>
+	</body>
+</html>
+
