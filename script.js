@@ -1,3 +1,44 @@
+// ─── Firebase SDK (ESM via CDN – loaded via <script type="module"> in index.html)
+// Import at top of module
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getDatabase,
+    ref,
+    set,
+    get,
+    push,
+    remove,
+    onValue,
+    off,
+    onDisconnect,
+    serverTimestamp,
+    update
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// ─── Firebase Init ────────────────────────────────────────────────────────────
+const firebaseConfig = {
+    apiKey: "AIzaSyCdJ83a2vwePAVY3tVTx4WXXIAqtcNgm_s",
+    authDomain: "global-db-yasagiriderma.firebaseapp.com",
+    projectId: "global-db-yasagiriderma",
+    storageBucket: "global-db-yasagiriderma.firebasestorage.app",
+    messagingSenderId: "705392456719",
+    appId: "1:705392456719:web:ca41d5c265aeec37fe1f7a"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getDatabase(firebaseApp);
+
+// ─── Matchmaking / Online State ───────────────────────────────────────────────
+let isOnline = navigator.onLine;
+let myPlayerId = null;          // unique session ID
+let currentRoomId = null;       // Firebase room key
+let myRole = null;              // "host" | "guest"
+let roomRef = null;             // Firebase ref for current room
+let roomListener = null;        // active onValue listener
+let waitingListener = null;     // listener while searching
+let isSearchingMatch = false;
+let matchFound = false;
+
+// ─── Game State ───────────────────────────────────────────────────────────────
 let characters = [];
 let selectedCharacterIndex = 0;
 let selectionCursor = 0;
@@ -27,57 +68,505 @@ let audioContext;
 let customBgmUrl = "";
 const cachedAssetUrls = new Map();
 const cachedAssetPromises = new Map();
-const loadingState = {
-    total: 0,
-    loaded: 0
-};
+const loadingState = { total: 0, loaded: 0 };
 
-const loadingScreen = document.getElementById("loading");
-const loadingProgressBar = document.getElementById("loadingProgressBar");
-const loadingStatusLabel = document.getElementById("loadingStatusLabel");
-const loadingPercentLabel = document.getElementById("loadingPercentLabel");
-const lobbyBgVideo = document.getElementById("lobby-bg-video");
-const lobbyCharacterName = document.getElementById("lobby-character-name");
-const lobbyCharacterRole = document.getElementById("lobby-character-role");
-const selectionTrack = document.getElementById("selectionTrack");
-const selectionSummary = document.getElementById("selection-summary");
-const selectionSkillName = document.getElementById("selectionSkillName");
-const startGameBtn = document.getElementById("startGameBtn");
-const openSelectionBtn = document.getElementById("openSelectionBtn");
-const openSettingsBtn = document.getElementById("openSettingsBtn");
-const confirmSelectionBtn = document.getElementById("confirmSelectionBtn");
-const closeSelectionBtn = document.getElementById("closeSelectionBtn");
-const closeSettingsBtn = document.getElementById("closeSettingsBtn");
-const prevBtn = document.getElementById("prevBtn");
-const nextBtn = document.getElementById("nextBtn");
-const inGameTitle = document.getElementById("inGameTitle");
-const turnBanner = document.getElementById("turnBanner");
-const ultimateOverlay = document.getElementById("ultimate-overlay");
-const ultimateVideo = document.getElementById("ultimateVideo");
-const battleResultOverlay = document.getElementById("battle-result-overlay");
-const battleResultTitle = document.getElementById("battleResultTitle");
-const battleResultSubtitle = document.getElementById("battleResultSubtitle");
-const rematchBtn = document.getElementById("rematchBtn");
-const backToLobbyBtn = document.getElementById("backToLobbyBtn");
-const ultimateActionBtn = document.getElementById("ultimateActionBtn");
-const ultimateBadge = document.getElementById("ultimateBadge");
-const surrenderOverlay = document.getElementById("surrender-overlay");
-const confirmSurrenderBtn = document.getElementById("confirmSurrenderBtn");
-const cancelSurrenderBtn = document.getElementById("cancelSurrenderBtn");
-const saveSettingsBtn = document.getElementById("saveSettingsBtn");
-const sfxVolumeSlider = document.getElementById("sfxVolumeSlider");
-const bgmVolumeSlider = document.getElementById("bgmVolumeSlider");
-const sfxVolumeValue = document.getElementById("sfxVolumeValue");
-const bgmVolumeValue = document.getElementById("bgmVolumeValue");
-const customBgmInput = document.getElementById("customBgmInput");
-const lightModeBtn = document.getElementById("lightModeBtn");
-const darkModeBtn = document.getElementById("darkModeBtn");
-const bgmAudio = document.getElementById("bgmAudio");
+// ─── DOM refs ─────────────────────────────────────────────────────────────────
+const loadingScreen          = document.getElementById("loading");
+const loadingProgressBar     = document.getElementById("loadingProgressBar");
+const loadingStatusLabel     = document.getElementById("loadingStatusLabel");
+const loadingPercentLabel    = document.getElementById("loadingPercentLabel");
+const lobbyBgVideo           = document.getElementById("lobby-bg-video");
+const lobbyCharacterName     = document.getElementById("lobby-character-name");
+const lobbyCharacterRole     = document.getElementById("lobby-character-role");
+const selectionTrack         = document.getElementById("selectionTrack");
+const selectionSummary       = document.getElementById("selection-summary");
+const selectionSkillName     = document.getElementById("selectionSkillName");
+const startGameBtn           = document.getElementById("startGameBtn");
+const openSelectionBtn       = document.getElementById("openSelectionBtn");
+const openSettingsBtn        = document.getElementById("openSettingsBtn");
+const confirmSelectionBtn    = document.getElementById("confirmSelectionBtn");
+const closeSelectionBtn      = document.getElementById("closeSelectionBtn");
+const closeSettingsBtn       = document.getElementById("closeSettingsBtn");
+const prevBtn                = document.getElementById("prevBtn");
+const nextBtn                = document.getElementById("nextBtn");
+const inGameTitle            = document.getElementById("inGameTitle");
+const turnBanner             = document.getElementById("turnBanner");
+const ultimateOverlay        = document.getElementById("ultimate-overlay");
+const ultimateVideo          = document.getElementById("ultimateVideo");
+const battleResultOverlay    = document.getElementById("battle-result-overlay");
+const battleResultTitle      = document.getElementById("battleResultTitle");
+const battleResultSubtitle   = document.getElementById("battleResultSubtitle");
+const rematchBtn             = document.getElementById("rematchBtn");
+const backToLobbyBtn         = document.getElementById("backToLobbyBtn");
+const ultimateActionBtn      = document.getElementById("ultimateActionBtn");
+const ultimateBadge          = document.getElementById("ultimateBadge");
+const surrenderOverlay       = document.getElementById("surrender-overlay");
+const confirmSurrenderBtn    = document.getElementById("confirmSurrenderBtn");
+const cancelSurrenderBtn     = document.getElementById("cancelSurrenderBtn");
+const saveSettingsBtn        = document.getElementById("saveSettingsBtn");
+const sfxVolumeSlider        = document.getElementById("sfxVolumeSlider");
+const bgmVolumeSlider        = document.getElementById("bgmVolumeSlider");
+const sfxVolumeValue         = document.getElementById("sfxVolumeValue");
+const bgmVolumeValue         = document.getElementById("bgmVolumeValue");
+const customBgmInput         = document.getElementById("customBgmInput");
+const lightModeBtn           = document.getElementById("lightModeBtn");
+const darkModeBtn            = document.getElementById("darkModeBtn");
+const bgmAudio               = document.getElementById("bgmAudio");
 
-function syncViewportHeight() {
-    document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`);
+// ─── Matchmaking UI overlay (injected) ────────────────────────────────────────
+function injectMatchmakingOverlay() {
+    if (document.getElementById("matchmaking-overlay")) return;
+    const el = document.createElement("div");
+    el.id = "matchmaking-overlay";
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = `
+        <div class="mm-panel">
+            <div class="mm-badge">MATCHMAKING</div>
+            <div id="mmTitle" class="mm-title">Mencari lawan...</div>
+            <div id="mmSub" class="mm-sub">Menghubungkan ke server</div>
+            <div class="mm-spinner"></div>
+            <button id="mmCancelBtn" class="result-btn back">Batal</button>
+        </div>
+    `;
+    // style
+    const style = document.createElement("style");
+    style.textContent = `
+        #matchmaking-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 120;
+            background: rgba(2,6,23,0.92);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        #matchmaking-overlay.show { display: flex; }
+        .mm-panel {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 12px; padding: 32px 28px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.14); border-radius: 20px;
+            max-width: 280px; width: 90%; text-align: center;
+        }
+        .mm-badge {
+            font-size: 0.7rem; letter-spacing: 3px;
+            color: var(--primary-glow); font-weight: 700;
+        }
+        .mm-title { font-size: 1.4rem; font-weight: 700; }
+        .mm-sub { font-size: 0.85rem; color: rgba(255,255,255,0.6); min-height: 20px; }
+        .mm-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary-glow);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    `;
+    document.head.appendChild(style);
+    document.getElementById("game-container").appendChild(el);
+
+    document.getElementById("mmCancelBtn").addEventListener("click", cancelMatchmaking);
 }
 
+function showMatchmakingOverlay(title, sub) {
+    injectMatchmakingOverlay();
+    const overlay = document.getElementById("matchmaking-overlay");
+    document.getElementById("mmTitle").textContent = title || "Mencari lawan...";
+    document.getElementById("mmSub").textContent = sub || "";
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+}
+
+function updateMatchmakingSub(sub) {
+    const el = document.getElementById("mmSub");
+    if (el) el.textContent = sub;
+}
+
+function hideMatchmakingOverlay() {
+    const overlay = document.getElementById("matchmaking-overlay");
+    if (overlay) {
+        overlay.classList.remove("show");
+        overlay.setAttribute("aria-hidden", "true");
+    }
+}
+
+// ─── Player ID ────────────────────────────────────────────────────────────────
+function getOrCreatePlayerId() {
+    let id = sessionStorage.getItem("kr_player_id");
+    if (!id) {
+        id = "p_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        sessionStorage.setItem("kr_player_id", id);
+    }
+    return id;
+}
+
+// ─── Online check ─────────────────────────────────────────────────────────────
+window.addEventListener("online",  () => { isOnline = true; });
+window.addEventListener("offline", () => { isOnline = false; });
+
+// ─── Matchmaking flow ─────────────────────────────────────────────────────────
+async function startMatchmaking() {
+    if (!isOnline) {
+        startBotGame();
+        return;
+    }
+
+    isSearchingMatch = true;
+    matchFound = false;
+    myPlayerId = getOrCreatePlayerId();
+
+    showMatchmakingOverlay("Mencari lawan...", "Menyambungkan ke server...");
+
+    try {
+        // Check for an open waiting room
+        const waitingRef = ref(db, "matchmaking/waiting");
+        const snapshot = await get(waitingRef);
+        let joined = false;
+
+        if (snapshot.exists()) {
+            const waitingRooms = snapshot.val();
+            // Find a room that is waiting and not ours
+            for (const [roomId, roomData] of Object.entries(waitingRooms)) {
+                if (roomData.hostId !== myPlayerId) {
+                    // Join as guest
+                    joined = true;
+                    currentRoomId = roomId;
+                    myRole = "guest";
+                    currentEnemyIndex = roomData.hostCharacterIndex;
+
+                    // Move room from waiting to active
+                    const activeRoomData = {
+                        host: {
+                            id: roomData.hostId,
+                            characterIndex: roomData.hostCharacterIndex,
+                            ready: true
+                        },
+                        guest: {
+                            id: myPlayerId,
+                            characterIndex: selectedCharacterIndex,
+                            ready: true
+                        },
+                        turn: "host",
+                        status: "active",
+                        createdAt: roomData.createdAt
+                    };
+
+                    await set(ref(db, `rooms/${roomId}`), activeRoomData);
+                    await remove(ref(db, `matchmaking/waiting/${roomId}`));
+
+                    updateMatchmakingSub("Lawan ditemukan! Memulai battle...");
+                    await sleep(800);
+
+                    hideMatchmakingOverlay();
+                    isSearchingMatch = false;
+                    matchFound = true;
+                    startOnlineBattle(roomId, "guest");
+                    break;
+                }
+            }
+        }
+
+        if (!joined) {
+            // Create a new waiting room as host
+            const newRoomRef = push(ref(db, "matchmaking/waiting"));
+            currentRoomId = newRoomRef.key;
+            myRole = "host";
+
+            await set(newRoomRef, {
+                hostId: myPlayerId,
+                hostCharacterIndex: selectedCharacterIndex,
+                createdAt: serverTimestamp()
+            });
+
+            // Auto-cleanup on disconnect
+            onDisconnect(newRoomRef).remove();
+
+            updateMatchmakingSub("Menunggu lawan masuk...");
+
+            // Listen for room to become active
+            const activeRef = ref(db, `rooms/${currentRoomId}`);
+            waitingListener = onValue(activeRef, async (snap) => {
+                if (!snap.exists() || !isSearchingMatch) return;
+                const room = snap.val();
+                if (room && room.status === "active" && room.guest) {
+                    off(activeRef, "value", waitingListener);
+                    waitingListener = null;
+                    currentEnemyIndex = room.guest.characterIndex;
+
+                    updateMatchmakingSub("Lawan ditemukan! Memulai battle...");
+                    await sleep(800);
+
+                    hideMatchmakingOverlay();
+                    isSearchingMatch = false;
+                    matchFound = true;
+                    startOnlineBattle(currentRoomId, "host");
+                }
+            });
+
+            // Timeout – fallback ke bot setelah 20 detik
+            setTimeout(async () => {
+                if (isSearchingMatch) {
+                    await cleanupRoom();
+                    isSearchingMatch = false;
+                    hideMatchmakingOverlay();
+                    showToast("Tidak ada lawan online. Lawan bot!");
+                    startBotGame();
+                }
+            }, 20000);
+        }
+    } catch (err) {
+        console.error("Matchmaking error:", err);
+        isSearchingMatch = false;
+        hideMatchmakingOverlay();
+        showToast("Koneksi gagal. Lawan bot!");
+        startBotGame();
+    }
+}
+
+async function cancelMatchmaking() {
+    isSearchingMatch = false;
+    if (waitingListener) {
+        off(ref(db, `rooms/${currentRoomId}`), "value", waitingListener);
+        waitingListener = null;
+    }
+    await cleanupRoom();
+    hideMatchmakingOverlay();
+    showSection("lobby");
+}
+
+async function cleanupRoom() {
+    if (!currentRoomId) return;
+    try {
+        await remove(ref(db, `matchmaking/waiting/${currentRoomId}`));
+        if (matchFound) {
+            await remove(ref(db, `rooms/${currentRoomId}`));
+        }
+    } catch (_) {}
+    currentRoomId = null;
+    myRole = null;
+}
+
+// ─── Online Battle ────────────────────────────────────────────────────────────
+function startOnlineBattle(roomId, role) {
+    myRole = role;
+    currentRoomId = roomId;
+    matchFound = true;
+
+    // currentEnemyIndex already set before calling this
+    showSection("in-game");
+}
+
+function listenToRoom() {
+    if (!currentRoomId) return;
+    if (roomRef && roomListener) {
+        off(roomRef, "value", roomListener);
+    }
+
+    roomRef = ref(db, `rooms/${currentRoomId}`);
+    roomListener = onValue(roomRef, (snap) => {
+        if (!snap.exists()) {
+            // Room deleted – opponent disconnected
+            if (battleState && !battleState.winner) {
+                finishBattle("player");
+                showToast("Lawan disconnect. Kamu menang!");
+            }
+            return;
+        }
+
+        const room = snap.val();
+        if (!room || !battleState) return;
+
+        // Sync HP values from DB for both sides
+        const myKey   = myRole === "host" ? "host" : "guest";
+        const oppKey  = myRole === "host" ? "guest" : "host";
+
+        if (room[myKey]  && room[myKey].hp  !== undefined) {
+            battleState.player.hp      = room[myKey].hp;
+            battleState.player.bonusHp = room[myKey].bonusHp || 0;
+        }
+        if (room[oppKey] && room[oppKey].hp !== undefined) {
+            battleState.enemy.hp      = room[oppKey].hp;
+            battleState.enemy.bonusHp = room[oppKey].bonusHp || 0;
+        }
+
+        // Handle winner
+        if (room.status === "finished" && room.winner && !battleState.winner) {
+            const localWinner = room.winner === myRole ? "player" : "enemy";
+            finishBattle(localWinner);
+            return;
+        }
+
+        // Handle turn
+        const myTurnKey = myRole;
+        if (room.turn === myTurnKey && !isPlayerTurn && !battleState.winner) {
+            isPlayerTurn = true;
+            footer.classList.remove("hidden");
+            const playerChar = getSelectedCharacter();
+            if (playerChar) turnBanner.textContent = `Giliran ${playerChar.name}`;
+            updateUltimateButton();
+        } else if (room.turn !== myTurnKey && isPlayerTurn && !battleState.winner) {
+            isPlayerTurn = false;
+            footer.classList.add("hidden");
+            const enemyChar = getEnemyCharacter();
+            if (enemyChar) turnBanner.textContent = `${enemyChar.name} bersiap...`;
+            updateUltimateButton();
+        }
+
+        // Handle opponent action
+        if (room.lastAction && room.lastAction.by !== myRole && !room.lastAction.processed) {
+            handleOpponentAction(room.lastAction, room);
+        }
+    });
+
+    // Cleanup on disconnect
+    onDisconnect(roomRef).update({ status: "abandoned" });
+}
+
+function handleOpponentAction(actionData, room) {
+    const { action, damage, bonusHp } = actionData;
+    const enemyChar = getEnemyCharacter();
+
+    if (action === "shield") {
+        if (battleState) {
+            battleState.enemy.bonusHp = bonusHp || 100;
+            const playerChar = getSelectedCharacter();
+            if (enemyChar) turnBanner.textContent = `${enemyChar.name} menambah guard`;
+        }
+    } else if (action === "ultimate") {
+        if (battleState) battleState.enemy.ultimateUses = Math.max(0, (battleState.enemy.ultimateUses || 1) - 1);
+        playUltimateVideo(enemyChar, () => {
+            if (!battleState || battleState.winner) return;
+            applyDamage("player", damage || 0, "ultimate");
+            if (battleState.winner) { finishBattle("enemy"); return; }
+            markOpponentActionProcessed();
+        });
+        return;
+    } else if (action === "attack") {
+        if (battleState) applyDamage("player", damage || 0, "attack");
+        if (battleState && battleState.winner) { finishBattle("enemy"); return; }
+    }
+
+    markOpponentActionProcessed();
+}
+
+async function markOpponentActionProcessed() {
+    if (!currentRoomId) return;
+    try {
+        await update(ref(db, `rooms/${currentRoomId}/lastAction`), { processed: true });
+    } catch (_) {}
+}
+
+async function sendOnlineAction(action) {
+    if (!currentRoomId || !myRole) return;
+
+    const playerChar = getSelectedCharacter();
+    const enemyChar  = getEnemyCharacter();
+    if (!playerChar || !enemyChar || !battleState) return;
+
+    const myKey  = myRole === "host" ? "host" : "guest";
+    const oppKey = myRole === "host" ? "guest" : "host";
+    const nextTurn = myRole === "host" ? "guest" : "host";
+
+    let damage = 0;
+    let bonusHp = battleState.player.bonusHp;
+
+    if (action === "shield") {
+        addDefenseBonus("player", 100);
+        bonusHp = battleState.player.bonusHp;
+        turnBanner.textContent = `${playerChar.name} menambah guard 100 HP`;
+    } else if (action === "ultimate") {
+        if (battleState.player.ultimateUses <= 0) {
+            footer.classList.remove("hidden");
+            isPlayerTurn = true;
+            updateUltimateButton();
+            return;
+        }
+        battleState.player.ultimateUses -= 1;
+        updateUltimateButton();
+        damage = getActionDamage(playerChar, "ultimate");
+        applyDamage("enemy", damage, "ultimate");
+    } else {
+        damage = getActionDamage(playerChar, "attack");
+        applyDamage("enemy", damage, "attack");
+    }
+
+    isPlayerTurn = false;
+    footer.classList.add("hidden");
+    updateUltimateButton();
+
+    // Check win
+    if (battleState.winner) {
+        try {
+            await update(ref(db, `rooms/${currentRoomId}`), {
+                status: "finished",
+                winner: myRole,
+                [`${myKey}/hp`]: battleState.player.hp,
+                [`${myKey}/bonusHp`]: battleState.player.bonusHp
+            });
+        } catch (_) {}
+        finishBattle("player");
+        return;
+    }
+
+    // Write action + HP update + pass turn
+    try {
+        await update(ref(db, `rooms/${currentRoomId}`), {
+            turn: nextTurn,
+            [`${myKey}/hp`]: battleState.player.hp,
+            [`${myKey}/bonusHp`]: battleState.player.bonusHp,
+            lastAction: {
+                by: myRole,
+                action,
+                damage,
+                bonusHp,
+                processed: false,
+                ts: serverTimestamp()
+            }
+        });
+    } catch (err) {
+        console.error("sendOnlineAction error:", err);
+    }
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+    let toast = document.getElementById("kr-toast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "kr-toast";
+        const s = document.createElement("style");
+        s.textContent = `
+            #kr-toast {
+                position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+                background: rgba(0,0,0,0.82); color: #fff;
+                padding: 10px 20px; border-radius: 20px;
+                font-size: 0.85rem; white-space: nowrap;
+                z-index: 200; opacity: 0; transition: opacity 0.3s;
+                pointer-events: none;
+            }
+            #kr-toast.visible { opacity: 1; }
+        `;
+        document.head.appendChild(s);
+        document.getElementById("game-container").appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add("visible");
+    setTimeout(() => toast.classList.remove("visible"), 3000);
+}
+
+// ─── Bot game (offline) ───────────────────────────────────────────────────────
+function startBotGame() {
+    matchFound = false;
+    currentRoomId = null;
+    myRole = null;
+    showSection("in-game");
+}
+
+// ─── Sleep util ───────────────────────────────────────────────────────────────
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// ─── Asset caching ────────────────────────────────────────────────────────────
 function getCachedAssetUrl(path) {
     return cachedAssetUrls.get(path) || path;
 }
@@ -93,31 +582,26 @@ function setLoadingProgress(loaded, total, message) {
 
 async function cacheMediaAsset(path, label) {
     if (!path) return path;
-
     if (cachedAssetUrls.has(path)) {
         loadingState.loaded += 1;
         setLoadingProgress(loadingState.loaded, loadingState.total, label);
         return cachedAssetUrls.get(path);
     }
-
     if (!cachedAssetPromises.has(path)) {
         cachedAssetPromises.set(path, (async () => {
             try {
                 const response = await fetch(path, { cache: "force-cache" });
-                if (!response.ok) {
-                    throw new Error(`Gagal memuat asset: ${path}`);
-                }
+                if (!response.ok) throw new Error(`Gagal memuat: ${path}`);
                 const blob = await response.blob();
                 const objectUrl = URL.createObjectURL(blob);
                 cachedAssetUrls.set(path, objectUrl);
                 return objectUrl;
-            } catch (error) {
-                console.warn(`Fallback ke asset asli untuk ${path}`, error);
+            } catch (err) {
+                console.warn(`Fallback untuk ${path}`, err);
                 return path;
             }
         })());
     }
-
     try {
         return await cachedAssetPromises.get(path);
     } finally {
@@ -128,31 +612,19 @@ async function cacheMediaAsset(path, label) {
 
 async function preloadCharacterMedia(characterList) {
     const assetEntries = [];
-
     characterList.forEach((character) => {
         if (character.preview) {
-            assetEntries.push({
-                path: character.preview,
-                label: `Caching preview ${character.name}...`
-            });
+            assetEntries.push({ path: character.preview, label: `Caching preview ${character.name}...` });
         }
         if (character.skill && character.skill.animation) {
-            assetEntries.push({
-                path: character.skill.animation,
-                label: `Caching ultimate ${character.name}...`
-            });
+            assetEntries.push({ path: character.skill.animation, label: `Caching ultimate ${character.name}...` });
         }
     });
-
-    assetEntries.push({
-        path: "./arena.png",
-        label: "Caching arena..."
-    });
+    assetEntries.push({ path: "./arena.png", label: "Caching arena..." });
 
     loadingState.total = assetEntries.length + 1;
     loadingState.loaded = 0;
     setLoadingProgress(0, loadingState.total, "Menyiapkan cache video...");
-
     await Promise.all(assetEntries.map((asset) => cacheMediaAsset(asset.path, asset.label)));
     loadingState.loaded += 1;
     setLoadingProgress(loadingState.loaded, loadingState.total, "Semua asset siap.");
@@ -160,12 +632,7 @@ async function preloadCharacterMedia(characterList) {
 
 function normalizeCharacter(character, index) {
     const accentPalette = ["#00d2ff", "#ff4d4d", "#ffd166", "#4dff88", "#b388ff", "#ff8fab", "#5eead4"];
-    const defaultAttackByRole = {
-        mage: 145,
-        summoner: 135,
-        fighter: 165,
-        tank: 120
-    };
+    const defaultAttackByRole = { mage: 145, summoner: 135, fighter: 165, tank: 120 };
     return {
         ...character,
         accent: accentPalette[index % accentPalette.length],
@@ -181,10 +648,7 @@ async function loadCharacters() {
     try {
         setLoadingProgress(0, 1, "Memuat data karakter...");
         const response = await fetch("./characters.json", { cache: "no-store" });
-        if (!response.ok) {
-            throw new Error("Gagal memuat characters.json");
-        }
-
+        if (!response.ok) throw new Error("Gagal memuat characters.json");
         const data = await response.json();
         characters = (data.characters || []).map(normalizeCharacter);
         await preloadCharacterMedia(characters);
@@ -213,25 +677,16 @@ async function loadCharacters() {
     document.getElementById("lobby").classList.add("show");
 }
 
-function getSelectedCharacter() {
-    return characters[selectedCharacterIndex] || null;
-}
-
-function getEnemyCharacter() {
-    return characters[currentEnemyIndex] || null;
-}
+function getSelectedCharacter() { return characters[selectedCharacterIndex] || null; }
+function getEnemyCharacter()    { return characters[currentEnemyIndex]    || null; }
 
 function pickRandomEnemyIndex() {
     if (characters.length <= 1) return selectedCharacterIndex;
-
-    const candidates = characters
-        .map((_, index) => index)
-        .filter((index) => index !== selectedCharacterIndex);
-
-    const randomIndex = Math.floor(Math.random() * candidates.length);
-    return candidates[randomIndex];
+    const candidates = characters.map((_, i) => i).filter((i) => i !== selectedCharacterIndex);
+    return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
+// ─── Battle State ─────────────────────────────────────────────────────────────
 function createCombatantState(character) {
     return {
         maxHp: character.hp,
@@ -249,12 +704,16 @@ function resetBattleState() {
     const playerCharacter = getSelectedCharacter();
     if (!playerCharacter) return;
 
-    currentEnemyIndex = pickRandomEnemyIndex();
+    // If online match, enemy was already set; otherwise pick random bot
+    if (!matchFound) {
+        currentEnemyIndex = pickRandomEnemyIndex();
+    }
+
     const enemyCharacter = getEnemyCharacter() || playerCharacter;
 
     battleState = {
         player: createCombatantState(playerCharacter),
-        enemy: createCombatantState(enemyCharacter),
+        enemy:  createCombatantState(enemyCharacter),
         winner: null
     };
 
@@ -266,8 +725,22 @@ function resetBattleState() {
     footer.classList.remove("hidden");
     turnBanner.textContent = `Giliran ${playerCharacter.name}`;
     inGameTitle.textContent = `${playerCharacter.name} VS ${enemyCharacter.name}`;
+
+    const modeTag = matchFound ? " [1v1 ONLINE]" : " [VS BOT]";
+    inGameTitle.textContent += modeTag;
+
     hideBattleResult();
     updateUltimateButton();
+
+    // If online, start listening for opponent moves
+    if (matchFound && currentRoomId) {
+        // Host goes first; guest waits
+        if (myRole === "guest") {
+            isPlayerTurn = false;
+            footer.classList.add("hidden");
+        }
+        listenToRoom();
+    }
 }
 
 function updateUltimateButton() {
@@ -277,13 +750,10 @@ function updateUltimateButton() {
     ultimateActionBtn.disabled = uses <= 0 || !isPlayerTurn || Boolean(battleState && battleState.winner);
 }
 
+// ─── Preview Video Pool ───────────────────────────────────────────────────────
 function getPreviewVideo(character) {
     if (!character || !character.preview) return null;
-
-    if (previewVideoPool.has(character.preview)) {
-        return previewVideoPool.get(character.preview);
-    }
-
+    if (previewVideoPool.has(character.preview)) return previewVideoPool.get(character.preview);
     const video = document.createElement("video");
     video.src = getCachedAssetUrl(character.preview);
     video.muted = true;
@@ -298,13 +768,10 @@ function getPreviewVideo(character) {
 
 function syncInGamePreviewVideos(active) {
     const playerCharacter = getSelectedCharacter();
-    const enemyCharacter = getEnemyCharacter() || playerCharacter;
+    const enemyCharacter  = getEnemyCharacter() || playerCharacter;
     const activePreviews = new Set(
-        [playerCharacter, enemyCharacter]
-            .map((character) => character && character.preview)
-            .filter(Boolean)
+        [playerCharacter, enemyCharacter].map((c) => c && c.preview).filter(Boolean)
     );
-
     previewVideoPool.forEach((video, previewPath) => {
         if (active && activePreviews.has(previewPath)) {
             video.play().catch(() => {});
@@ -312,13 +779,10 @@ function syncInGamePreviewVideos(active) {
             video.pause();
         }
     });
-
     if (active) {
         [playerCharacter, enemyCharacter].forEach((character) => {
             const video = getPreviewVideo(character);
-            if (video) {
-                video.play().catch(() => {});
-            }
+            if (video) video.play().catch(() => {});
         });
     }
 }
@@ -326,7 +790,6 @@ function syncInGamePreviewVideos(active) {
 function renderLobbyPreview() {
     const character = getSelectedCharacter();
     if (!character) return;
-
     document.documentElement.style.setProperty("--primary-glow", character.accent);
     lobbyBgVideo.src = getCachedAssetUrl(character.preview);
     lobbyBgVideo.muted = true;
@@ -335,30 +798,27 @@ function renderLobbyPreview() {
     lobbyCharacterRole.textContent = `${character.role} - HP ${character.hp}`;
 }
 
+// ─── Audio ────────────────────────────────────────────────────────────────────
 function ensureAudioContext() {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
-    if (audioContext.state === "suspended") {
-        audioContext.resume().catch(() => {});
-    }
+    if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
     return audioContext;
 }
 
 function playUiSound(type = "tap") {
     if (sfxVolume <= 0) return;
-
     const ctx = ensureAudioContext();
     if (!ctx) return;
-
-    const osc = ctx.createOscillator();
+    const osc  = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     const now = ctx.currentTime;
     const profile = {
-        tap: { start: 420, end: 620, duration: 0.08, wave: "triangle" },
-        confirm: { start: 360, end: 760, duration: 0.14, wave: "sine" },
-        back: { start: 280, end: 180, duration: 0.12, wave: "sawtooth" }
+        tap:     { start: 420, end: 620, duration: 0.08, wave: "triangle" },
+        confirm: { start: 360, end: 760, duration: 0.14, wave: "sine"     },
+        back:    { start: 280, end: 180, duration: 0.12, wave: "sawtooth" }
     }[type] || { start: 420, end: 620, duration: 0.08, wave: "triangle" };
 
     osc.type = profile.wave;
@@ -369,7 +829,6 @@ function playUiSound(type = "tap") {
     gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, sfxVolume * 0.05), now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + profile.duration);
-
     osc.connect(filter);
     filter.connect(gain);
     gain.connect(ctx.destination);
@@ -389,16 +848,15 @@ function updateAudioUI() {
 function updateThemeUI() {
     document.body.classList.toggle("theme-light", currentTheme === "light");
     lightModeBtn.classList.toggle("active", currentTheme === "light");
-    darkModeBtn.classList.toggle("active", currentTheme === "dark");
+    darkModeBtn.classList.toggle("active",  currentTheme === "dark");
 }
 
 function startBgmIfAvailable() {
     bgmAudio.volume = bgmVolume;
-    if (bgmAudio.src) {
-        bgmAudio.play().catch(() => {});
-    }
+    if (bgmAudio.src) bgmAudio.play().catch(() => {});
 }
 
+// ─── Selection UI ─────────────────────────────────────────────────────────────
 function createSelectionCard(character, index) {
     const card = document.createElement("article");
     card.className = "selection-card";
@@ -429,7 +887,6 @@ function createSelectionCard(character, index) {
 
 function initSelection() {
     if (selectionInitialized) return;
-
     selectionTrack.innerHTML = "";
     selectionCards = characters.map((character, index) => createSelectionCard(character, index));
     selectionInitialized = true;
@@ -438,10 +895,8 @@ function initSelection() {
 function cardPositionClass(index) {
     const total = characters.length;
     let diff = index - selectionCursor;
-
     if (diff > total / 2) diff -= total;
     if (diff < -total / 2) diff += total;
-
     if (diff === 0) return "center";
     if (diff === -1) return "left";
     if (diff === 1) return "right";
@@ -451,7 +906,6 @@ function cardPositionClass(index) {
 function updateSelectionUI() {
     const character = characters[selectionCursor];
     if (!character) return;
-
     selectionCards.forEach((card, index) => {
         card.className = `selection-card ${cardPositionClass(index)}`;
         const isCenter = index === selectionCursor;
@@ -464,9 +918,10 @@ function updateSelectionUI() {
             card.style.borderColor = "rgba(255,255,255,0.18)";
         }
     });
-
     selectionSummary.textContent = `${character.name} - ${character.role.toUpperCase()} - HP ${character.hp}`;
-    selectionSkillName.textContent = character.skill ? `${character.skill.name} - Damage ${character.skill.damage} - Use ${character.skill.use}` : "Tidak ada skill";
+    selectionSkillName.textContent = character.skill
+        ? `${character.skill.name} - Damage ${character.skill.damage} - Use ${character.skill.use}`
+        : "Tidak ada skill";
 }
 
 function moveSelection(step) {
@@ -474,17 +929,16 @@ function moveSelection(step) {
     selectionReady = false;
     selectionCursor = (selectionCursor + step + characters.length) % characters.length;
     updateSelectionUI();
-    window.setTimeout(() => {
-        selectionReady = true;
-    }, 360);
+    window.setTimeout(() => { selectionReady = true; }, 360);
 }
 
 function confirmCharacterSelection() {
     selectedCharacterIndex = selectionCursor;
     renderLobbyPreview();
-    showSection("in-game");
+    showSection("lobby");
 }
 
+// ─── Section Navigation ───────────────────────────────────────────────────────
 function showSection(sectionId) {
     document.getElementById("lobby").classList.remove("show");
     document.getElementById("selection").classList.remove("show");
@@ -505,6 +959,14 @@ function showSection(sectionId) {
         });
         syncInGamePreviewVideos(false);
     } else if (sectionId === "lobby") {
+        // Detach any room listener if coming back
+        if (roomRef && roomListener) {
+            off(roomRef, "value", roomListener);
+            roomListener = null;
+        }
+        matchFound = false;
+        currentRoomId = null;
+        myRole = null;
         renderLobbyPreview();
         syncInGamePreviewVideos(false);
         startBgmIfAvailable();
@@ -517,14 +979,15 @@ function showSection(sectionId) {
     }
 }
 
+// ─── In-Game Init ─────────────────────────────────────────────────────────────
 function initInGame() {
-    container = document.getElementById("game-container");
+    container  = document.getElementById("game-container");
     gameCanvas = document.getElementById("game");
-    gameCtx = gameCanvas.getContext("2d");
-    footer = document.querySelector(".overlay-footer");
+    gameCtx    = gameCanvas.getContext("2d");
+    footer     = document.querySelector(".overlay-footer");
 
     function resizeCanvas() {
-        gameCanvas.width = container.clientWidth;
+        gameCanvas.width  = container.clientWidth;
         gameCanvas.height = container.clientHeight;
     }
 
@@ -534,9 +997,7 @@ function initInGame() {
     }
 
     resizeCanvas();
-
     resetBattleState();
-
     syncInGamePreviewVideos(true);
 
     if (!inGameStarted) {
@@ -545,35 +1006,28 @@ function initInGame() {
     }
 }
 
-function surrender() {
-    showSurrenderPrompt();
-}
-
-function confirmSurrender() {
-    stopUltimateVideo();
-    battleToken += 1;
-    hideSurrenderPrompt();
-    hideBattleResult();
-    showSection("lobby");
-}
-
-function showSurrenderPrompt() {
-    surrenderOverlay.classList.add("show");
-    surrenderOverlay.setAttribute("aria-hidden", "false");
-}
-
-function hideSurrenderPrompt() {
-    surrenderOverlay.classList.remove("show");
-    surrenderOverlay.setAttribute("aria-hidden", "true");
-}
-
+// ─── Player Action ────────────────────────────────────────────────────────────
 function playerAction(action) {
     if (!battleState || battleState.winner || !isPlayerTurn || isSwitching) return;
 
     const playerCharacter = getSelectedCharacter();
-    const enemyCharacter = getEnemyCharacter();
+    const enemyCharacter  = getEnemyCharacter();
     if (!playerCharacter || !enemyCharacter) return;
 
+    // Online mode: relay action to Firebase
+    if (matchFound && currentRoomId) {
+        if (action === "ultimate") {
+            if (battleState.player.ultimateUses <= 0) return;
+            playUltimateVideo(playerCharacter, async () => {
+                await sendOnlineAction("ultimate");
+            });
+        } else {
+            sendOnlineAction(action);
+        }
+        return;
+    }
+
+    // Bot mode (original logic)
     isPlayerTurn = false;
     turnBanner.textContent = `${enemyCharacter.name} bersiap...`;
     footer.classList.add("hidden");
@@ -596,28 +1050,22 @@ function playerAction(action) {
             if (!battleState || battleState.winner) return;
             const damage = getActionDamage(playerCharacter, action);
             applyDamage("enemy", damage, action);
-            if (battleState.winner) {
-                finishBattle("player");
-                return;
-            }
+            if (battleState.winner) { finishBattle("player"); return; }
             beginTurnSwitch(() => enemyResponse(), 2000);
         });
     } else {
         const damage = getActionDamage(playerCharacter, action);
         applyDamage("enemy", damage, action);
-        if (battleState.winner) {
-            finishBattle("player");
-            return;
-        }
+        if (battleState.winner) { finishBattle("player"); return; }
         beginTurnSwitch(() => enemyResponse(), 2000);
     }
 }
 
+// ─── Bot Response ─────────────────────────────────────────────────────────────
 function enemyResponse() {
     if (!battleState || battleState.winner) return;
-
     const playerCharacter = getSelectedCharacter();
-    const enemyCharacter = getEnemyCharacter();
+    const enemyCharacter  = getEnemyCharacter();
     if (!playerCharacter || !enemyCharacter) return;
 
     const action = chooseEnemyAction(enemyCharacter);
@@ -638,10 +1086,7 @@ function enemyResponse() {
             if (!battleState || battleState.winner) return;
             const damage = getActionDamage(enemyCharacter, action);
             applyDamage("player", damage, action);
-            if (battleState.winner) {
-                finishBattle("enemy");
-                return;
-            }
+            if (battleState.winner) { finishBattle("enemy"); return; }
             turnBanner.textContent = `${enemyCharacter.name} menyerang ${playerCharacter.name}`;
             beginTurnSwitch(() => {
                 if (!battleState || battleState.winner) return;
@@ -654,10 +1099,7 @@ function enemyResponse() {
     } else {
         const damage = getActionDamage(enemyCharacter, action);
         applyDamage("player", damage, action);
-        if (battleState.winner) {
-            finishBattle("enemy");
-            return;
-        }
+        if (battleState.winner) { finishBattle("enemy"); return; }
         turnBanner.textContent = `${enemyCharacter.name} menyerang ${playerCharacter.name}`;
         beginTurnSwitch(() => {
             if (!battleState || battleState.winner) return;
@@ -673,7 +1115,6 @@ function beginTurnSwitch(callback, delay) {
     targetAngle += Math.PI;
     isSwitching = true;
     const activeToken = battleToken;
-
     setTimeout(() => {
         if (activeToken !== battleToken) return;
         callback();
@@ -681,9 +1122,7 @@ function beginTurnSwitch(callback, delay) {
 }
 
 function getActionDamage(character, action) {
-    if (action === "ultimate") {
-        return character.skill ? character.skill.damage : Math.round(character.attack * 1.6);
-    }
+    if (action === "ultimate") return character.skill ? character.skill.damage : Math.round(character.attack * 1.6);
     return character.attack;
 }
 
@@ -696,7 +1135,6 @@ function chooseEnemyAction(enemyCharacter) {
 
 function applyDamage(target, baseDamage, action = "attack") {
     if (!battleState) return 0;
-
     const defender = battleState[target];
     const finalDamage = Math.max(1, Math.round(baseDamage));
     let remainingDamage = finalDamage;
@@ -707,21 +1145,16 @@ function applyDamage(target, baseDamage, action = "attack") {
         defender.bonusHp = Math.max(0, defender.bonusHp - absorbed);
         remainingDamage -= absorbed;
     }
-
     if (remainingDamage > 0) {
         defender.hp = Math.max(0, defender.hp - remainingDamage);
     }
 
     defender.trailDelayUntil = performance.now() + 1000;
-    defender.damageFx = {
-        amount: finalDamage,
-        startedAt: performance.now()
-    };
+    defender.damageFx = { amount: finalDamage, startedAt: performance.now() };
 
     if (defender.hp <= 0) {
         battleState.winner = target === "enemy" ? "player" : "enemy";
     }
-
     return finalDamage;
 }
 
@@ -730,21 +1163,26 @@ function addDefenseBonus(target, amount) {
     const combatant = battleState[target];
     combatant.bonusHp = Math.min(100, combatant.bonusHp + amount);
     combatant.displayHp = combatant.hp + combatant.bonusHp;
-    combatant.trailHp = combatant.hp + combatant.bonusHp;
+    combatant.trailHp   = combatant.hp + combatant.bonusHp;
     combatant.trailDelayUntil = 0;
 }
 
 function finishBattle(winner) {
     if (!battleState) return;
-
     isSwitching = false;
     battleState.winner = winner;
     footer.classList.add("hidden");
     isPlayerTurn = false;
     updateUltimateButton();
 
+    // Cleanup room listener
+    if (roomRef && roomListener) {
+        off(roomRef, "value", roomListener);
+        roomListener = null;
+    }
+
     const playerCharacter = getSelectedCharacter();
-    const enemyCharacter = getEnemyCharacter();
+    const enemyCharacter  = getEnemyCharacter();
     if (winner === "player" && playerCharacter) {
         turnBanner.textContent = `${playerCharacter.name} menang`;
         showBattleResult("player", playerCharacter, enemyCharacter);
@@ -754,19 +1192,18 @@ function finishBattle(winner) {
     }
 }
 
+// ─── Battle Result UI ─────────────────────────────────────────────────────────
 function showBattleResult(winner, playerCharacter, enemyCharacter) {
     if (!playerCharacter || !enemyCharacter) return;
-
     if (winner === "player") {
         battleResultTitle.textContent = "Victory";
         battleResultTitle.className = "battle-result-title victory";
-        battleResultSubtitle.textContent = `${playerCharacter.name} menaklukkan ${enemyCharacter.name} di arena. Lanjut rematch atau kembali ke lobi utama.`;
+        battleResultSubtitle.textContent = `${playerCharacter.name} menaklukkan ${enemyCharacter.name} di arena.`;
     } else {
         battleResultTitle.textContent = "Defeat";
         battleResultTitle.className = "battle-result-title defeat";
-        battleResultSubtitle.textContent = `${playerCharacter.name} tumbang oleh ${enemyCharacter.name}. Coba strategi lain lewat rematch atau kembali ke lobi.`;
+        battleResultSubtitle.textContent = `${playerCharacter.name} tumbang oleh ${enemyCharacter.name}.`;
     }
-
     battleResultOverlay.classList.add("show");
     battleResultOverlay.setAttribute("aria-hidden", "false");
 }
@@ -779,17 +1216,21 @@ function hideBattleResult() {
 function rematchBattle() {
     stopUltimateVideo();
     battleToken += 1;
+    // Online rematch: just go back to lobby (start a new search)
+    if (matchFound || currentRoomId) {
+        cleanupRoom();
+        matchFound = false;
+        showSection("lobby");
+        return;
+    }
     initInGame();
     syncInGamePreviewVideos(true);
 }
 
+// ─── Ultimate Video ───────────────────────────────────────────────────────────
 function playUltimateVideo(character, onComplete) {
     const animation = character && character.skill ? character.skill.animation : "";
-    if (!animation) {
-        if (onComplete) onComplete();
-        return;
-    }
-
+    if (!animation) { if (onComplete) onComplete(); return; }
     ultimateCompletion = onComplete || null;
     ultimateVideo.src = getCachedAssetUrl(animation);
     ultimateVideo.muted = false;
@@ -804,37 +1245,54 @@ function stopUltimateVideo(runCompletion = false) {
     ultimateVideo.currentTime = 0;
     ultimateOverlay.classList.remove("show");
     ultimateOverlay.setAttribute("aria-hidden", "true");
-
     const completion = ultimateCompletion;
     ultimateCompletion = null;
-    if (runCompletion && completion) {
-        completion();
-    }
+    if (runCompletion && completion) completion();
 }
 
 ultimateVideo.addEventListener("ended", () => stopUltimateVideo(true));
 
+// ─── Surrender ────────────────────────────────────────────────────────────────
+function surrender() { showSurrenderPrompt(); }
+
+function confirmSurrender() {
+    stopUltimateVideo();
+    battleToken += 1;
+    hideSurrenderPrompt();
+    hideBattleResult();
+    if (matchFound && currentRoomId) {
+        cleanupRoom();
+        matchFound = false;
+    }
+    showSection("lobby");
+}
+
+function showSurrenderPrompt() {
+    surrenderOverlay.classList.add("show");
+    surrenderOverlay.setAttribute("aria-hidden", "false");
+}
+
+function hideSurrenderPrompt() {
+    surrenderOverlay.classList.remove("show");
+    surrenderOverlay.setAttribute("aria-hidden", "true");
+}
+
+// ─── Canvas Render ────────────────────────────────────────────────────────────
 function drawArenaBackground() {
     if (arenaImage.complete && arenaImage.naturalWidth > 0) {
         const canvasRatio = gameCanvas.width / gameCanvas.height;
-        const imageRatio = arenaImage.naturalWidth / arenaImage.naturalHeight;
-        let drawWidth;
-        let drawHeight;
-        let offsetX = 0;
-        let offsetY = 0;
-
+        const imageRatio  = arenaImage.naturalWidth / arenaImage.naturalHeight;
+        let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
         if (imageRatio > canvasRatio) {
             drawHeight = gameCanvas.height;
-            drawWidth = drawHeight * imageRatio;
-            offsetX = (gameCanvas.width - drawWidth) / 2;
+            drawWidth  = drawHeight * imageRatio;
+            offsetX    = (gameCanvas.width - drawWidth) / 2;
         } else {
-            drawWidth = gameCanvas.width;
+            drawWidth  = gameCanvas.width;
             drawHeight = drawWidth / imageRatio;
-            offsetY = (gameCanvas.height - drawHeight) / 2;
+            offsetY    = (gameCanvas.height - drawHeight) / 2;
         }
-
         gameCtx.drawImage(arenaImage, offsetX, offsetY, drawWidth, drawHeight);
-
         const vignette = gameCtx.createLinearGradient(0, 0, 0, gameCanvas.height);
         vignette.addColorStop(0, "rgba(3, 5, 10, 0.18)");
         vignette.addColorStop(0.55, "rgba(2, 4, 10, 0.08)");
@@ -843,7 +1301,6 @@ function drawArenaBackground() {
         gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
         return;
     }
-
     const skyGradient = gameCtx.createLinearGradient(0, 0, 0, gameCanvas.height);
     skyGradient.addColorStop(0, "#314766");
     skyGradient.addColorStop(0.42, "#172233");
@@ -851,71 +1308,49 @@ function drawArenaBackground() {
     skyGradient.addColorStop(1, "#050507");
     gameCtx.fillStyle = skyGradient;
     gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-    const spotlight = gameCtx.createRadialGradient(
-        gameCanvas.width / 2,
-        gameCanvas.height * 0.36,
-        20,
-        gameCanvas.width / 2,
-        gameCanvas.height * 0.36,
-        gameCanvas.width * 0.65
-    );
+    const spotlight = gameCtx.createRadialGradient(gameCanvas.width/2, gameCanvas.height*0.36, 20, gameCanvas.width/2, gameCanvas.height*0.36, gameCanvas.width*0.65);
     spotlight.addColorStop(0, "rgba(255, 214, 153, 0.22)");
     spotlight.addColorStop(0.4, "rgba(255, 153, 102, 0.1)");
     spotlight.addColorStop(1, "rgba(0, 0, 0, 0)");
     gameCtx.fillStyle = spotlight;
     gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-
     const floorY = gameCanvas.height * 0.7;
     const floorGradient = gameCtx.createLinearGradient(0, floorY, 0, gameCanvas.height);
     floorGradient.addColorStop(0, "#312022");
     floorGradient.addColorStop(1, "#09090b");
     gameCtx.fillStyle = floorGradient;
     gameCtx.fillRect(0, floorY, gameCanvas.width, gameCanvas.height - floorY);
-
     gameCtx.fillStyle = "rgba(255,255,255,0.05)";
     gameCtx.fillRect(0, floorY + 10, gameCanvas.width, 2);
-
     gameCtx.beginPath();
-    gameCtx.ellipse(gameCanvas.width / 2, floorY + 32, gameCanvas.width * 0.28, 28, 0, 0, Math.PI * 2);
-    const arenaGlow = gameCtx.createRadialGradient(gameCanvas.width / 2, floorY + 32, 10, gameCanvas.width / 2, floorY + 32, gameCanvas.width * 0.32);
+    gameCtx.ellipse(gameCanvas.width/2, floorY+32, gameCanvas.width*0.28, 28, 0, 0, Math.PI*2);
+    const arenaGlow = gameCtx.createRadialGradient(gameCanvas.width/2, floorY+32, 10, gameCanvas.width/2, floorY+32, gameCanvas.width*0.32);
     arenaGlow.addColorStop(0, "rgba(255, 196, 120, 0.28)");
     arenaGlow.addColorStop(0.45, "rgba(255, 120, 82, 0.12)");
     arenaGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
     gameCtx.fillStyle = arenaGlow;
     gameCtx.fill();
-
     gameCtx.strokeStyle = "rgba(255, 210, 160, 0.26)";
     gameCtx.lineWidth = 2;
     gameCtx.beginPath();
-    gameCtx.ellipse(gameCanvas.width / 2, floorY + 32, gameCanvas.width * 0.22, 18, 0, 0, Math.PI * 2);
+    gameCtx.ellipse(gameCanvas.width/2, floorY+32, gameCanvas.width*0.22, 18, 0, 0, Math.PI*2);
     gameCtx.stroke();
 }
 
 function stepDisplayedHp(combatant, now) {
     const effectiveHp = combatant.hp + combatant.bonusHp;
     combatant.displayHp += (effectiveHp - combatant.displayHp) * 0.18;
-    if (Math.abs(effectiveHp - combatant.displayHp) < 0.5) {
-        combatant.displayHp = effectiveHp;
-    }
-
+    if (Math.abs(effectiveHp - combatant.displayHp) < 0.5) combatant.displayHp = effectiveHp;
     if (now >= combatant.trailDelayUntil) {
         combatant.trailHp += (effectiveHp - combatant.trailHp) * 0.12;
-        if (Math.abs(effectiveHp - combatant.trailHp) < 0.5) {
-            combatant.trailHp = effectiveHp;
-        }
+        if (Math.abs(effectiveHp - combatant.trailHp) < 0.5) combatant.trailHp = effectiveHp;
     }
 }
 
 function drawDamageFx(x, y, scale, combatant) {
     if (!combatant.damageFx) return;
-
     const elapsed = performance.now() - combatant.damageFx.startedAt;
-    if (elapsed > 900) {
-        combatant.damageFx = null;
-        return;
-    }
-
+    if (elapsed > 900) { combatant.damageFx = null; return; }
     const progress = elapsed / 900;
     gameCtx.save();
     gameCtx.translate(x, y - 90 * scale - progress * 34);
@@ -935,44 +1370,34 @@ function drawUI(x, y, scale, name, combatant, accent, side) {
     gameCtx.save();
     gameCtx.translate(x, y);
     gameCtx.scale(scale, scale);
-
     gameCtx.fillStyle = "rgba(2, 6, 23, 0.86)";
     gameCtx.fillRect(-64, -122, 128, 54);
-
     gameCtx.fillStyle = "white";
     gameCtx.font = "bold 11px Arial";
     gameCtx.fillText(name, -50, -100);
-
     const maxEffectiveHp = Math.max(combatant.maxHp, combatant.hp + combatant.bonusHp, combatant.displayHp, combatant.trailHp);
     const displayRatio = Math.max(0, Math.min(1, combatant.displayHp / maxEffectiveHp));
-    const trailRatio = Math.max(0, Math.min(1, combatant.trailHp / maxEffectiveHp));
-    const baseRatio = Math.max(0, Math.min(1, combatant.hp / maxEffectiveHp));
-    const bonusRatio = Math.max(0, Math.min(1, (combatant.hp + combatant.bonusHp) / maxEffectiveHp));
+    const trailRatio   = Math.max(0, Math.min(1, combatant.trailHp   / maxEffectiveHp));
+    const baseRatio    = Math.max(0, Math.min(1, combatant.hp        / maxEffectiveHp));
+    const bonusRatio   = Math.max(0, Math.min(1, (combatant.hp + combatant.bonusHp) / maxEffectiveHp));
     const hpColor = side === "player" ? "#22c55e" : "#ef4444";
-
     gameCtx.fillStyle = "#1e293b";
     gameCtx.fillRect(-50, -88, 100, 8);
-
     gameCtx.fillStyle = "#facc15";
     gameCtx.fillRect(-50, -88, 100 * trailRatio, 8);
-
     gameCtx.fillStyle = hpColor;
     gameCtx.fillRect(-50, -88, 100 * Math.min(displayRatio, baseRatio), 8);
-
     if (combatant.bonusHp > 0) {
         gameCtx.fillStyle = "rgba(255,255,255,0.95)";
         gameCtx.fillRect(-50 + 100 * baseRatio, -88, 100 * Math.max(0, bonusRatio - baseRatio), 8);
     }
-
     gameCtx.fillStyle = "rgba(255,255,255,0.76)";
     gameCtx.font = "10px Arial";
     gameCtx.fillText(`${Math.round(Math.max(0, combatant.hp))} / ${combatant.maxHp}`, -50, -68);
-
     if (combatant.bonusHp > 0) {
         gameCtx.fillStyle = "#ffffff";
         gameCtx.fillText(`+${Math.round(combatant.bonusHp)}`, 18, -68);
     }
-
     gameCtx.restore();
 }
 
@@ -991,23 +1416,15 @@ function drawCard(x, y, scale, character) {
     gameCtx.save();
     gameCtx.translate(x, y);
     gameCtx.scale(scale, scale);
-
-    const width = 90;
-    const height = 130;
-    const left = -45;
-    const top = -65;
-    const radius = 14;
+    const width = 90, height = 130, left = -45, top = -65, radius = 14;
     const previewVideo = getPreviewVideo(character);
-    const canDrawPreview = previewVideo && previewVideo.readyState >= 2 && previewVideo.videoWidth > 0 && previewVideo.videoHeight > 0;
-
+    const canDrawPreview = previewVideo && previewVideo.readyState >= 2 && previewVideo.videoWidth > 0;
     const grad = gameCtx.createLinearGradient(0, top, 0, top + height);
     grad.addColorStop(0, character.accent);
     grad.addColorStop(1, "#020617");
-
     drawRoundedRectPath(left, top, width, height, radius);
     gameCtx.fillStyle = grad;
     gameCtx.fill();
-
     if (canDrawPreview) {
         gameCtx.save();
         drawRoundedRectPath(left, top, width, height, radius);
@@ -1015,7 +1432,6 @@ function drawCard(x, y, scale, character) {
         gameCtx.drawImage(previewVideo, left, top, width, height);
         gameCtx.restore();
     }
-
     const overlay = gameCtx.createLinearGradient(0, top, 0, top + height);
     overlay.addColorStop(0, "rgba(2, 6, 23, 0.05)");
     overlay.addColorStop(0.55, "rgba(2, 6, 23, 0.2)");
@@ -1023,17 +1439,14 @@ function drawCard(x, y, scale, character) {
     drawRoundedRectPath(left, top, width, height, radius);
     gameCtx.fillStyle = overlay;
     gameCtx.fill();
-
     gameCtx.strokeStyle = "rgba(255,255,255,0.3)";
     gameCtx.lineWidth = 2;
     drawRoundedRectPath(left, top, width, height, radius);
     gameCtx.stroke();
-
     gameCtx.strokeStyle = `${character.accent}66`;
     gameCtx.lineWidth = 1;
     drawRoundedRectPath(left + 4, top + 4, width - 8, height - 8, radius - 3);
     gameCtx.stroke();
-
     gameCtx.restore();
 }
 
@@ -1044,12 +1457,10 @@ function getScale(y) {
 
 function updateInGame() {
     if (!gameCtx) return;
-
     if (gameCanvas.width !== container.clientWidth || gameCanvas.height !== container.clientHeight) {
-        gameCanvas.width = container.clientWidth;
+        gameCanvas.width  = container.clientWidth;
         gameCanvas.height = container.clientHeight;
     }
-
     requestAnimationFrame(updateInGame);
     gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
     drawArenaBackground();
@@ -1057,26 +1468,21 @@ function updateInGame() {
     const now = performance.now();
     if (battleState) {
         stepDisplayedHp(battleState.player, now);
-        stepDisplayedHp(battleState.enemy, now);
+        stepDisplayedHp(battleState.enemy,  now);
     }
 
     if (isSwitching) {
         angle += (targetAngle - angle) * 0.08;
-        if (Math.abs(targetAngle - angle) < 0.01) {
-            angle = targetAngle;
-            isSwitching = false;
-        }
+        if (Math.abs(targetAngle - angle) < 0.01) { angle = targetAngle; isSwitching = false; }
     }
 
     const playerCharacter = getSelectedCharacter();
-    const enemyCharacter = getEnemyCharacter() || playerCharacter;
+    const enemyCharacter  = getEnemyCharacter() || playerCharacter;
     if (!playerCharacter || !enemyCharacter || !battleState) return;
 
     const centerX = gameCanvas.width / 2;
     const centerY = gameCanvas.height / 2 - 10;
-    const radiusX = 120;
-    const radiusY = 60;
-    const offsetX = 70;
+    const radiusX = 120, radiusY = 60, offsetX = 70;
 
     const playerPos = {
         x: centerX + Math.cos(angle) * radiusX - offsetX,
@@ -1086,7 +1492,6 @@ function updateInGame() {
         combatant: battleState.player,
         side: "player"
     };
-
     const enemyPos = {
         x: centerX + Math.cos(angle + Math.PI) * radiusX + offsetX,
         y: centerY + Math.sin(angle + Math.PI) * radiusY,
@@ -1096,9 +1501,7 @@ function updateInGame() {
         side: "enemy"
     };
 
-    const objects = [playerPos, enemyPos];
-    objects.sort((a, b) => a.y - b.y);
-
+    const objects = [playerPos, enemyPos].sort((a, b) => a.y - b.y);
     objects.forEach((obj) => {
         const scale = getScale(obj.y);
         drawUI(obj.x, obj.y, scale, obj.name, obj.combatant, obj.character.accent, obj.side);
@@ -1107,90 +1510,68 @@ function updateInGame() {
     });
 }
 
-function applySettings() {
-    updateAudioUI();
-    updateThemeUI();
-}
-
+// ─── Settings ─────────────────────────────────────────────────────────────────
+function applySettings() { updateAudioUI(); updateThemeUI(); }
 function bindButtonSound(button, type = "tap") {
     if (!button) return;
     button.addEventListener("click", () => playUiSound(type));
 }
 
-startGameBtn.addEventListener("click", () => showSection("in-game"));
-openSelectionBtn.addEventListener("click", () => showSection("selection"));
-openSettingsBtn.addEventListener("click", () => showSection("settings"));
-closeSelectionBtn.addEventListener("click", () => showSection("lobby"));
-closeSettingsBtn.addEventListener("click", () => showSection("lobby"));
+function syncViewportHeight() {
+    document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`);
+}
+
+// ─── Button Wiring ────────────────────────────────────────────────────────────
+startGameBtn.addEventListener("click", () => {
+    // Start matchmaking (online) or bot
+    startMatchmaking();
+});
+
+openSelectionBtn.addEventListener("click",   () => showSection("selection"));
+openSettingsBtn.addEventListener("click",    () => showSection("settings"));
+closeSelectionBtn.addEventListener("click",  () => showSection("lobby"));
+closeSettingsBtn.addEventListener("click",   () => showSection("lobby"));
 confirmSelectionBtn.addEventListener("click", confirmCharacterSelection);
-nextBtn.addEventListener("click", () => moveSelection(1));
-prevBtn.addEventListener("click", () => moveSelection(-1));
-rematchBtn.addEventListener("click", rematchBattle);
+nextBtn.addEventListener("click",            () => moveSelection(1));
+prevBtn.addEventListener("click",            () => moveSelection(-1));
+rematchBtn.addEventListener("click",         rematchBattle);
 backToLobbyBtn.addEventListener("click", () => {
     stopUltimateVideo();
     battleToken += 1;
+    cleanupRoom();
+    matchFound = false;
     showSection("lobby");
 });
 confirmSurrenderBtn.addEventListener("click", confirmSurrender);
-cancelSurrenderBtn.addEventListener("click", hideSurrenderPrompt);
-saveSettingsBtn.addEventListener("click", () => showSection("lobby"));
+cancelSurrenderBtn.addEventListener("click",  hideSurrenderPrompt);
+saveSettingsBtn.addEventListener("click",     () => showSection("lobby"));
 
-sfxVolumeSlider.addEventListener("input", (event) => {
-    sfxVolume = Number(event.target.value) / 100;
-    updateAudioUI();
-});
+sfxVolumeSlider.addEventListener("input", (e) => { sfxVolume = Number(e.target.value) / 100; updateAudioUI(); });
+bgmVolumeSlider.addEventListener("input", (e) => { bgmVolume = Number(e.target.value) / 100; updateAudioUI(); });
 
-bgmVolumeSlider.addEventListener("input", (event) => {
-    bgmVolume = Number(event.target.value) / 100;
-    updateAudioUI();
-});
-
-customBgmInput.addEventListener("change", (event) => {
-    const file = event.target.files && event.target.files[0];
+customBgmInput.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
-
-    if (customBgmUrl) {
-        URL.revokeObjectURL(customBgmUrl);
-    }
-
+    if (customBgmUrl) URL.revokeObjectURL(customBgmUrl);
     customBgmUrl = URL.createObjectURL(file);
     bgmAudio.src = customBgmUrl;
     startBgmIfAvailable();
     playUiSound("confirm");
 });
 
-lightModeBtn.addEventListener("click", () => {
-    currentTheme = "light";
-    updateThemeUI();
-    playUiSound("tap");
-});
-
-darkModeBtn.addEventListener("click", () => {
-    currentTheme = "dark";
-    updateThemeUI();
-    playUiSound("tap");
-});
+lightModeBtn.addEventListener("click", () => { currentTheme = "light"; updateThemeUI(); playUiSound("tap"); });
+darkModeBtn.addEventListener("click",  () => { currentTheme = "dark";  updateThemeUI(); playUiSound("tap"); });
 
 [
-    startGameBtn,
-    openSelectionBtn,
-    openSettingsBtn,
-    closeSelectionBtn,
-    closeSettingsBtn,
-    confirmSelectionBtn,
-    nextBtn,
-    prevBtn,
-    rematchBtn,
-    saveSettingsBtn,
-    confirmSurrenderBtn,
-    cancelSurrenderBtn,
-    lightModeBtn,
-    darkModeBtn,
-    backToLobbyBtn
-].forEach((button) => bindButtonSound(button, button === confirmSurrenderBtn || button === rematchBtn || button === saveSettingsBtn ? "confirm" : "tap"));
+    startGameBtn, openSelectionBtn, openSettingsBtn, closeSelectionBtn,
+    closeSettingsBtn, confirmSelectionBtn, nextBtn, prevBtn, rematchBtn,
+    saveSettingsBtn, confirmSurrenderBtn, cancelSurrenderBtn,
+    lightModeBtn, darkModeBtn, backToLobbyBtn
+].forEach((button) => bindButtonSound(button,
+    button === confirmSurrenderBtn || button === rematchBtn || button === saveSettingsBtn ? "confirm" : "tap"
+));
 
 document.querySelectorAll(".action-btn, .surrender-btn").forEach((button) => bindButtonSound(button, "tap"));
-
 document.addEventListener("pointerdown", () => ensureAudioContext(), { once: true });
 window.addEventListener("resize", syncViewportHeight);
 window.addEventListener("orientationchange", syncViewportHeight);
