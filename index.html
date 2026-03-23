@@ -67,7 +67,8 @@
         #lobby,
         #selection,
         #settings,
-        #in-game {
+        #in-game,
+        #loading {
             display: none;
             position: relative;
             width: 100%;
@@ -77,8 +78,79 @@
         #lobby.show,
         #selection.show,
         #settings.show,
-        #in-game.show {
+        #in-game.show,
+        #loading.show {
             display: block;
+        }
+
+        #loading {
+            background:
+                radial-gradient(circle at top, rgba(0, 210, 255, 0.18), transparent 32%),
+                radial-gradient(circle at bottom, rgba(255, 77, 77, 0.12), transparent 24%),
+                linear-gradient(180deg, #02040a 0%, #05070d 48%, #010103 100%);
+        }
+
+        .loading-shell {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            padding: 40px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 18px;
+            text-align: center;
+        }
+
+        .loading-kicker {
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .loading-title {
+            margin: 0;
+            font-family: "Cinzel", serif;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        .loading-copy {
+            margin: 0 auto;
+            max-width: 280px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .loading-progress {
+            width: 100%;
+            height: 12px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.4);
+        }
+
+        .loading-progress-bar {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5, #ffd166);
+            box-shadow: 0 0 24px rgba(0, 210, 255, 0.4);
+            transition: width 180ms ease;
+        }
+
+        .loading-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.68);
+            letter-spacing: 1px;
         }
 
         .screen-video {
@@ -919,7 +991,23 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="lobby" class="show">
+        <div id="loading" class="show">
+            <div class="screen-backdrop"></div>
+            <div class="loading-shell">
+                <div class="loading-kicker">Preparing Cache</div>
+                <h1 class="loading-title">Khodam Rebellion</h1>
+                <p class="loading-copy">Video idle dan ultimate sedang disiapkan biar lobby tidak nge-lag dan battle lebih stabil.</p>
+                <div class="loading-progress" aria-hidden="true">
+                    <div id="loadingProgressBar" class="loading-progress-bar"></div>
+                </div>
+                <div class="loading-meta">
+                    <span id="loadingStatusLabel">Memuat data karakter...</span>
+                    <span id="loadingPercentLabel">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="lobby">
             <video id="lobby-bg-video" class="screen-video" autoplay muted loop playsinline preload="auto"></video>
             <div class="screen-backdrop"></div>
 
@@ -1076,7 +1164,6 @@
     let selectionInitialized = false;
     const previewVideoPool = new Map();
     const arenaImage = new Image();
-    arenaImage.src = "./arena.png";
 
     let gameCanvas;
     let gameCtx;
@@ -1096,7 +1183,17 @@
     let bgmVolume = 0.35;
     let audioContext;
     let customBgmUrl = "";
+    const cachedAssetUrls = new Map();
+    const cachedAssetPromises = new Map();
+    const loadingState = {
+        total: 0,
+        loaded: 0
+    };
 
+    const loadingScreen = document.getElementById("loading");
+    const loadingProgressBar = document.getElementById("loadingProgressBar");
+    const loadingStatusLabel = document.getElementById("loadingStatusLabel");
+    const loadingPercentLabel = document.getElementById("loadingPercentLabel");
     const lobbyBgVideo = document.getElementById("lobby-bg-video");
     const lobbyCharacterName = document.getElementById("lobby-character-name");
     const lobbyCharacterRole = document.getElementById("lobby-character-role");
@@ -1135,6 +1232,86 @@
     const darkModeBtn = document.getElementById("darkModeBtn");
     const bgmAudio = document.getElementById("bgmAudio");
 
+    function getCachedAssetUrl(path) {
+        return cachedAssetUrls.get(path) || path;
+    }
+
+    function setLoadingProgress(loaded, total, message) {
+        loadingState.loaded = loaded;
+        loadingState.total = total;
+        const percent = total > 0 ? Math.round((loaded / total) * 100) : 0;
+        loadingProgressBar.style.width = `${percent}%`;
+        loadingPercentLabel.textContent = `${percent}%`;
+        loadingStatusLabel.textContent = message;
+    }
+
+    async function cacheMediaAsset(path, label) {
+        if (!path) return path;
+
+        if (cachedAssetUrls.has(path)) {
+            loadingState.loaded += 1;
+            setLoadingProgress(loadingState.loaded, loadingState.total, label);
+            return cachedAssetUrls.get(path);
+        }
+
+        if (!cachedAssetPromises.has(path)) {
+            cachedAssetPromises.set(path, (async () => {
+                try {
+                    const response = await fetch(path, { cache: "force-cache" });
+                    if (!response.ok) {
+                        throw new Error(`Gagal memuat asset: ${path}`);
+                    }
+                    const blob = await response.blob();
+                    const objectUrl = URL.createObjectURL(blob);
+                    cachedAssetUrls.set(path, objectUrl);
+                    return objectUrl;
+                } catch (error) {
+                    console.warn(`Fallback ke asset asli untuk ${path}`, error);
+                    return path;
+                }
+            })());
+        }
+
+        try {
+            return await cachedAssetPromises.get(path);
+        } finally {
+            loadingState.loaded += 1;
+            setLoadingProgress(loadingState.loaded, loadingState.total, label);
+        }
+    }
+
+    async function preloadCharacterMedia(characterList) {
+        const assetEntries = [];
+
+        characterList.forEach((character) => {
+            if (character.preview) {
+                assetEntries.push({
+                    path: character.preview,
+                    label: `Caching preview ${character.name}...`
+                });
+            }
+            if (character.skill && character.skill.animation) {
+                assetEntries.push({
+                    path: character.skill.animation,
+                    label: `Caching ultimate ${character.name}...`
+                });
+            }
+        });
+
+        assetEntries.push({
+            path: "./arena.png",
+            label: "Caching arena..."
+        });
+
+        loadingState.total = assetEntries.length + 1;
+        loadingState.loaded = 0;
+        setLoadingProgress(0, loadingState.total, "Menyiapkan cache video...");
+
+        await Promise.all(assetEntries.map((asset) => cacheMediaAsset(asset.path, asset.label)));
+        loadingState.loaded += 1;
+        setLoadingProgress(loadingState.loaded, loadingState.total, "Semua asset siap.");
+    }
+
     function normalizeCharacter(character, index) {
         const accentPalette = ["#00d2ff", "#ff4d4d", "#ffd166", "#4dff88", "#b388ff", "#ff8fab", "#5eead4"];
         const defaultAttackByRole = {
@@ -1156,6 +1333,7 @@
 
     async function loadCharacters() {
         try {
+            setLoadingProgress(0, 1, "Memuat data karakter...");
             const response = await fetch("./characters.json", { cache: "no-store" });
             if (!response.ok) {
                 throw new Error("Gagal memuat characters.json");
@@ -1163,11 +1341,13 @@
 
             const data = await response.json();
             characters = (data.characters || []).map(normalizeCharacter);
+            await preloadCharacterMedia(characters);
         } catch (error) {
             console.error(error);
             selectionSummary.textContent = "Karakter gagal dimuat.";
             lobbyCharacterName.textContent = "Data Error";
             lobbyCharacterRole.textContent = "Periksa characters.json";
+            loadingStatusLabel.textContent = "Gagal menyiapkan asset.";
         }
 
         if (!characters.length) {
@@ -1179,9 +1359,12 @@
 
         selectedCharacterIndex = 0;
         selectionCursor = selectedCharacterIndex;
+        arenaImage.src = getCachedAssetUrl("./arena.png");
         renderLobbyPreview();
         initSelection();
         updateSelectionUI();
+        loadingScreen.classList.remove("show");
+        document.getElementById("lobby").classList.add("show");
     }
 
     function getSelectedCharacter() {
@@ -1256,7 +1439,7 @@
         }
 
         const video = document.createElement("video");
-        video.src = character.preview;
+        video.src = getCachedAssetUrl(character.preview);
         video.muted = true;
         video.loop = true;
         video.autoplay = false;
@@ -1299,7 +1482,7 @@
         if (!character) return;
 
         document.documentElement.style.setProperty("--primary-glow", character.accent);
-        lobbyBgVideo.src = character.preview;
+        lobbyBgVideo.src = getCachedAssetUrl(character.preview);
         lobbyBgVideo.muted = true;
         lobbyBgVideo.play().catch(() => {});
         lobbyCharacterName.textContent = character.name;
@@ -1377,7 +1560,7 @@
         card.style.borderColor = `${character.accent}55`;
 
         const video = document.createElement("video");
-        video.src = character.preview;
+        video.src = getCachedAssetUrl(character.preview);
         video.muted = true;
         video.loop = true;
         video.autoplay = true;
@@ -1762,7 +1945,7 @@
         }
 
         ultimateCompletion = onComplete || null;
-        ultimateVideo.src = animation;
+        ultimateVideo.src = getCachedAssetUrl(animation);
         ultimateVideo.muted = false;
         ultimateVideo.volume = bgmVolume;
         ultimateOverlay.classList.add("show");
