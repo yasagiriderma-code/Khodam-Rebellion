@@ -48,11 +48,25 @@
 
                 <footer>
                     <button id="startGameBtn" class="btn-lobby btn-start">Cari Lawan</button>
+                    <button id="startGameBtn" class="btn-lobby btn-start">Mulai Lobby</button>
                     <div class="btn-row">
                         <button id="openSelectionBtn" class="btn-lobby">Ganti Khodam</button>
                         <button id="openSettingsBtn" class="btn-lobby">Pengaturan</button>
                     </div>
                 </footer>
+
+                <div id="match-lobby" class="match-lobby-overlay" aria-hidden="true">
+                    <div class="match-lobby-shell">
+                        <h2>Lobby Pertarungan</h2>
+                        <p id="matchmakingStatus" class="matchmaking-status">Temukan pemain online atau mulai cepat.</p>
+                        <div class="match-lobby-actions">
+                            <button id="quickMatchBtn" class="btn-lobby btn-start">Mulai Cepat</button>
+                            <button id="closeMatchLobbyBtn" class="btn-lobby">Tutup Lobby</button>
+                        </div>
+                        <div id="onlinePlayersList" class="online-players-list"></div>
+                        <div id="incomingChallenges" class="incoming-challenges"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
