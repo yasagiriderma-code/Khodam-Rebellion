@@ -1445,7 +1445,7 @@
         const uses = battleState ? battleState.player.ultimateUses : 0;
         ultimateBadge.textContent = String(Math.max(0, uses));
         ultimateBadge.style.display = uses > 0 ? "flex" : "none";
-        ultimateActionBtn.disabled = uses <= 0 || !isPlayerTurn || isSwitching || Boolean(battleState && battleState.winner);
+        ultimateActionBtn.disabled = uses <= 0 || !isPlayerTurn || Boolean(battleState && battleState.winner);
     }
 
     function getPreviewVideo(character) {
