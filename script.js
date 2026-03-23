@@ -219,79 +219,96 @@ async function startMatchmaking() {
     showMatchmakingOverlay("Mencari lawan...", "Menyambungkan ke server...");
 
     try {
-        // Check for an open waiting room
+        // ── Bersihkan stale rooms dulu (waiting > 30 detik tanpa createdAt valid) ──
         const waitingRef = ref(db, "matchmaking/waiting");
         const snapshot = await get(waitingRef);
         let joined = false;
 
         if (snapshot.exists()) {
             const waitingRooms = snapshot.val();
-            // Find a room that is waiting and not ours
+            const now = Date.now();
+
             for (const [roomId, roomData] of Object.entries(waitingRooms)) {
-                if (roomData.hostId !== myPlayerId) {
-                    // Join as guest
-                    joined = true;
-                    currentRoomId = roomId;
-                    myRole = "guest";
-                    currentEnemyIndex = roomData.hostCharacterIndex;
+                // Skip room milik sendiri
+                if (roomData.hostId === myPlayerId) continue;
 
-                    // Move room from waiting to active
-                    const activeRoomData = {
-                        host: {
-                            id: roomData.hostId,
-                            characterIndex: roomData.hostCharacterIndex,
-                            ready: true
-                        },
-                        guest: {
-                            id: myPlayerId,
-                            characterIndex: selectedCharacterIndex,
-                            ready: true
-                        },
-                        turn: "host",
-                        status: "active",
-                        createdAt: roomData.createdAt
-                    };
-
-                    await set(ref(db, `rooms/${roomId}`), activeRoomData);
-                    await remove(ref(db, `matchmaking/waiting/${roomId}`));
-
-                    updateMatchmakingSub("Lawan ditemukan! Memulai battle...");
-                    await sleep(800);
-
-                    hideMatchmakingOverlay();
-                    isSearchingMatch = false;
-                    matchFound = true;
-                    startOnlineBattle(roomId, "guest");
-                    break;
+                // Skip room yang sudah terlalu lama (> 30 detik) → stale, hapus
+                const age = now - (roomData.createdAt || 0);
+                if (age > 30000) {
+                    await remove(ref(db, `matchmaking/waiting/${roomId}`)).catch(() => {});
+                    continue;
                 }
+
+                // Join sebagai guest
+                joined = true;
+                currentRoomId = roomId;
+                myRole = "guest";
+                currentEnemyIndex = roomData.hostCharacterIndex;
+
+                const activeRoomData = {
+                    host: {
+                        id: roomData.hostId,
+                        characterIndex: roomData.hostCharacterIndex,
+                        hp: characters[roomData.hostCharacterIndex]?.hp || 2000,
+                        bonusHp: 0
+                    },
+                    guest: {
+                        id: myPlayerId,
+                        characterIndex: selectedCharacterIndex,
+                        hp: characters[selectedCharacterIndex]?.hp || 2000,
+                        bonusHp: 0
+                    },
+                    turn: "host",
+                    status: "active",
+                    createdAt: roomData.createdAt
+                };
+
+                await set(ref(db, `rooms/${roomId}`), activeRoomData);
+                await remove(ref(db, `matchmaking/waiting/${roomId}`));
+
+                updateMatchmakingSub("Lawan ditemukan! Memulai battle...");
+                await sleep(800);
+
+                hideMatchmakingOverlay();
+                isSearchingMatch = false;
+                matchFound = true;
+                startOnlineBattle(roomId, "guest");
+                break;
             }
         }
 
         if (!joined) {
-            // Create a new waiting room as host
+            // Buat room baru sebagai host
             const newRoomRef = push(ref(db, "matchmaking/waiting"));
             currentRoomId = newRoomRef.key;
             myRole = "host";
 
+            // Simpan createdAt sebagai client timestamp (serverTimestamp tidak bisa dibaca saat offline)
             await set(newRoomRef, {
                 hostId: myPlayerId,
                 hostCharacterIndex: selectedCharacterIndex,
-                createdAt: serverTimestamp()
+                createdAt: Date.now()
             });
 
-            // Auto-cleanup on disconnect
+            // Auto-hapus saat disconnect
             onDisconnect(newRoomRef).remove();
 
             updateMatchmakingSub("Menunggu lawan masuk...");
 
-            // Listen for room to become active
+            // Listen untuk room aktif
             const activeRef = ref(db, `rooms/${currentRoomId}`);
+            const capturedRoomId = currentRoomId;
+
             waitingListener = onValue(activeRef, async (snap) => {
-                if (!snap.exists() || !isSearchingMatch) return;
+                if (!isSearchingMatch) return;
+                if (!snap.exists()) return;
+
                 const room = snap.val();
                 if (room && room.status === "active" && room.guest) {
-                    off(activeRef, "value", waitingListener);
+                    // Matikan listener — gunakan off() langsung dengan ref
+                    off(activeRef);
                     waitingListener = null;
+
                     currentEnemyIndex = room.guest.characterIndex;
 
                     updateMatchmakingSub("Lawan ditemukan! Memulai battle...");
@@ -300,36 +317,37 @@ async function startMatchmaking() {
                     hideMatchmakingOverlay();
                     isSearchingMatch = false;
                     matchFound = true;
-                    startOnlineBattle(currentRoomId, "host");
+                    startOnlineBattle(capturedRoomId, "host");
                 }
             });
 
-            // Timeout – fallback ke bot setelah 20 detik
+            // Timeout 20 detik → fallback bot
             setTimeout(async () => {
-                if (isSearchingMatch) {
-                    await cleanupRoom();
-                    isSearchingMatch = false;
-                    hideMatchmakingOverlay();
-                    showToast("Tidak ada lawan online. Lawan bot!");
-                    startBotGame();
-                }
+                if (!isSearchingMatch) return;
+                off(activeRef);
+                waitingListener = null;
+                await cleanupRoom();
+                isSearchingMatch = false;
+                hideMatchmakingOverlay();
+                showToast("Tidak ada lawan online. Lawan bot!");
+                startBotGame();
             }, 20000);
         }
     } catch (err) {
         console.error("Matchmaking error:", err);
         isSearchingMatch = false;
         hideMatchmakingOverlay();
-        showToast("Koneksi gagal. Lawan bot!");
+        showToast(`Koneksi gagal (${err.code || err.message}). Lawan bot!`);
         startBotGame();
     }
 }
 
 async function cancelMatchmaking() {
     isSearchingMatch = false;
-    if (waitingListener) {
-        off(ref(db, `rooms/${currentRoomId}`), "value", waitingListener);
-        waitingListener = null;
+    if (currentRoomId) {
+        off(ref(db, `rooms/${currentRoomId}`));
     }
+    waitingListener = null;
     await cleanupRoom();
     hideMatchmakingOverlay();
     showSection("lobby");
@@ -359,8 +377,9 @@ function startOnlineBattle(roomId, role) {
 
 function listenToRoom() {
     if (!currentRoomId) return;
-    if (roomRef && roomListener) {
-        off(roomRef, "value", roomListener);
+    if (roomRef) {
+        off(roomRef);
+        roomListener = null;
     }
 
     roomRef = ref(db, `rooms/${currentRoomId}`);
@@ -960,8 +979,8 @@ function showSection(sectionId) {
         syncInGamePreviewVideos(false);
     } else if (sectionId === "lobby") {
         // Detach any room listener if coming back
-        if (roomRef && roomListener) {
-            off(roomRef, "value", roomListener);
+        if (roomRef) {
+            off(roomRef);
             roomListener = null;
         }
         matchFound = false;
@@ -1176,8 +1195,8 @@ function finishBattle(winner) {
     updateUltimateButton();
 
     // Cleanup room listener
-    if (roomRef && roomListener) {
-        off(roomRef, "value", roomListener);
+    if (roomRef) {
+        off(roomRef);
         roomListener = null;
     }
 
