@@ -395,7 +395,7 @@ function updateBgmVol(){
 }
 
 function handleBgmFile(file){
-  if(!file)return;
+  if(!file || !file.name)return;
   if(bgmBlobUrl)URL.revokeObjectURL(bgmBlobUrl);
   bgmBlobUrl=URL.createObjectURL(file);
   if(!bgmAudio)bgmAudio=new Audio();
@@ -410,6 +410,7 @@ function handleBgmFile(file){
 function handleBgmDrop(e){
   e.preventDefault();
   document.getElementById('upload-area').classList.remove('dragover');
+  if(!e.dataTransfer || !e.dataTransfer.files || e.dataTransfer.files.length === 0) return;
   var f=e.dataTransfer.files[0];
   if(f&&f.type.startsWith('audio'))handleBgmFile(f);
 }
@@ -1076,7 +1077,7 @@ document.addEventListener('click',function(e){
 });
 
 handleBgmFile=function(file){
-  if(!file)return;
+  if(!file || !file.name)return;
   bgmFileName=file.name;
   if(bgmBlobUrl)URL.revokeObjectURL(bgmBlobUrl);
   bgmBlobUrl=URL.createObjectURL(file);
