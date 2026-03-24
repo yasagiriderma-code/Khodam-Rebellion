@@ -1,237 +1,46 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Khodam Rebellion - Complete Game</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div id="game-container">
-        <div id="loading" class="show">
-            <div class="screen-backdrop"></div>
-            <div class="loading-shell">
-                <div class="loading-kicker">Preparing Cache</div>
-                <h1 class="loading-title">Khodam Rebellion</h1>
-                <p class="loading-copy">Video idle dan ultimate sedang disiapkan biar lobby tidak nge-lag dan battle lebih stabil.</p>
-                <div class="loading-progress" aria-hidden="true">
-                    <div id="loadingProgressBar" class="loading-progress-bar"></div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Khodam Rebellion</title> 
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <!-- Title Intro Page -->
+        <div class="intro">
+            <h1>Khodam <br> Rebellion</h1>
+        </div>
+
+        <!-- Unduh Konten Page -->
+        <div class="early-caching">
+            <div>
+                <h1>Mengunduh Konten</h1>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
                 </div>
-                <div class="loading-meta">
-                    <span id="loadingStatusLabel">Memuat data karakter...</span>
-                    <span id="loadingPercentLabel">0%</span>
-                </div>
+                <h1><span id="progress-text">0</span>%</h1>
             </div>
         </div>
 
-        <div id="lobby">
-            <video id="lobby-bg-video" class="screen-video" autoplay muted loop playsinline preload="auto"></video>
-            <div class="screen-backdrop"></div>
-
-            <div class="screen-content">
-                <header>
-                    <div class="title-row">
-                        <h1 class="title">KHODAM</h1>
-                        <h1 class="title">REBELLION</h1>
-                    </div>
-                </header>
-
-                <div class="character-preview">
-                    <div class="aura"></div>
-                    <div class="lobby-preview-meta">
-                        <label for="playerNameInput" class="player-name-label">Nama Kamu</label>
-                    <input id="playerNameInput" class="player-name-input" type="text" placeholder="Masukkan nama..." maxlength="20" />
-                    <h2 id="lobby-character-name" class="lobby-preview-name">Loading...</h2>
-                        <div id="lobby-character-role" class="lobby-preview-role">Memuat karakter</div>
-                    </div>
-                </div>
-
-                <footer>
-                    <button id="startGameBtn" class="btn-lobby btn-start">Cari Lawan</button>
-                    <button id="startGameBtn" class="btn-lobby btn-start">Mulai Lobby</button>
-                    <div class="btn-row">
-                        <button id="openSelectionBtn" class="btn-lobby">Ganti Khodam</button>
-                        <button id="openSettingsBtn" class="btn-lobby">Pengaturan</button>
-                    </div>
-                </footer>
-
-                <div id="match-lobby" class="match-lobby-overlay" aria-hidden="true">
-                    <div class="match-lobby-shell">
-                        <h2>Lobby Pertarungan</h2>
-                        <p id="matchmakingStatus" class="matchmaking-status">Temukan pemain online atau mulai cepat.</p>
-                        <div class="match-lobby-actions">
-                            <button id="quickMatchBtn" class="btn-lobby btn-start">Mulai Cepat</button>
-                            <button id="closeMatchLobbyBtn" class="btn-lobby">Tutup Lobby</button>
-                        </div>
-                        <div id="onlinePlayersList" class="online-players-list"></div>
-                        <div id="incomingChallenges" class="incoming-challenges"></div>
-                    </div>
-                </div>
+        <!-- Main Lobby -->
+        <div class="main-lobby">
+            <div class="main-lobby-title-overlay">
+                <h1 id="nama-khodam">Wiro Sableng</h1>
+            </div>
+            <video autoplay muted loop id="background-video-main-lobby">
+                <source src="wirosableng.mp4" type="video/mp4">
+                Error: Tidak bisa preview animasi Khodam.
+            </video>
+            <div class="input-name-overlay">
+                <input type="text" id="player-name-input" placeholder="Masukkan Namamu...">
+            </div>
+            <div class="main-lobby-tombol-overlay">
+                <button id="khodam-selection-button">👻🔄</button>
+                <button id="play-button">BERTARUNG ▶</button>
             </div>
         </div>
 
-        <div id="matchmaking">
-            <video id="matchmaking-bg-video" class="screen-video" autoplay muted loop playsinline preload="auto"></video>
-            <div class="screen-backdrop"></div>
-            <div class="matchmaking-shell">
-                <div class="matchmaking-header">
-                    <div>
-                        <div class="matchmaking-kicker">Online Lobby</div>
-                        <h1 class="matchmaking-title">Cari Lawan</h1>
-                        <p id="matchmakingStatus" class="matchmaking-status">Temukan pemain online atau mulai cepat.</p>
-                    </div>
-                    <button id="closeMatchLobbyBtn" class="close-btn matchmaking-close" aria-label="Kembali">X</button>
-                </div>
-
-                <div class="matchmaking-player-card">
-                    <div class="matchmaking-player-label">Profil Aktif</div>
-                    <div class="matchmaking-player-name-row">
-                        <strong id="matchmakingPlayerName">Pemain</strong>
-                        <span id="matchmakingCharacterName">Loading...</span>
-                    </div>
-                </div>
-
-                <div class="match-lobby-actions">
-                    <button id="quickMatchBtn" class="btn-lobby btn-start">Match Cepat</button>
-                </div>
-
-                <section class="matchmaking-panel">
-                    <div class="matchmaking-panel-head">
-                        <h2>Pemain Online</h2>
-                    </div>
-                    <div id="onlinePlayersList" class="online-players-list"></div>
-                </section>
-
-                <section class="matchmaking-panel">
-                    <div class="matchmaking-panel-head">
-                        <h2>Tantangan Masuk</h2>
-                    </div>
-                    <div id="incomingChallenges" class="incoming-challenges"></div>
-                </section>
-            </div>
-        </div>
-
-        <div id="selection">
-            <button id="closeSelectionBtn" class="close-btn" aria-label="Tutup">X</button>
-            <div class="selection-shell">
-                <div class="selection-info">
-                    <h1>PILIH KHODAM</h1>
-                    <div class="selection-subtitle" id="selection-summary">Memuat daftar karakter...</div>
-                </div>
-
-                <div class="selection-stage">
-                    <div class="selection-glow"></div>
-                    <div class="nav-buttons">
-                        <button id="prevBtn" class="arrow-btn" aria-label="Sebelumnya">&lt;</button>
-                        <button id="nextBtn" class="arrow-btn" aria-label="Berikutnya">&gt;</button>
-                    </div>
-                    <div id="selectionTrack" class="selection-track"></div>
-                </div>
-
-                <div class="selection-footer">
-                    <div class="selection-skill">
-                        <strong>Ultimate Preview</strong>
-                        <span id="selectionSkillName">Memuat skill...</span>
-                    </div>
-                    <button id="confirmSelectionBtn" class="btn-pilih">Konfirmasi Hero</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="settings">
-            <div class="screen-backdrop"></div>
-            <div class="settings-shell">
-                <div class="settings-header">
-                    <div>
-                        <h1 class="settings-title">Pengaturan</h1>
-                        <div class="settings-subtitle">Biar classy, tetap noisy, dan makin personal.</div>
-                    </div>
-                    <button id="closeSettingsBtn" class="close-btn" aria-label="Tutup">X</button>
-                </div>
-
-                <div class="settings-stack">
-                    <div class="settings-card">
-                        <h3>Audio</h3>
-                        <p>Atur volume UI, BGM, atau upload soundtrack sendiri.</p>
-                        <div class="setting-row">
-                            <label class="setting-label" for="sfxVolumeSlider">
-                                <span>Sound Effect</span>
-                                <span id="sfxVolumeValue" class="setting-value">70%</span>
-                            </label>
-                            <input id="sfxVolumeSlider" class="settings-range" type="range" min="0" max="100" value="70">
-                        </div>
-                        <div class="setting-row">
-                            <label class="setting-label" for="bgmVolumeSlider">
-                                <span>BGM</span>
-                                <span id="bgmVolumeValue" class="setting-value">35%</span>
-                            </label>
-                            <input id="bgmVolumeSlider" class="settings-range" type="range" min="0" max="100" value="35">
-                        </div>
-                        <input id="customBgmInput" class="file-input" type="file" accept="audio/*">
-                    </div>
-
-                    <div class="settings-card">
-                        <h3>Tampilan</h3>
-                        <p>Switch cepat antara dark mode dan light mode.</p>
-                        <div class="theme-toggle">
-                            <button id="lightModeBtn" class="theme-btn">Light Mode</button>
-                            <button id="darkModeBtn" class="theme-btn active">Dark Mode</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-footer">
-                    <button id="saveSettingsBtn" class="btn-lobby btn-start">Simpan & Kembali</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="in-game">
-            <div class="overlay-header">
-                <button class="surrender-btn" onclick="surrender()">X</button>
-                <div id="inGameTitle" class="overlay-title">Preparing Battle</div>
-            </div>
-
-            <div id="turnBanner" class="status-banner">Giliran Player</div>
-            <canvas id="game"></canvas>
-
-            <div class="overlay-footer">
-                <button class="action-btn attack-btn" onclick="playerAction('attack')" aria-label="Attack">ATK</button>
-                <button class="action-btn shield-btn" onclick="playerAction('shield')" aria-label="Shield">DEF</button>
-                <button id="ultimateActionBtn" class="action-btn ultimate-btn" onclick="playerAction('ultimate')" aria-label="Ultimate">
-                    <span id="ultimateBadge" class="ultimate-badge">1</span>
-                    ULT
-                </button>
-            </div>
-
-            <div id="ultimate-overlay" aria-hidden="true">
-                <video id="ultimateVideo" muted playsinline preload="auto"></video>
-            </div>
-
-            <div id="battle-result-overlay" aria-hidden="true">
-                <div class="battle-result-panel">
-                    <div class="battle-result-badge">Battle Result</div>
-                    <div id="battleResultTitle" class="battle-result-title">Victory</div>
-                    <p id="battleResultSubtitle" class="battle-result-subtitle"></p>
-                    <div class="battle-result-actions">
-                        <button id="rematchBtn" class="result-btn rematch">Main Lagi</button>
-                        <button id="backToLobbyBtn" class="result-btn back">Kembali</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="surrender-overlay" aria-hidden="true">
-                <div class="surrender-panel">
-                    <h2 class="surrender-title">Menyerah?</h2>
-                    <div class="surrender-actions">
-                        <button id="confirmSurrenderBtn" class="result-btn rematch">Ya</button>
-                        <button id="cancelSurrenderBtn" class="result-btn back">Tidak</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <audio id="bgmAudio" loop></audio>
-    <script type="module" src="script.js"></script>
-</body>
+        <script src="script.js"></script>
+    </body>
 </html>
