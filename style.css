@@ -257,9 +257,9 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     background: gold;
     display: none;
 }
-/* .gameplay.active{
+.gameplay.active{
     display: flex;
-} */
+}
 .combatant{
     position: absolute;
     top: 0;
@@ -275,7 +275,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
 .status-card{
     width: 170px;
     padding: 14px 16px 12px;
-    border-radius: 20px;
+    border-radius: 10px;
     background: rgba(0, 0, 0, 0.748);
     color: #ffffff;
     box-shadow: 0 14px 24px rgba(0, 0, 0, 0.25);
@@ -318,16 +318,6 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     background-position: center;
     object-fit: cover;
 }
-.player-art{
-    background:
-        linear-gradient(180deg, rgba(255,255,255,0.15), rgba(0,0,0,0.08)),
-        linear-gradient(135deg, #38bdf8 0%, #0f172a 100%);
-}
-.opponent-art{
-    background:
-        linear-gradient(180deg, rgba(255,255,255,0.15), rgba(0,0,0,0.08)),
-        linear-gradient(135deg, #fb7185 0%, #7f1d1d 100%);
-}
 @media (max-width: 768px){
     .combatant{
         width: 140px;
@@ -355,7 +345,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     display: flex;
     justify-content: center;
     align-items: center;
-    display: none;
+    /* display: none; */
 }
 /* .action-menu-overlay.active{
     display: flex;
@@ -383,7 +373,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    display: none;
+    /* display: none; */
 }
 /* .surrender-overlay.active{
     display: flex;
@@ -407,9 +397,53 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1000;
+    z-index: 5;
     /* display: none; */
 }
 /* .fullscreen-animation-in-game.active{
     display: block;
 } */
+.animasi-fullscreen-video{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+.skip-animation-overlay{
+    position: absolute;
+    z-index: 6;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none;
+}
+.skip-animation-button{
+    margin: 0 30px 0 auto;
+    padding: 10px 20px;
+    background: #ffffff;
+    border: 5px solid #000000;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.695);
+    border-radius: 10px;
+    font-size: 18px;
+    font-family: 'Lilita One';
+    cursor: pointer;
+}
+
+.kata2-hero-overlay{
+    color: #000000;
+    position: absolute;
+    z-index: 6;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    display: none;
+}

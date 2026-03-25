@@ -95,7 +95,7 @@
                     </div>
                 </div>
                 <div class="card-player battle-card">
-                    <video class="card-art opponent-art" autoplay muted loop>
+                    <video class="card-art" autoplay muted loop>
                         <source src="wirosableng.mp4" type="video/mp4">
                     </video>
                 </div>
@@ -109,7 +109,9 @@
                     </div>
                 </div>
                 <div class="card-opponent battle-card">
-                    <img class="card-art opponent-art" src="sipitung.png" alt="Si Pitung">
+                    <video class="card-art" autoplay muted loop>
+                        <source src="sipitung.mp4" type="video/mp4">
+                    </video>
                 </div>
             </div>
         </div>
@@ -125,9 +127,15 @@
 
         <!-- Animasi Fullscreen -->
         <div class="fullscreen-animation-in-game">
-            <video autoplay muted>
+            <video autoplay muted class="animasi-fullscreen-video">
                 <source src="wirosableng.mp4" type="video/mp4">
             </video>
+        </div>
+        <div class="skip-animation-overlay">
+            <button class="skip-animation-button">SKIP ⏭</button>
+        </div>
+        <div class="kata2-hero-overlay">
+            <p id="kata2-hero">"Dunia ini memang panggung sandiwara"</p>
         </div>
 
         <script src="script.js"></script>
