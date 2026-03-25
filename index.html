@@ -84,6 +84,52 @@
             <h1>⌛</h1>
         </div>
 
+        <!-- Gameplay -->
+        <div class="gameplay">
+            <div class="player combatant">
+                <div class="status-card-player status-card">
+                    <p class="label" id="nama-player">KAMU</p>
+                    <h2 class="name" id="player-battle-name">WIRO SABLENG</h2>
+                    <div class="hp-track">
+                        <div class="hp-fill" id="player-hp-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="card-player battle-card">
+                    <video class="card-art opponent-art" autoplay muted loop>
+                        <source src="wirosableng.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+            <div class="opponent combatant">
+                <div class="status-card-opponent status-card">
+                    <p class="label" id="nama-opponent">MUSUH</p>
+                    <h2 class="name" id="opponent-battle-name">SI PITUNG</h2>
+                    <div class="hp-track">
+                        <div class="hp-fill enemy-fill" id="opponent-hp-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div class="card-opponent battle-card">
+                    <img class="card-art opponent-art" src="sipitung.png" alt="Si Pitung">
+                </div>
+            </div>
+        </div>
+        <div class="surrender-overlay">
+            <button class="surrender-button">🏳️</button>
+        </div>
+        <div class="action-menu-overlay">
+            <button class="action-button">🗡️</button>
+            <button class="action-button">⚔️</button>
+            <button class="action-button">💥</button>
+            <button class="action-button">🛡️</button>
+        </div>
+
+        <!-- Animasi Fullscreen -->
+        <div class="fullscreen-animation-in-game">
+            <video autoplay muted>
+                <source src="wirosableng.mp4" type="video/mp4">
+            </video>
+        </div>
+
         <script src="script.js"></script>
     </body>
 </html>
