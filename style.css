@@ -54,7 +54,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     color: #000000;
     height: 100vh;
     font-size: 20px;
-    display: none;
+    /* display: none; */
 }
 .main-lobby-title-overlay{
     position: absolute;
@@ -257,9 +257,9 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     background: gold;
     display: none;
 }
-.gameplay.active{
+/* .gameplay.active{
     display: flex;
-}
+} */
 .combatant{
     position: absolute;
     top: 0;
@@ -345,7 +345,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     display: flex;
     justify-content: center;
     align-items: center;
-    /* display: none; */
+    display: none;
 }
 /* .action-menu-overlay.active{
     display: flex;
@@ -373,7 +373,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    /* display: none; */
+    display: none;
 }
 /* .surrender-overlay.active{
     display: flex;
