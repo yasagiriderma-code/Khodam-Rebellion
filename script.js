@@ -27,7 +27,7 @@ function getArenaMetrics() {
 
   return {
     centerX: width / 2.1,
-    centerY: height * 0.4,
+    centerY: height * 0.35,
     radiusX: Math.min(width * 0.23, 180),
     radiusY: Math.min(height * 0.09, 78)
   };
