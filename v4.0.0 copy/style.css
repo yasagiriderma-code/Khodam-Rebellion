@@ -138,7 +138,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     background: #db3bff;
     color: #000000;
     font-size: 20px;
-    display: none;
+    /* display: none; */
 }
 .khodam-selection-title-overlay{
     position: fixed;
@@ -165,7 +165,6 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
 }
 .khodam-card{
     width: 150px;
-    height: 280px;
     margin: 10px;
     padding: 10px;
     background: #ffffff;
@@ -176,7 +175,7 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     font-family: 'Lilita One';
     cursor: pointer;
 }
-.khodam-card img{
+.khodam-card video{
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -257,9 +256,9 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     background: gold;
     display: none;
 }
-.gameplay.active{
+/* .gameplay.active{
     display: flex;
-}
+} */
 .combatant{
     position: absolute;
     top: 0;
@@ -341,23 +340,23 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 200px;
+    height: 150px;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* display: none; */
+    display: none;
 }
 /* .action-menu-overlay.active{
     display: flex;
 } */
 .action-button{
     margin: 0 5px;
-    padding: 25px;
+    padding: 20px;
     background: #2f8dff;
     border: 5px solid #000000;
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.695);
     border-radius: 50%;
-    font-size: 30px;
+    font-size: 25px;
     font-family: 'Lilita One';
     cursor: pointer;
 }
@@ -373,19 +372,19 @@ h1, h2, h3, h4, h5, h6{margin: 0; padding: 0;}
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    /* display: none; */
+    display: none;
 }
 /* .surrender-overlay.active{
     display: flex;
 } */
 .surrender-button{
     margin: 0 auto 0 30px;
-    padding: 20px;
+    padding: 15px;
     background: #ef4444;
     border: 5px solid #000000;
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.695);
     border-radius: 50%;
-    font-size: 20px;
+    font-size: 15px;
     font-family: 'Lilita One';
     cursor: pointer;
 }
