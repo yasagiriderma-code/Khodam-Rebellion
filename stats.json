@@ -1,0 +1,54 @@
+{
+    "rank":{
+        "culun"                             :"rank 1, 0 win streak     | no bonus",
+        "prajurit"                          :"rank 2, 2 win streak     | bonus 10% hp, atk, armor",
+        "ksatria"                           :"rank 3, 5 win streak     | bonus 20% hp, atk, armor",
+        "jendral"                           :"rank 4, 10 win streak    | bonus 30% hp, atk, armor",
+        "sang_juara"                        :"rank 5, 20 win streak    | bonus 40% hp, atk, armor",
+        "raja"                              :"rank 6, 50 win streak    | bonus 50% hp, atk, armor",
+        "kaisar_perang"                     :"rank 7, 100 win streak   | bonus 60% hp, atk, armor",
+        "raja_iblis / pahlawan"             :"rank 8, 200 win streak   | bonus 100% hp, atk, armor | pilihan gelar",
+        "legend / mythic / immortal"        :"rank 9, 500 win streak   | bonus 200% hp, atk, armor | pilihan gelar",
+        "dewa / pinnacle / zenith"          :"rank 10, 1000 win streak | bonus 500% hp, atk, armor | pilihan gelar"
+    },
+    "role":{
+        "pendekar":"hp, armor, dan serangan yang seimbang",
+        "dukun":"serangan efek, burn, poison, freeze, dll, hp dan armor rendah",
+        "raksasa":"hp dan pertahanan tinggi dengan serangan yang rendah",
+        "pawang":"atk rendah, hp armor sedang, summon menyerang tiap turn damage tambahan",
+        "jagal":"glass cannon, hp dan armor sangat rendah dengan atk sangat tinggi"
+    },
+    "khodam":{
+        "banaspati":{
+            "preview":"animation/banaspati/banaspati.mp4",
+            "role":"dukun",
+            "hp":"??",
+            "action":{
+                "attack":{
+                    "name":"bola api",
+                    "damage":"??",
+                    "preview":"none",
+                    "use":"unlimited"
+                },
+                "skill":{
+                    "name":"laser lahar",
+                    "damage":"??",
+                    "preview":"animation/banaspati/banaspati-skill.mp4",
+                    "use":"??"
+                },
+                "ultimate":{
+                    "name":"semburan magma",
+                    "damage":"??",
+                    "preview":"animation/banaspati/banaspati-ultimate.mp4",
+                    "use":"??"
+                },
+                "shield":{
+                    "name":"perisai api",
+                    "armor":"??",
+                    "preview":"none",
+                    "use":"??"
+                }
+            }
+        }
+    }
+}
