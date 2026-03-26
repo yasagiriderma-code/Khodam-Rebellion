@@ -22,15 +22,16 @@
   },
 
   "khodam": {
+
     "banaspati": {
       "preview": "animation/banaspati/banaspati.mp4",
       "role": "dukun",
-      "hp": 700,
+      "hp": 800,
       "action": {
-        "attack": { "name": "bola api", "damage": 90, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "laser lahar", "damage": 180, "preview": "animation/banaspati/banaspati-skill.mp4", "use": 3 },
-        "ultimate": { "name": "semburan magma", "damage": 320, "preview": "animation/banaspati/banaspati-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perisai api", "armor": 60, "preview": "none", "use": 2 }
+        "attack": { "name": "bola api", "damage": 95, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "laser lahar", "damage": 210, "preview": "animation/banaspati/banaspati-skill.mp4", "use": 3 },
+        "ultimate": { "name": "semburan magma", "damage": 360, "preview": "animation/banaspati/banaspati-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai api", "armor": 120, "preview": "none", "use": 2 }
       }
     },
 
@@ -39,46 +40,46 @@
       "role": "pendekar",
       "hp": 1000,
       "action": {
-        "attack": { "name": "tubrukan bebek", "damage": 100, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "mode tank + meriam", "damage": 200, "preview": "animation/bebekturbo/bebekturbo-skill.mp4", "use": 3 },
-        "ultimate": { "name": "mode mecha laser", "damage": 350, "preview": "animation/bebekturbo/bebekturbo-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perisai energi", "armor": 120, "preview": "none", "use": 2 }
+        "attack": { "name": "tubrukan bebek", "damage": 110, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "mode tank + meriam", "damage": 240, "preview": "animation/bebekturbo/bebekturbo-skill.mp4", "use": 3 },
+        "ultimate": { "name": "mode mecha laser", "damage": 420, "preview": "animation/bebekturbo/bebekturbo-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai energi", "armor": 160, "preview": "none", "use": 2 }
       }
     },
 
     "buto ijo": {
       "preview": "animation/butoijo/butoijo.mp4",
       "role": "raksasa",
-      "hp": 1600,
+      "hp": 1700,
       "action": {
-        "attack": { "name": "tinju kuat", "damage": 80, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "tinju bertubi-tubi", "damage": 160, "preview": "animation/butoijo/butoijo-skill.mp4", "use": 3 },
-        "ultimate": { "name": "smack down", "damage": 280, "preview": "animation/butoijo/butoijo-ultimate.mp4", "use": 1 },
-        "shield": { "name": "tubuh besi", "armor": 200, "preview": "none", "use": 3 }
+        "attack": { "name": "tinju kuat", "damage": 90, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "tinju bertubi-tubi", "damage": 200, "preview": "animation/butoijo/butoijo-skill.mp4", "use": 3 },
+        "ultimate": { "name": "smack down", "damage": 340, "preview": "animation/butoijo/butoijo-ultimate.mp4", "use": 1 },
+        "shield": { "name": "tubuh besi", "armor": 320, "preview": "none", "use": 3 }
       }
     },
 
     "gado gado": {
       "preview": "animation/gadogado/gadogado.mp4",
       "role": "anomali",
-      "hp": 500,
+      "hp": 550,
       "action": {
-        "attack": { "name": "rasanya enak", "damage": 140, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "kebanyakan saos sambal", "damage": 260, "preview": "animation/gadogado/gadogado-skill.mp4", "use": 2 },
-        "ultimate": { "name": "lempar piring brutal", "damage": 500, "preview": "animation/gadogado/gadogado-ultimate.mp4", "use": 1 },
-        "shield": { "name": "daun pisang", "armor": 40, "preview": "none", "use": 1 }
+        "attack": { "name": "rasanya enak", "damage": 150, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "kebanyakan saos sambal", "damage": 330, "preview": "animation/gadogado/gadogado-skill.mp4", "use": 2 },
+        "ultimate": { "name": "lempar piring brutal", "damage": 600, "preview": "animation/gadogado/gadogado-ultimate.mp4", "use": 1 },
+        "shield": { "name": "daun pisang", "armor": 60, "preview": "none", "use": 1 }
       }
     },
 
     "kliwon": {
       "preview": "animation/kliwon/kliwon.mp4",
       "role": "jagal",
-      "hp": 600,
+      "hp": 650,
       "action": {
-        "attack": { "name": "serangan sabit", "damage": 130, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "sabit beruntun", "damage": 240, "preview": "animation/kliwon/kliwon-skill.mp4", "use": 3 },
-        "ultimate": { "name": "putaran maut", "damage": 420, "preview": "animation/kliwon/kliwon-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perisai tengkorak", "armor": 50, "preview": "none", "use": 1 }
+        "attack": { "name": "serangan sabit", "damage": 140, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "sabit beruntun", "damage": 300, "preview": "animation/kliwon/kliwon-skill.mp4", "use": 3 },
+        "ultimate": { "name": "putaran maut", "damage": 520, "preview": "animation/kliwon/kliwon-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai tengkorak", "armor": 80, "preview": "none", "use": 1 }
       }
     },
 
@@ -87,58 +88,58 @@
       "role": "pendekar",
       "hp": 1000,
       "action": {
-        "attack": { "name": "tinju kuat", "damage": 95, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "tendangan 360", "damage": 190, "preview": "animation/kunti/kunti-skill.mp4", "use": 3 },
-        "ultimate": { "name": "combo udara", "damage": 330, "preview": "animation/kunti/kunti-ultimate.mp4", "use": 1 },
-        "shield": { "name": "kuda-kuda besi", "armor": 130, "preview": "none", "use": 2 }
+        "attack": { "name": "tinju kuat", "damage": 110, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "tendangan 360", "damage": 240, "preview": "animation/kunti/kunti-skill.mp4", "use": 3 },
+        "ultimate": { "name": "combo udara", "damage": 420, "preview": "animation/kunti/kunti-ultimate.mp4", "use": 1 },
+        "shield": { "name": "kuda-kuda besi", "armor": 160, "preview": "none", "use": 2 }
       }
     },
 
     "nenek lampir": {
       "preview": "animation/neneklampir/neneklampir.mp4",
       "role": "dukun",
-      "hp": 700,
+      "hp": 800,
       "action": {
-        "attack": { "name": "bola racun", "damage": 85, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "gas beracun", "damage": 170, "preview": "animation/neneklampir/neneklampir-skill.mp4", "use": 3 },
-        "ultimate": { "name": "ledakan racun", "damage": 300, "preview": "animation/neneklampir/neneklampir-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perisai racun", "armor": 70, "preview": "none", "use": 2 }
+        "attack": { "name": "bola racun", "damage": 90, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "gas beracun", "damage": 200, "preview": "animation/neneklampir/neneklampir-skill.mp4", "use": 3 },
+        "ultimate": { "name": "ledakan racun", "damage": 350, "preview": "animation/neneklampir/neneklampir-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai racun", "armor": 120, "preview": "none", "use": 2 }
       }
     },
 
     "ninja pocong": {
       "preview": "animation/ninjapocong/ninjapocong.mp4",
       "role": "jagal",
-      "hp": 600,
+      "hp": 650,
       "action": {
-        "attack": { "name": "tebasan katana", "damage": 135, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "tebasan cepat", "damage": 250, "preview": "animation/ninjapocong/ninjapocong-skill.mp4", "use": 3 },
-        "ultimate": { "name": "tebasan kabut", "damage": 400, "preview": "animation/ninjapocong/ninjapocong-ultimate.mp4", "use": 1 },
-        "shield": { "name": "tangkis", "armor": 40, "preview": "none", "use": 1 }
+        "attack": { "name": "tebasan katana", "damage": 145, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "tebasan cepat", "damage": 310, "preview": "animation/ninjapocong/ninjapocong-skill.mp4", "use": 3 },
+        "ultimate": { "name": "tebasan kabut", "damage": 540, "preview": "animation/ninjapocong/ninjapocong-ultimate.mp4", "use": 1 },
+        "shield": { "name": "tangkis", "armor": 80, "preview": "none", "use": 1 }
       }
     },
 
     "nyi roro kidul": {
       "preview": "animation/nyirorokidul/nyirorokidul.mp4",
       "role": "dukun",
-      "hp": 750,
+      "hp": 820,
       "action": {
-        "attack": { "name": "bola air", "damage": 95, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "gelombang air", "damage": 180, "preview": "animation/nyirorokidul/nyirorokidul-skill.mp4", "use": 3 },
-        "ultimate": { "name": "naga samudra", "damage": 320, "preview": "animation/nyirorokidul/nyirorokidul-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perisai air", "armor": 80, "preview": "none", "use": 2 }
+        "attack": { "name": "bola air", "damage": 100, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "gelombang air", "damage": 220, "preview": "animation/nyirorokidul/nyirorokidul-skill.mp4", "use": 3 },
+        "ultimate": { "name": "naga samudra", "damage": 380, "preview": "animation/nyirorokidul/nyirorokidul-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai air", "armor": 120, "preview": "none", "use": 2 }
       }
     },
 
     "siliwangi": {
       "preview": "animation/siliwangi/siliwangi.mp4",
       "role": "pawang",
-      "hp": 900,
+      "hp": 950,
       "action": {
-        "attack": { "name": "tebasan keris", "damage": 70, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "keris petir", "damage": 150, "preview": "animation/siliwangi/siliwangi-skill.mp4", "use": 3 },
-        "ultimate": { "name": "harimau putih", "damage": 260, "preview": "animation/siliwangi/siliwangi-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perlindungan harimau", "armor": 120, "preview": "none", "use": 2 }
+        "attack": { "name": "tebasan keris", "damage": 85, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "keris petir", "damage": 190, "preview": "animation/siliwangi/siliwangi-skill.mp4", "use": 3 },
+        "ultimate": { "name": "harimau putih", "damage": 320, "preview": "animation/siliwangi/siliwangi-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perlindungan harimau", "armor": 150, "preview": "none", "use": 2 }
       }
     },
 
@@ -147,10 +148,10 @@
       "role": "pendekar",
       "hp": 1000,
       "action": {
-        "attack": { "name": "tebasan golok", "damage": 105, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "silat golok", "damage": 200, "preview": "animation/sipitung/sipitung-skill.mp4", "use": 3 },
-        "ultimate": { "name": "golok terbang", "damage": 340, "preview": "animation/sipitung/sipitung-ultimate.mp4", "use": 1 },
-        "shield": { "name": "tangkis", "armor": 120, "preview": "none", "use": 2 }
+        "attack": { "name": "tebasan golok", "damage": 110, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "silat golok", "damage": 240, "preview": "animation/sipitung/sipitung-skill.mp4", "use": 3 },
+        "ultimate": { "name": "golok terbang", "damage": 420, "preview": "animation/sipitung/sipitung-ultimate.mp4", "use": 1 },
+        "shield": { "name": "tangkis", "armor": 160, "preview": "none", "use": 2 }
       }
     },
 
@@ -159,10 +160,10 @@
       "role": "pendekar",
       "hp": 950,
       "action": {
-        "attack": { "name": "tebasan berat", "damage": 110, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "tebasan cepat", "damage": 210, "preview": "animation/tuyul/tuyul-skill.mp4", "use": 3 },
-        "ultimate": { "name": "tebasan udara", "damage": 360, "preview": "animation/tuyul/tuyul-ultimate.mp4", "use": 1 },
-        "shield": { "name": "tangkisan berat", "armor": 110, "preview": "none", "use": 2 }
+        "attack": { "name": "tebasan berat", "damage": 115, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "tebasan cepat", "damage": 250, "preview": "animation/tuyul/tuyul-skill.mp4", "use": 3 },
+        "ultimate": { "name": "tebasan udara", "damage": 430, "preview": "animation/tuyul/tuyul-ultimate.mp4", "use": 1 },
+        "shield": { "name": "tangkisan berat", "armor": 160, "preview": "none", "use": 2 }
       }
     },
 
@@ -171,10 +172,10 @@
       "role": "pendekar",
       "hp": 1000,
       "action": {
-        "attack": { "name": "lempar batu", "damage": 100, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "kapak naga geni", "damage": 220, "preview": "animation/wirosableng/wirosableng-skill.mp4", "use": 3 },
-        "ultimate": { "name": "tornado kapak", "damage": 380, "preview": "animation/wirosableng/wirosableng-ultimate.mp4", "use": 1 },
-        "shield": { "name": "tekad baja", "armor": 120, "preview": "none", "use": 2 }
+        "attack": { "name": "lempar batu", "damage": 115, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "kapak naga geni", "damage": 260, "preview": "animation/wirosableng/wirosableng-skill.mp4", "use": 3 },
+        "ultimate": { "name": "tornado kapak", "damage": 460, "preview": "animation/wirosableng/wirosableng-ultimate.mp4", "use": 1 },
+        "shield": { "name": "tekad baja", "armor": 160, "preview": "none", "use": 2 }
       }
     },
 
@@ -183,11 +184,12 @@
       "role": "pendekar",
       "hp": 1000,
       "action": {
-        "attack": { "name": "tombak cahaya", "damage": 105, "preview": "none", "use": "unlimited" },
-        "skill": { "name": "laser tombak", "damage": 210, "preview": "animation/yasa/yasa-skill.mp4", "use": 3 },
-        "ultimate": { "name": "hujan tombak", "damage": 370, "preview": "animation/yasa/yasa-ultimate.mp4", "use": 1 },
-        "shield": { "name": "perisai cahaya", "armor": 130, "preview": "none", "use": 2 }
+        "attack": { "name": "tombak cahaya", "damage": 115, "preview": "none", "use": "unlimited" },
+        "skill": { "name": "laser tombak", "damage": 250, "preview": "animation/yasa/yasa-skill.mp4", "use": 3 },
+        "ultimate": { "name": "hujan tombak", "damage": 450, "preview": "animation/yasa/yasa-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai cahaya", "armor": 160, "preview": "none", "use": 2 }
       }
     }
+
   }
 }
