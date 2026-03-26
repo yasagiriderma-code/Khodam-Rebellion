@@ -1,0 +1,49 @@
+make the full (Minimum Viable Product) working game "without changing the UI and game flow".
+
+
+
+
+
+
+
+when player open the web, play intro page fade in, about 2 second fade out
+
+
+
+after that the early caching page will download required asset and code, asset from stats.json
+
+
+
+after finish downloading, player redirected to main lobby, they can input their names, and choose khodam. then play. the background play preview animation of selected khodam, the khodam name also dynamicaly match with the selection
+
+
+
+in khodam selection page, turn hardcoded khodam cards, into integrated content from stats.json, when player clicked khodam card their border 'pop' like selected UX, and "pilih" button will apear and when player click -> select the khodam and go back to main lobby, if player clicked outside the card, "pilih" button hides, only "batal" button shown that when clicked player go back to main-lobby with current khodam.
+
+
+
+in main lobby, when player clicked "bertarung" they redirected to "cari lawan" page, a loading screen about 2-3 second, then go to gameplay page.
+
+
+
+this is the most important, in gameplay page, first the stats card, when game started the player name match from input before, the enemy bot name is random, the khodam name match from selected, and HP set to 100% match each khodam unique HP, second the 4 action button, 
+
+🗡️
+
+          dagger button means attack, when clicked if none animation preview the orbit spin animation run, and  enemy lost HP with smooth animation and hit text effect based on khodam's damage, if there was animation preview, pop up fullscreen animation page that plays till done, can be skipped with button, then close, do orbit spin animation, etc.... integrated with stats.json,
+
+⚔️
+
+two sword means skill, when clicked.. same as dagger cycle but specify in skill from stats.json,
+
+💥
+
+explosion means ultimate, when clicked.... same as dagger and two sword but specify in ultimate from stats.json,
+
+🛡️
+
+shield means when clicked, player hp bar get some white armor bar based on stats.json, that become additional HP when attacked by enemy, play animations if only there has animation, third is the enemy, enemy have same cycle, can auto attack, skill, ultimate, and shield, and open the animation page if there was preview animation. fourth the win or lose pop up, <h1> victory/defeat, with 2 buttons "ulangi" for re-match or "ke lobby" to go to main lobby. last is surrender button
+
+🏳️
+
+when clicked show pop up <h1> surrender? and 2 button "ya" for yes and "tidak" for no, "ya" will lost the game and go back to main-lobby, "tidak" will continue the game
