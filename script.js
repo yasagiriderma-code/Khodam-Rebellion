@@ -122,6 +122,16 @@ function clamp(number, min, max) {
   return Math.min(Math.max(number, min), max);
 }
 
+function getHpTone(hpPercent) {
+  if (hpPercent < 30) {
+    return "is-low";
+  }
+  if (hpPercent < 60) {
+    return "is-medium";
+  }
+  return "is-high";
+}
+
 function showScreen(name) {
   Object.entries(screens).forEach(([key, element]) => {
     element.classList.toggle("screen-visible", key === name);
@@ -447,6 +457,7 @@ function syncCombatantUi(side) {
   const combatant = elements.combatants[side];
   const hpPercent = clamp((participant.hp / participant.maxHp) * 100, 0, 100);
   const armorPercent = clamp((participant.armor / participant.maxHp) * 100, 0, 100);
+  const hpTone = getHpTone(hpPercent);
 
   combatant.label.textContent = side === "player" ? (state.battle.playerName || "KAMU") : participant.displayName;
   combatant.name.textContent = toTitleCase(participant.khodamKey);
@@ -455,6 +466,8 @@ function syncCombatantUi(side) {
   combatant.armorFill.style.left = `${hpPercent}%`;
   combatant.armorFill.style.width = `${armorPercent}%`;
   combatant.meta.textContent = `${Math.ceil(participant.hp)} / ${participant.maxHp} HP${participant.armor ? ` + ${participant.armor} armor` : ""}`;
+  combatant.hpFill.classList.remove("is-high", "is-medium", "is-low");
+  combatant.hpFill.classList.add(hpTone);
 
   const preview = state.data.khodam[participant.khodamKey].preview;
   applyVideoSource(combatant.art, preview);

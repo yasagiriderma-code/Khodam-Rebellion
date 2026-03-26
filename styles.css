@@ -457,6 +457,7 @@ p {
     z-index: 2;
     left: 0;
     background: rgb(34, 197, 94);
+    transition: width 0.55s ease, left 0.55s ease, background-color 0.3s ease;
 }
 
 .hp-trail-fill {
@@ -470,16 +471,24 @@ p {
     border-left: 2px solid rgba(0, 0, 0, 0.55);
 }
 
-.enemy-fill {
-    background: rgb(239, 68, 68);
-}
-
 .enemy-trail-fill {
     background: #fbbf24;
 }
 
 .enemy-armor-fill {
     background: rgba(255, 255, 255, 0.96);
+}
+
+.hp-fill.is-high {
+    background: rgb(34, 197, 94);
+}
+
+.hp-fill.is-medium {
+    background: rgb(249, 115, 22);
+}
+
+.hp-fill.is-low {
+    background: rgb(239, 68, 68);
 }
 
 .battle-card {
