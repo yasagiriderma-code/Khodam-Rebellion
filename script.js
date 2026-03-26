@@ -104,6 +104,12 @@ const state = {
   battle: null
 };
 
+const mediaProbe = document.createElement("video");
+const mediaSupport = {
+  webm: Boolean(mediaProbe.canPlayType('video/webm; codecs="vp9,opus"') || mediaProbe.canPlayType("video/webm")),
+  mp4: Boolean(mediaProbe.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"') || mediaProbe.canPlayType("video/mp4"))
+};
+
 function delay(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
@@ -147,7 +153,9 @@ async function preloadVideo(src) {
     const video = document.createElement("video");
     video.preload = "auto";
     video.muted = true;
-    video.src = src;
+    // Simpan elemen di DOM tersembunyi supaya browser tetap cache-nya
+    video.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;";
+    document.body.appendChild(video);
 
     let settled = false;
     const finish = () => {
@@ -155,13 +163,19 @@ async function preloadVideo(src) {
         return;
       }
       settled = true;
-      video.removeAttribute("src");
-      video.load();
+      // Jangan hapus src — biarkan browser tetap pegang cache
       resolve();
     };
 
+    video.addEventListener("canplaythrough", finish, { once: true });
     video.addEventListener("loadeddata", finish, { once: true });
     video.addEventListener("error", finish, { once: true });
+
+    // Timeout fallback 8 detik supaya gak stuck
+    window.setTimeout(finish, 8000);
+
+    video.src = chooseCompatibleMedia(src);
+    video.load();
   });
 }
 
@@ -187,12 +201,20 @@ async function runEarlyCaching(data) {
 
   showScreen("cache");
 
-  for (const asset of assets) {
-    await preloadVideo(asset);
-    loaded += 1;
-    const progress = Math.round((loaded / total) * 100);
-    elements.progressFill.style.width = `${progress}%`;
-    elements.progressText.textContent = String(progress);
+  // Batch 4 video sekaligus supaya paralel tapi gak overload jaringan
+  const BATCH_SIZE = 4;
+  for (let i = 0; i < assets.length; i += BATCH_SIZE) {
+    const batch = assets.slice(i, i + BATCH_SIZE);
+    await Promise.all(
+      batch.map((asset) =>
+        preloadVideo(asset).then(() => {
+          loaded += 1;
+          const progress = Math.round((loaded / total) * 100);
+          elements.progressFill.style.width = `${progress}%`;
+          elements.progressText.textContent = String(progress);
+        })
+      )
+    );
   }
 
   if (!assets.length) {
@@ -203,15 +225,44 @@ async function runEarlyCaching(data) {
   await delay(250);
 }
 
+function buildMediaCandidates(src) {
+  if (!src) {
+    return [];
+  }
+
+  if (src.endsWith(".mp4")) {
+    return [
+      { type: "webm", src: src.replace(/\.mp4$/i, ".webm") },
+      { type: "mp4", src }
+    ];
+  }
+
+  if (src.endsWith(".webm")) {
+    return [
+      { type: "webm", src },
+      { type: "mp4", src: src.replace(/\.webm$/i, ".mp4") }
+    ];
+  }
+
+  return [{ type: "mp4", src }];
+}
+
+function chooseCompatibleMedia(src) {
+  const candidates = buildMediaCandidates(src);
+  const preferred = candidates.find((candidate) => mediaSupport[candidate.type]);
+  return preferred?.src || candidates[0]?.src || src;
+}
+
 function applyVideoSource(video, src) {
   if (!video || !src) {
     return;
   }
-  if (video.getAttribute("src") === src) {
+  const resolvedSrc = chooseCompatibleMedia(src);
+  if (video.getAttribute("src") === resolvedSrc) {
     return;
   }
   video.pause();
-  video.setAttribute("src", src);
+  video.setAttribute("src", resolvedSrc);
   video.load();
   const playPromise = video.play();
   if (playPromise?.catch) {
@@ -228,19 +279,38 @@ function renderLobbySelection() {
 function renderSelectionCards() {
   elements.selectionCards.innerHTML = "";
 
+  // Observer buat lazy-play video hanya kalau card kelihatan di layar
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const video = entry.target.querySelector("video");
+        if (!video) return;
+        if (entry.isIntersecting) {
+          const playPromise = video.play();
+          if (playPromise?.catch) playPromise.catch(() => {});
+        } else {
+          video.pause();
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
   state.khodamList.forEach((key) => {
     const khodam = state.data.khodam[key];
     const card = document.createElement("div");
     card.className = "khodam-card";
     card.dataset.khodam = key;
+    // Jangan autoplay langsung — observer yang ngatur
     card.innerHTML = `
-      <video autoplay muted loop playsinline src="${khodam.preview}"></video>
+      <video muted loop playsinline src="${chooseCompatibleMedia(khodam.preview)}"></video>
       <h2>${toTitleCase(key)}</h2>
     `;
     if (state.pendingKhodamKey === key) {
       card.classList.add("is-selected");
     }
     elements.selectionCards.appendChild(card);
+    observer.observe(card);
   });
 
   syncSelectionButtons();
