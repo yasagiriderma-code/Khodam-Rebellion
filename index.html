@@ -1,175 +1,770 @@
 <!DOCTYPE html>
 <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Khodam Rebellion</title> 
-        <link rel="stylesheet" href="styles.css">
-    </head>
-    <body>
-        <!-- Title Intro Page -->
-        <div class="intro">
-            <h1>KHODAM <br> REBELLION</h1>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Khodam Rebellion - Battle Arena</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #0a0a0a;
+            font-family: 'Lilita One', cursive;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+        
+        /* Global pages container */
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            overflow: hidden;
+        }
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 20;
+        }
+        
+        /* INTRO */
+        .intro-page {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .intro-page h1 {
+            font-size: clamp(2.5rem, 12vw, 4rem);
+            letter-spacing: 4px;
+            color: black;
+            animation: fadeScale 1.2s ease;
+        }
+        
+        /* EARLY CACHING */
+        .caching-page {
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .caching-card {
+            text-align: center;
+            padding: 2rem;
+        }
+        .progress-bar-big {
+            width: 260px;
+            height: 30px;
+            background: #111;
+            border-radius: 40px;
+            border: 4px solid black;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        .progress-fill-cache {
+            width: 0%;
+            height: 100%;
+            background: #2ecc2e;
+            transition: width 0.1s linear;
+        }
+        
+        /* MAIN LOBBY */
+        .lobby-page {
+            background: #000;
+        }
+        .lobby-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        .lobby-title {
+            position: absolute;
+            top: 12%;
+            width: 100%;
+            text-align: center;
+            z-index: 2;
+        }
+        #nama-khodam-lobby {
+            font-size: clamp(2rem, 10vw, 3.8rem);
+            color: white;
+            text-shadow: 6px 6px 0 black;
+            letter-spacing: 2px;
+        }
+        .input-area {
+            position: absolute;
+            bottom: 28%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 2;
+        }
+        #player-name-input {
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            width: 70%;
+            max-width: 320px;
+            border-radius: 60px;
+            border: 3px solid black;
+            font-family: 'Lilita One';
+            text-align: center;
+            background: rgba(255,255,240,0.95);
+        }
+        .lobby-buttons {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 2;
+        }
+        .lobby-btn {
+            font-size: 1.8rem;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 3px solid black;
+            font-family: 'Lilita One';
+            background: #ffcc44;
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+            transition: 0.07s linear;
+        }
+        .lobby-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 black;}
+        #khodam-select-btn { background: #3b82f6; color: white;}
+        #play-btn { background: #22c55e; color: white;}
+        
+        /* KHODAM SELECTION */
+        .khodam-page {
+            background: #b45eff;
+            overflow-y: auto;
+        }
+        .selection-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid black;
+            z-index: 5;
+        }
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            padding: 110px 16px 160px;
+        }
+        .khodam-card-item {
+            width: 150px;
+            background: white;
+            border-radius: 20px;
+            border: 4px solid black;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.1s linear;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+        }
+        .khodam-card-item.selected-card {
+            border: 5px solid gold;
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px #ffd966;
+        }
+        .khodam-card-item video {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            background: #1a1a1a;
+        }
+        .khodam-card-item h3 {
+            text-align: center;
+            padding: 8px;
+            font-size: 1.2rem;
+        }
+        .selection-buttons {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            background: rgba(0,0,0,0.6);
+            padding: 20px;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+        .sel-btn {
+            font-size: 1.5rem;
+            padding: 12px 30px;
+            border-radius: 60px;
+            border: 2px solid black;
+            font-family: 'Lilita One';
+            background: #ef4444;
+            color: white;
+        }
+        .sel-btn.confirm {
+            background: #22c55e;
+            display: none;
+        }
+        
+        /* CARI LAWAN */
+        .loading-page {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .loading-page h2 { font-size: 2rem; }
+        .spinner {
+            font-size: 4rem;
+            animation: spin 1s infinite linear;
+        }
+        
+        /* GAMEPLAY */
+        .gameplay-page {
+            background: radial-gradient(circle, #2c5a2a, #1a3a1a);
+            position: relative;
+            overflow: hidden;
+        }
+        .arena-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+        }
+        .combatants-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .combatant-unit {
+            position: absolute;
+            width: 160px;
+            transition: all 0.08s linear;
+            will-change: transform;
+        }
+        .status-badge {
+            background: rgba(0,0,0,0.85);
+            border-radius: 20px;
+            padding: 8px 10px;
+            color: white;
+            width: 100%;
+        }
+        .badge-name {
+            font-size: 1rem;
+        }
+        .badge-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .hp-bar-container {
+            background: #3a3a3a;
+            height: 12px;
+            border-radius: 20px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .hp-fill-bar {
+            width: 100%;
+            height: 100%;
+            background: #2ecc71;
+            transition: width 0.2s ease;
+        }
+        .enemy-fill {
+            background: #e74c3c;
+        }
+        .armor-overlay {
+            background: #c0c0c0;
+            height: 4px;
+            margin-top: 2px;
+            border-radius: 10px;
+            transition: width 0.2s;
+        }
+        .battle-card-vid {
+            width: 100%;
+            height: 220px;
+            border-radius: 20px;
+            border: 3px solid black;
+            background: #f3e5c0;
+            margin-top: 8px;
+            object-fit: cover;
+        }
+        .action-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            z-index: 30;
+            background: rgba(0,0,0,0.5);
+            padding: 12px;
+            backdrop-filter: blur(8px);
+        }
+        .action-btn {
+            font-size: 2rem;
+            background: #2c3e66;
+            border: 3px solid black;
+            border-radius: 60px;
+            padding: 12px 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #111;
+            transition: 0.05s linear;
+        }
+        .action-btn:active { transform: translateY(2px);}
+        .surrender-float {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 30;
+            background: #e63946;
+            border-radius: 60px;
+            padding: 10px 18px;
+            font-size: 1.6rem;
+            border: 2px solid black;
+            cursor: pointer;
+        }
+        .popup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            visibility: hidden;
+        }
+        .popup-card {
+            background: white;
+            padding: 30px;
+            border-radius: 40px;
+            text-align: center;
+            min-width: 260px;
+        }
+        .popup-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+        .fullscreen-anim-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+        }
+        .fullscreen-vid {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: black;
+        }
+        .skip-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            background: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            z-index: 301;
+        }
+        .hit-effect {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+            color: red;
+            text-shadow: 2px 2px white;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            z-index: 50;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0px);} 100% { opacity: 0; transform: translateY(-50px);}}
+        @keyframes fadeScale { 0% { opacity: 0; transform: scale(0.9);} 100% { opacity: 1; transform: scale(1);}}
+        @media (max-width: 550px) { .combatant-unit { width: 130px; } .battle-card-vid { height: 170px; } .action-btn { font-size: 1.5rem; padding: 8px 14px;} }
+    </style>
+</head>
+<body>
 
-        <!-- Unduh Konten Page -->
-        <div class="early-caching">
-            <div>
-                <h1>MENGUNDUH KONTEN</h1>
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <h1><span id="progress-text">0</span>%</h1>
-            </div>
-        </div>
+<!-- PAGES -->
+<div id="introPage" class="page intro-page active"><h1>KHODAM<br>REBELLION</h1></div>
+<div id="cachingPage" class="page caching-page"><div class="caching-card"><h2>MENGUNDUH KONTEN</h2><div class="progress-bar-big"><div id="cacheFill" class="progress-fill-cache"></div></div><h2 id="percentText">0%</h2></div></div>
+<div id="lobbyPage" class="page lobby-page"><video id="lobbyBgVideo" autoplay muted loop class="lobby-video"></video><div class="lobby-title"><h1 id="nama-khodam-lobby">WIRO SABLENG</h1></div><div class="input-area"><input type="text" id="player-name-input" placeholder="Ketik Nama Kamu ..."></div><div class="lobby-buttons"><button id="khodam-selection-button" class="lobby-btn">👻🔄</button><button id="play-button" class="lobby-btn">BERTARUNG ▶</button></div></div>
+<div id="khodamPage" class="page khodam-page"><div class="selection-header"><h1>Pilih Khodam</h1></div><div id="khodamCardsGrid" class="cards-grid"></div><div class="selection-buttons"><button id="cancelSelectBtn" class="sel-btn">❌ BATAL</button><button id="confirmSelectBtn" class="sel-btn confirm">✔️ PILIH</button></div></div>
+<div id="loadingPage" class="page loading-page"><h2>Mencari Lawan</h2><div class="spinner">⌛</div></div>
+<div id="gameplayPage" class="page gameplay-page"><div class="combatants-container" id="combatContainer"><div id="playerUnit" class="combatant-unit" style="left:10%; top:35%;"><div class="status-badge"><div class="badge-name" id="playerLabel">KAMU</div><div class="badge-title" id="playerNameBattle">SABLENG</div><div class="hp-bar-container"><div id="playerHpFill" class="hp-fill-bar" style="width:100%"></div></div><div id="playerArmorBar" class="armor-overlay" style="width:0%"></div></div><video id="playerCardVideo" autoplay muted loop class="battle-card-vid"></video></div><div id="opponentUnit" class="combatant-unit" style="right:10%; top:35%;"><div class="status-badge"><div class="badge-name">MUSUH</div><div class="badge-title" id="opponentNameBattle">PITUNG</div><div class="hp-bar-container"><div id="opponentHpFill" class="hp-fill-bar enemy-fill" style="width:100%"></div></div><div id="opponentArmorBar" class="armor-overlay" style="width:0%"></div></div><video id="opponentCardVideo" autoplay muted loop class="battle-card-vid"></video></div></div><div class="action-bar"><button data-action="attack" class="action-btn">🗡️</button><button data-action="skill" class="action-btn">⚔️</button><button data-action="ultimate" class="action-btn">💥</button><button data-action="shield" class="action-btn">🛡️</button></div><div id="surrenderBtn" class="surrender-float">🏳️</div></div>
 
-        <!-- Main Lobby -->
-        <div class="main-lobby">
-            <div class="main-lobby-title-overlay">
-                <h1 id="nama-khodam">WIRO SABLENG</h1>
-            </div>
-            <video autoplay muted loop id="background-video-main-lobby">
-                <source src="animation/sableng.mp4" type="video/mp4">
-                Error: Tidak bisa lihat animasi Khodam.
-            </video>
-            <div class="input-name-overlay">
-                <input type="text" id="player-name-input" placeholder="Ketik Nama Kamu . . .">
-            </div>
-            <div class="main-lobby-tombol-overlay">
-                <button id="khodam-selection-button">👻🔄</button>
-                <button id="play-button">BERTARUNG ▶</button>
-            </div>
-        </div>
+<!-- MODALS -->
+<div id="resultModal" class="popup-modal"><div class="popup-card"><h1 id="resultTitle"></h1><div class="popup-buttons"><button id="rematchBtn">ULANGI</button><button id="lobbyFromResultBtn">KE LOBBY</button></div></div></div>
+<div id="surrenderModal" class="popup-modal"><div class="popup-card"><h1>SURRENDER?</h1><div class="popup-buttons"><button id="surrenderYes">YA</button><button id="surrenderNo">TIDAK</button></div></div></div>
+<div id="fullscreenAnim" class="fullscreen-anim-layer"><video id="animVideo" class="fullscreen-vid" autoplay muted></video><button id="skipAnimBtn" class="skip-btn">SKIP ⏭</button></div>
 
-        <!-- Khodam Selection Page -->
-        <div class="khodam-selection">
-            <div class="khodam-selection-title-overlay">
-                <h1>Pilih Khodam</h1>
-            </div>
-            <div class="khodam-selection-cards">
-                <div class="khodam-card">
-                    <video src="animation/kliwon.mp4" alt="Kliwon" autoplay muted loop></video>
-                    <h2>KLIWON</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/sableng.mp4" alt="Wiro Sableng" autoplay muted loop></video>
-                    <h2>WIRO SABLENG</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/pitung.mp4" alt="Si Pitung" autoplay muted loop></video>
-                    <h2>SI PITUNG</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/pepei.mp4" alt="Ninja Pocong" autoplay muted loop></video>
-                    <h2>NINJA POCONG</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/roro.mp4" alt="Nyai Roro Kidul" autoplay muted loop></video>
-                    <h2>NYAI RORO KIDUL</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/tuyul.mp4" alt="Tuyul" autoplay muted loop></video>
-                    <h2>TUYUL</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/kujo.mp4" alt="Buto Ijo" autoplay muted loop></video>
-                    <h2>BUTO IJO</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/gadogado.mp4" alt="Gado Gado" autoplay muted loop></video>
-                    <h2>GADO GADO</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/onibaba.mp4" alt="Mak Lampir" autoplay muted loop></video>
-                    <h2>MAK LAMPIR</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/siliwangi.mp4" alt="Siliwangi" autoplay muted loop></video>
-                    <h2>SILIWANGI</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/uni.mp4" alt="Kunti" autoplay muted loop></video>
-                    <h2>KUNTI</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/bara.mp4" alt="Banaspati" autoplay muted loop></video>
-                    <h2>BANASPATI</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/bebekturbo.mp4" alt="Bebek Turbo" autoplay muted loop></video>
-                    <h2>BEBEK TURBO</h2>
-                </div>
-                <div class="khodam-card">
-                    <video src="animation/yasa.mp4" alt="Yasa" autoplay muted loop></video>
-                    <h2>YASA</h2>
-                </div>
-            </div>
-            <div class="khodam-selection-button-overlay">
-                <button class="khodam-option-button batalpilih-button"><span>❌</span><br> BATAL</button>
-                <button class="khodam-option-button pilih-button"><span>✔️</span><br> PILIH</button>
-            </div>
-        </div>
-
-        <!-- Cari Lawan Page -->
-        <div class="cari-lawan">
-            <h2>Mencari Lawan</h2>
-            <h1>⌛</h1>
-        </div>
-
-        <!-- Gameplay -->
-        <div class="gameplay">
-            <div class="player combatant">
-                <div class="status-card-player status-card">
-                    <p class="label" id="nama-player">KAMU</p>
-                    <h2 class="name" id="player-battle-name">SABLENG</h2>
-                    <div class="hp-track">
-                        <div class="hp-fill" id="player-hp-fill" style="width: 100%;"></div>
-                    </div>
-                </div>
-                <div class="card-player battle-card">
-                    <video class="card-art" autoplay muted loop>
-                        <source src="animation/sableng.mp4" type="video/mp4">
-                    </video>
-                </div>
-            </div>
-            <div class="opponent combatant">
-                <div class="status-card-opponent status-card">
-                    <p class="label" id="nama-opponent">MUSUH</p>
-                    <h2 class="name" id="opponent-battle-name">PITUNG</h2>
-                    <div class="hp-track">
-                        <div class="hp-fill enemy-fill" id="opponent-hp-fill" style="width: 100%;"></div>
-                    </div>
-                </div>
-                <div class="card-opponent battle-card">
-                    <video class="card-art" autoplay muted loop>
-                        <source src="animation/pitung.mp4" type="video/mp4">
-                    </video>
-                </div>
-            </div>
-        </div>
-        <div class="surrender-overlay">
-            <button class="surrender-button">🏳️</button>
-        </div>
-        <div class="action-menu-overlay">
-            <button class="action-button">🗡️</button>
-            <button class="action-button">⚔️</button>
-            <button class="action-button">💥</button>
-            <button class="action-button">🛡️</button>
-        </div>
-
-        <!-- Animasi Fullscreen -->
-        <div class="fullscreen-animation-in-game">
-            <video autoplay muted class="animasi-fullscreen-video">
-                <source src="animation/sableng.mp4" type="video/mp4">
-            </video>
-        </div>
-        <div class="skip-animation-overlay">
-            <button class="skip-animation-button">SKIP ⏭</button>
-        </div>
-        <div class="kata2-hero-overlay">
-            <p id="kata2-hero">"Dunia ini memang panggung sandiwara"</p>
-        </div>
-
-        <script src="script.js"></script>
-    </body>
+<script>
+    // ---------- GLOBAL STATE ----------
+    let gameData = null;            // from stats.json
+    let selectedKhodamId = "wiro sableng";
+    let selectedKhodamObj = null;
+    let playerName = "PETARUNG";
+    let currentMatch = {
+        player: { currentHp: 1000, maxHp: 1000, armor: 0, khodamId: "", khodamData: null },
+        opponent: { currentHp: 1000, maxHp: 1000, armor: 0, khodamId: "", khodamData: null }
+    };
+    let battleActive = true;
+    let isPlayerTurn = true;
+    let pendingAction = null;
+    let animationPlaying = false;
+    let opponentTimeout = null;
+    
+    // DOM elements
+    const pages = {
+        intro: document.getElementById('introPage'),
+        caching: document.getElementById('cachingPage'),
+        lobby: document.getElementById('lobbyPage'),
+        khodam: document.getElementById('khodamPage'),
+        loading: document.getElementById('loadingPage'),
+        gameplay: document.getElementById('gameplayPage')
+    };
+    function showPage(pageName) {
+        Object.keys(pages).forEach(p => pages[p].classList.remove('active'));
+        pages[pageName].classList.add('active');
+    }
+    
+    // ----- fetch & load assets ----
+    async function loadGameAssets() {
+        showPage('caching');
+        let fakeProgress = 0;
+        const interval = setInterval(() => {
+            if (fakeProgress < 90) fakeProgress += Math.floor(Math.random() * 12);
+            document.getElementById('cacheFill').style.width = fakeProgress + '%';
+            document.getElementById('percentText').innerText = fakeProgress;
+        }, 150);
+        try {
+            const res = await fetch('stats.json');
+            gameData = await res.json();
+            // preload all video previews (optional but efficient)
+            const allKhodams = Object.keys(gameData.khodam);
+            for (let k of allKhodams) {
+                const vidUrl = gameData.khodam[k].preview;
+                if(vidUrl) { const vid = document.createElement('video'); vid.src = vidUrl; vid.preload = 'metadata'; }
+            }
+            fakeProgress = 100;
+            document.getElementById('cacheFill').style.width = '100%';
+            document.getElementById('percentText').innerText = '100';
+            clearInterval(interval);
+            await new Promise(r => setTimeout(r, 400));
+            // set default khodam
+            selectedKhodamId = "wiro sableng";
+            selectedKhodamObj = gameData.khodam["wiro sableng"];
+            updateLobbyVisual();
+            showPage('lobby');
+        } catch(e) { console.warn(e); fakeProgress=100; clearInterval(interval); showPage('lobby'); }
+    }
+    
+    function updateLobbyVisual() {
+        const lobbyNameSpan = document.getElementById('nama-khodam-lobby');
+        lobbyNameSpan.innerText = selectedKhodamId.toUpperCase();
+        const videoBg = document.getElementById('lobbyBgVideo');
+        if(selectedKhodamObj?.preview) {
+            videoBg.src = selectedKhodamObj.preview;
+            videoBg.load();
+            videoBg.play().catch(e=>{});
+        }
+    }
+    
+    // khodam selection grid
+    function buildKhodamGrid() {
+        const grid = document.getElementById('khodamCardsGrid');
+        grid.innerHTML = '';
+        let selectedCardDiv = null;
+        for (const [id, data] of Object.entries(gameData.khodam)) {
+            const card = document.createElement('div');
+            card.className = 'khodam-card-item';
+            card.setAttribute('data-id', id);
+            const vid = document.createElement('video');
+            vid.src = data.preview;
+            vid.autoplay = true;
+            vid.muted = true;
+            vid.loop = true;
+            const title = document.createElement('h3');
+            title.innerText = id.toUpperCase();
+            card.appendChild(vid);
+            card.appendChild(title);
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.khodam-card-item').forEach(c => c.classList.remove('selected-card'));
+                card.classList.add('selected-card');
+                selectedCardDiv = card;
+                document.getElementById('confirmSelectBtn').style.display = 'block';
+            });
+            grid.appendChild(card);
+        }
+        document.getElementById('confirmSelectBtn').onclick = () => {
+            if(selectedCardDiv) {
+                const newId = selectedCardDiv.getAttribute('data-id');
+                selectedKhodamId = newId;
+                selectedKhodamObj = gameData.khodam[newId];
+                updateLobbyVisual();
+                showPage('lobby');
+            }
+        };
+        document.getElementById('cancelSelectBtn').onclick = () => { showPage('lobby'); };
+    }
+    
+    // helper random opponent
+    function getRandomOpponent() {
+        const keys = Object.keys(gameData.khodam);
+        const rand = keys[Math.floor(Math.random() * keys.length)];
+        return { id: rand, data: gameData.khodam[rand] };
+    }
+    
+    // Battle core
+    function startBattle() {
+        const playerKhodam = selectedKhodamObj;
+        const opp = getRandomOpponent();
+        const playerMaxHp = playerKhodam.hp;
+        const oppMaxHp = opp.data.hp;
+        currentMatch.player = {
+            currentHp: playerMaxHp, maxHp: playerMaxHp, armor: 0,
+            khodamId: selectedKhodamId, khodamData: playerKhodam
+        };
+        currentMatch.opponent = {
+            currentHp: oppMaxHp, maxHp: oppMaxHp, armor: 0,
+            khodamId: opp.id, khodamData: opp.data
+        };
+        battleActive = true;
+        isPlayerTurn = true;
+        if(opponentTimeout) clearTimeout(opponentTimeout);
+        // UI update
+        document.getElementById('playerNameBattle').innerText = playerName.toUpperCase();
+        document.getElementById('opponentNameBattle').innerText = opp.id.toUpperCase();
+        const playerVideo = document.getElementById('playerCardVideo');
+        playerVideo.src = playerKhodam.preview;
+        playerVideo.load(); playerVideo.play().catch(e=>{});
+        const oppVideo = document.getElementById('opponentCardVideo');
+        oppVideo.src = opp.data.preview;
+        oppVideo.load(); oppVideo.play().catch(e=>{});
+        refreshHealthBars();
+        showPage('gameplay');
+    }
+    
+    function refreshHealthBars() {
+        const playerPercent = (currentMatch.player.currentHp / currentMatch.player.maxHp) * 100;
+        const oppPercent = (currentMatch.opponent.currentHp / currentMatch.opponent.maxHp) * 100;
+        document.getElementById('playerHpFill').style.width = Math.max(0, playerPercent) + '%';
+        document.getElementById('opponentHpFill').style.width = Math.max(0, oppPercent) + '%';
+        const playerArmorPercent = (currentMatch.player.armor / currentMatch.player.maxHp) * 100;
+        const oppArmorPercent = (currentMatch.opponent.armor / currentMatch.opponent.maxHp) * 100;
+        document.getElementById('playerArmorBar').style.width = playerArmorPercent + '%';
+        document.getElementById('opponentArmorBar').style.width = oppArmorPercent + '%';
+    }
+    
+    function showHitEffect(targetElement, damage) {
+        const rect = targetElement.getBoundingClientRect();
+        const div = document.createElement('div');
+        div.className = 'hit-effect';
+        div.innerText = `-${damage}`;
+        div.style.left = rect.left + rect.width/2 + 'px';
+        div.style.top = rect.top + 'px';
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 600);
+    }
+    
+    async function applyDamage(target, damage, isPlayerTarget) {
+        const unit = isPlayerTarget ? currentMatch.player : currentMatch.opponent;
+        let remainingDamage = damage;
+        if(unit.armor > 0) {
+            const block = Math.min(unit.armor, remainingDamage);
+            unit.armor -= block;
+            remainingDamage -= block;
+        }
+        if(remainingDamage > 0) {
+            unit.currentHp = Math.max(0, unit.currentHp - remainingDamage);
+        }
+        refreshHealthBars();
+        const targetDiv = isPlayerTarget ? document.getElementById('playerUnit') : document.getElementById('opponentUnit');
+        showHitEffect(targetDiv, damage);
+        if(unit.currentHp <= 0) { battleActive = false; endBattle(isPlayerTarget ? "KAMU KALAH..." : "VICTORY!"); return true; }
+        return false;
+    }
+    
+    async function performAction(actor, actionType, isPlayer) {
+        if(!battleActive || animationPlaying) return false;
+        const khodam = isPlayer ? currentMatch.player.khodamData : currentMatch.opponent.khodamData;
+        const actionObj = khodam.action[actionType];
+        if(!actionObj) return false;
+        const damageVal = actionObj.damage || 0;
+        const armorVal = actionObj.armor || 0;
+        const preview = actionObj.preview !== "none" ? actionObj.preview : null;
+        // play animation if exists
+        if(preview && preview !== "none") {
+            animationPlaying = true;
+            const fullLayer = document.getElementById('fullscreenAnim');
+            const animVid = document.getElementById('animVideo');
+            animVid.src = preview;
+            animVid.load();
+            fullLayer.style.visibility = 'visible';
+            await new Promise(resolve => {
+                const onEnd = () => { animVid.removeEventListener('ended', onEnd); resolve(); };
+                animVid.addEventListener('ended', onEnd);
+                animVid.play().catch(e=>resolve());
+                document.getElementById('skipAnimBtn').onclick = () => { animVid.pause(); resolve(); };
+            });
+            fullLayer.style.visibility = 'hidden';
+            animationPlaying = false;
+        }
+        // apply effect
+        if(damageVal > 0) {
+            const isTargetPlayer = !isPlayer;
+            const targetUnit = isTargetPlayer ? currentMatch.player : currentMatch.opponent;
+            await applyDamage(targetUnit, damageVal, isTargetPlayer);
+        }
+        if(armorVal > 0) {
+            const unit = isPlayer ? currentMatch.player : currentMatch.opponent;
+            unit.armor += armorVal;
+            refreshHealthBars();
+        }
+        // spin orbit after any action
+        spinCombatants();
+        return true;
+    }
+    
+    function spinCombatants() {
+        const playerDiv = document.getElementById('playerUnit');
+        const oppDiv = document.getElementById('opponentUnit');
+        playerDiv.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+        oppDiv.style.transition = 'transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+        playerDiv.style.transform = 'rotate(2deg) translateX(-12px)';
+        oppDiv.style.transform = 'rotate(-2deg) translateX(12px)';
+        setTimeout(() => {
+            playerDiv.style.transform = '';
+            oppDiv.style.transform = '';
+        }, 220);
+    }
+    
+    async function playerAction(action) {
+        if(!battleActive || animationPlaying || !isPlayerTurn) return;
+        isPlayerTurn = false;
+        await performAction('player', action, true);
+        if(!battleActive) return;
+        // enemy turn after delay
+        if(opponentTimeout) clearTimeout(opponentTimeout);
+        opponentTimeout = setTimeout(async () => {
+            if(!battleActive) return;
+            const oppData = currentMatch.opponent.khodamData;
+            const actions = ['attack', 'skill', 'ultimate', 'shield'];
+            let chosen = 'attack';
+            const rand = Math.random();
+            if(rand < 0.15 && oppData.action.ultimate?.damage) chosen = 'ultimate';
+            else if(rand < 0.4 && oppData.action.skill?.damage) chosen = 'skill';
+            else if(rand < 0.55 && oppData.action.shield?.armor) chosen = 'shield';
+            await performAction('opponent', chosen, false);
+            if(battleActive) isPlayerTurn = true;
+            opponentTimeout = null;
+        }, 700);
+    }
+    
+    function endBattle(resultText) {
+        battleActive = false;
+        const modal = document.getElementById('resultModal');
+        document.getElementById('resultTitle').innerText = resultText;
+        modal.style.visibility = 'visible';
+    }
+    
+    // Orbital dynamic movement
+    let orbitAngle = 0;
+    function animateOrbit() {
+        const player = document.getElementById('playerUnit');
+        const opp = document.getElementById('opponentUnit');
+        const container = document.getElementById('combatContainer');
+        if(!container) return;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        const centerX = w/2.4;
+        const centerY = h*0.4;
+        const radX = Math.min(w*0.18, 140);
+        const radY = Math.min(h*0.09, 70);
+        orbitAngle += 0.008;
+        const pX = centerX + Math.cos(orbitAngle) * radX - 70;
+        const pY = centerY + Math.sin(orbitAngle) * radY;
+        const oX = centerX + Math.cos(orbitAngle + Math.PI) * radX + 20;
+        const oY = centerY + Math.sin(orbitAngle + Math.PI) * radY;
+        player.style.left = pX + 'px';
+        player.style.top = pY + 'px';
+        opp.style.left = oX + 'px';
+        opp.style.top = oY + 'px';
+        const scaleP = 0.75 + (pY / h) * 0.5;
+        const scaleO = 0.75 + (oY / h) * 0.5;
+        player.style.transform = `scale(${Math.min(1.1, scaleP)})`;
+        opp.style.transform = `scale(${Math.min(1.1, scaleO)})`;
+        requestAnimationFrame(animateOrbit);
+    }
+    
+    // event binding
+    function bindEvents() {
+        document.getElementById('khodam-selection-button').onclick = () => { buildKhodamGrid(); showPage('khodam'); };
+        document.getElementById('play-button').onclick = () => {
+            const inputName = document.getElementById('player-name-input').value.trim();
+            if(inputName) playerName = inputName;
+            else playerName = selectedKhodamId.toUpperCase();
+            showPage('loading');
+            setTimeout(() => { startBattle(); }, 2000);
+        };
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const act = btn.getAttribute('data-action');
+                if(act) playerAction(act);
+            });
+        });
+        document.getElementById('surrenderBtn').onclick = () => { document.getElementById('surrenderModal').style.visibility = 'visible'; };
+        document.getElementById('surrenderYes').onclick = () => { document.getElementById('surrenderModal').style.visibility = 'hidden'; endBattle("KAMU MENYERAH"); };
+        document.getElementById('surrenderNo').onclick = () => { document.getElementById('surrenderModal').style.visibility = 'hidden'; };
+        document.getElementById('rematchBtn').onclick = () => { document.getElementById('resultModal').style.visibility = 'hidden'; startBattle(); };
+        document.getElementById('lobbyFromResultBtn').onclick = () => { document.getElementById('resultModal').style.visibility = 'hidden'; showPage('lobby'); };
+    }
+    
+    // intro fade then caching
+    setTimeout(() => {
+        document.getElementById('introPage').style.transition = 'opacity 0.9s';
+        document.getElementById('introPage').style.opacity = '0';
+        setTimeout(() => { loadGameAssets(); }, 800);
+    }, 1800);
+    
+    bindEvents();
+    animateOrbit();
+    // prefill
+    window.addEventListener('load', () => {});
+</script>
+</body>
 </html>
