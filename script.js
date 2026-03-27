@@ -83,6 +83,10 @@ const battleQuotes = {
   shield: ["Aku tahan!", "Belum tumbang!", "Pertahanan aktif!"]
 };
 
+const khodamAssetAliases = {
+  "si pitung": "pitung"
+};
+
 const state = {
   data: null,
   khodamList: [],
@@ -162,6 +166,18 @@ function resolvePreviewMedia(src) {
   }
 
   return src.replace(/\.(mp4|webm)$/i, ".png");
+}
+
+function toAssetSlug(value) {
+  return (khodamAssetAliases[value] || value).replace(/\s+/g, "").toLowerCase();
+}
+
+function getKhodamPreviewSrc(khodamKey, previewSrc = "none") {
+  if (previewSrc && previewSrc !== "none") {
+    return resolvePreviewMedia(previewSrc);
+  }
+
+  return `asset/${toAssetSlug(khodamKey)}.png`;
 }
 
 function isVideoAsset(src) {
@@ -255,10 +271,8 @@ function queueAssetPreload(src) {
 
 function buildPreviewAssetList(data) {
   const assets = [];
-  Object.values(data.khodam).forEach((khodam) => {
-    if (khodam.preview && khodam.preview !== "none") {
-      assets.push(resolvePreviewMedia(khodam.preview));
-    }
+  Object.entries(data.khodam).forEach(([khodamKey, khodam]) => {
+    assets.push(getKhodamPreviewSrc(khodamKey, khodam.preview));
   });
   return [...new Set(assets)];
 }
@@ -346,7 +360,7 @@ function applyVideoSource(video, src) {
 function renderLobbySelection() {
   const khodam = state.data.khodam[state.selectedKhodamKey];
   elements.lobbyKhodamName.textContent = toTitleCase(state.selectedKhodamKey);
-  applyImageSource(elements.lobbyVideo, khodam.preview);
+  applyImageSource(elements.lobbyVideo, getKhodamPreviewSrc(state.selectedKhodamKey, khodam.preview));
 }
 
 function renderSelectionCards() {
@@ -359,7 +373,7 @@ function renderSelectionCards() {
     card.dataset.khodam = key;
     // Jangan autoplay langsung — observer yang ngatur
     card.innerHTML = `
-      <img src="${resolvePreviewMedia(khodam.preview)}" alt="${toTitleCase(key)}">
+      <img src="${getKhodamPreviewSrc(key, khodam.preview)}" alt="${toTitleCase(key)}">
       <h2>${toTitleCase(key)}</h2>
     `;
     if (state.pendingKhodamKey === key) {
@@ -514,7 +528,7 @@ function syncCombatantUi(side) {
   combatant.hpFill.classList.remove("is-high", "is-medium", "is-low");
   combatant.hpFill.classList.add(hpTone);
 
-  const preview = state.data.khodam[participant.khodamKey].preview;
+  const preview = getKhodamPreviewSrc(participant.khodamKey, state.data.khodam[participant.khodamKey].preview);
   applyImageSource(combatant.art, preview);
 }
 
