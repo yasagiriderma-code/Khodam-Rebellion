@@ -101,13 +101,11 @@ const state = {
   },
   battleSession: 0,
   activeAnimationResolver: null,
-  battle: null
-};
-
-const mediaProbe = document.createElement("video");
-const mediaSupport = {
-  webm: Boolean(mediaProbe.canPlayType('video/webm; codecs="vp9,opus"') || mediaProbe.canPlayType("video/webm")),
-  mp4: Boolean(mediaProbe.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"') || mediaProbe.canPlayType("video/mp4"))
+  battle: null,
+  assetCache: {
+    ready: new Set(),
+    pending: new Map()
+  }
 };
 
 function delay(ms) {
@@ -158,7 +156,23 @@ async function fetchStats() {
   return response.json();
 }
 
+function resolvePreviewMedia(src) {
+  if (!src || src === "none") {
+    return src;
+  }
+
+  return src.replace(/\.(mp4|webm)$/i, ".png");
+}
+
+function isVideoAsset(src) {
+  return /\.(mp4|webm)$/i.test(src || "");
+}
+
 async function preloadVideo(src) {
+  if (!src || src === "none") {
+    return;
+  }
+
   return new Promise((resolve) => {
     const video = document.createElement("video");
     video.preload = "auto";
@@ -189,23 +203,68 @@ async function preloadVideo(src) {
   });
 }
 
-function buildAssetList(data) {
+async function preloadImage(src) {
+  if (!src || src === "none") {
+    return;
+  }
+
+  return new Promise((resolve) => {
+    const image = new Image();
+    let settled = false;
+
+    const finish = () => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      resolve();
+    };
+
+    image.addEventListener("load", finish, { once: true });
+    image.addEventListener("error", finish, { once: true });
+    window.setTimeout(finish, 8000);
+    image.src = src;
+  });
+}
+
+function queueAssetPreload(src) {
+  if (!src || src === "none") {
+    return Promise.resolve();
+  }
+
+  const resolvedSrc = isVideoAsset(src) ? chooseCompatibleMedia(src) : resolvePreviewMedia(src);
+  if (state.assetCache.ready.has(resolvedSrc)) {
+    return Promise.resolve();
+  }
+
+  const pendingRequest = state.assetCache.pending.get(resolvedSrc);
+  if (pendingRequest) {
+    return pendingRequest;
+  }
+
+  const preloadRequest = isVideoAsset(src) ? preloadVideo(src) : preloadImage(resolvedSrc);
+
+  const request = preloadRequest.then(() => {
+    state.assetCache.ready.add(resolvedSrc);
+    state.assetCache.pending.delete(resolvedSrc);
+  });
+
+  state.assetCache.pending.set(resolvedSrc, request);
+  return request;
+}
+
+function buildPreviewAssetList(data) {
   const assets = [];
   Object.values(data.khodam).forEach((khodam) => {
     if (khodam.preview && khodam.preview !== "none") {
-      assets.push(khodam.preview);
+      assets.push(resolvePreviewMedia(khodam.preview));
     }
-    Object.values(khodam.action).forEach((action) => {
-      if (action.preview && action.preview !== "none") {
-        assets.push(action.preview);
-      }
-    });
   });
   return [...new Set(assets)];
 }
 
 async function runEarlyCaching(data) {
-  const assets = buildAssetList(data);
+  const assets = buildPreviewAssetList(data);
   const total = assets.length || 1;
   let loaded = 0;
 
@@ -217,7 +276,7 @@ async function runEarlyCaching(data) {
     const batch = assets.slice(i, i + BATCH_SIZE);
     await Promise.all(
       batch.map((asset) =>
-        preloadVideo(asset).then(() => {
+        queueAssetPreload(asset).then(() => {
           loaded += 1;
           const progress = Math.round((loaded / total) * 100);
           elements.progressFill.style.width = `${progress}%`;
@@ -241,17 +300,11 @@ function buildMediaCandidates(src) {
   }
 
   if (src.endsWith(".mp4")) {
-    return [
-      { type: "webm", src: src.replace(/\.mp4$/i, ".webm") },
-      { type: "mp4", src }
-    ];
+    return [{ type: "mp4", src }];
   }
 
   if (src.endsWith(".webm")) {
-    return [
-      { type: "webm", src },
-      { type: "mp4", src: src.replace(/\.webm$/i, ".mp4") }
-    ];
+    return [{ type: "mp4", src: src.replace(/\.webm$/i, ".mp4") }];
   }
 
   return [{ type: "mp4", src }];
@@ -259,8 +312,18 @@ function buildMediaCandidates(src) {
 
 function chooseCompatibleMedia(src) {
   const candidates = buildMediaCandidates(src);
-  const preferred = candidates.find((candidate) => mediaSupport[candidate.type]);
-  return preferred?.src || candidates[0]?.src || src;
+  return candidates[0]?.src || src;
+}
+
+function applyImageSource(image, src) {
+  if (!image || !src) {
+    return;
+  }
+  const resolvedSrc = resolvePreviewMedia(src);
+  if (image.getAttribute("src") === resolvedSrc) {
+    return;
+  }
+  image.setAttribute("src", resolvedSrc);
 }
 
 function applyVideoSource(video, src) {
@@ -283,28 +346,11 @@ function applyVideoSource(video, src) {
 function renderLobbySelection() {
   const khodam = state.data.khodam[state.selectedKhodamKey];
   elements.lobbyKhodamName.textContent = toTitleCase(state.selectedKhodamKey);
-  applyVideoSource(elements.lobbyVideo, khodam.preview);
+  applyImageSource(elements.lobbyVideo, khodam.preview);
 }
 
 function renderSelectionCards() {
   elements.selectionCards.innerHTML = "";
-
-  // Observer buat lazy-play video hanya kalau card kelihatan di layar
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const video = entry.target.querySelector("video");
-        if (!video) return;
-        if (entry.isIntersecting) {
-          const playPromise = video.play();
-          if (playPromise?.catch) playPromise.catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    },
-    { threshold: 0.1 }
-  );
 
   state.khodamList.forEach((key) => {
     const khodam = state.data.khodam[key];
@@ -313,14 +359,13 @@ function renderSelectionCards() {
     card.dataset.khodam = key;
     // Jangan autoplay langsung — observer yang ngatur
     card.innerHTML = `
-      <video muted loop playsinline src="${chooseCompatibleMedia(khodam.preview)}"></video>
+      <img src="${resolvePreviewMedia(khodam.preview)}" alt="${toTitleCase(key)}">
       <h2>${toTitleCase(key)}</h2>
     `;
     if (state.pendingKhodamKey === key) {
       card.classList.add("is-selected");
     }
     elements.selectionCards.appendChild(card);
-    observer.observe(card);
   });
 
   syncSelectionButtons();
@@ -470,7 +515,7 @@ function syncCombatantUi(side) {
   combatant.hpFill.classList.add(hpTone);
 
   const preview = state.data.khodam[participant.khodamKey].preview;
-  applyVideoSource(combatant.art, preview);
+  applyImageSource(combatant.art, preview);
 }
 
 function syncBattleUi() {
@@ -579,6 +624,42 @@ function stopFullscreenAnimation() {
   showOverlay(overlays.kata, false);
 }
 
+function getParticipantActionAssets(participant) {
+  if (!participant) {
+    return [];
+  }
+
+  return ["skill", "ultimate"]
+    .map((actionKey) => participant.actions[actionKey]?.preview)
+    .filter((src) => src && src !== "none");
+}
+
+async function warmupBattleAssets(onProgress) {
+  const assets = [
+    ...getParticipantActionAssets(state.battle?.player),
+    ...getParticipantActionAssets(state.battle?.opponent)
+  ];
+  const uniqueAssets = [...new Set(assets)];
+
+  if (!uniqueAssets.length) {
+    onProgress?.(100, 0, 0);
+    return;
+  }
+
+  let loaded = 0;
+  onProgress?.(0, loaded, uniqueAssets.length);
+
+  await Promise.all(
+    uniqueAssets.map((src) =>
+      queueAssetPreload(src).then(() => {
+        loaded += 1;
+        const progress = Math.round((loaded / uniqueAssets.length) * 100);
+        onProgress?.(progress, loaded, uniqueAssets.length);
+      })
+    )
+  );
+}
+
 function applyDamage(target, amount) {
   const armorBlocked = Math.min(target.armor, amount);
   target.armor -= armorBlocked;
@@ -630,6 +711,7 @@ async function runAction(actorSide, actionKey) {
   state.isBattleBusy = true;
   updateActionButtons();
 
+  await queueAssetPreload(action.preview);
   await playFullscreenAnimation(action.preview, action.katakata || "");
 
   if (!isBattleSessionActive(sessionId)) {
@@ -756,7 +838,6 @@ function resetOrbit() {
 function startBattleScene() {
   state.battleSession += 1;
   resetOrbit();
-  buildBattleState();
   resetBattleFeedback();
   state.turnOwner = "player";
   state.gameOver = false;
@@ -771,10 +852,15 @@ function startBattleScene() {
 }
 
 async function startMatch() {
+  buildBattleState();
   showOverlay(overlays.actionMenu, false);
   showOverlay(overlays.surrender, false);
   showScreen("search");
-  await delay(2300);
+
+  const minimumSearchDelay = delay(2300);
+  const assetWarmup = warmupBattleAssets();
+
+  await Promise.all([minimumSearchDelay, assetWarmup]);
   startBattleScene();
 }
 

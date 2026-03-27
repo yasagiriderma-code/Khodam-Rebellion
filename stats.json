@@ -71,6 +71,30 @@
       }
     },
 
+    "gundam kw": {
+      "preview": "animation/gundamkw/gundamkw.mp4",
+      "role": "raksasa",
+      "hp": 1200,
+      "action": {
+        "attack": { "name": "serangan sabit", "damage": 140, "preview": "animation/gundamkw/gundamkw-attack.mp4", "use": "unlimited" },
+        "skill": { "name": "sabit beruntun", "damage": 300, "preview": "animation/gundamkw/gundamkw-skill.mp4", "use": 3 },
+        "ultimate": { "name": "putaran maut", "damage": 520, "preview": "animation/gundamkw/gundamkw-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai tengkorak", "armor": 80, "preview": "animation/gundamkw/gundamkw-defend.mp4", "use": 1 }
+      }
+    },
+
+    "hanoman": {
+      "preview": "animation/hanoman/hanoman.mp4",
+      "role": "raksasa",
+      "hp": 1200,
+      "action": {
+        "attack": { "name": "serangan sabit", "damage": 140, "preview": "animation/hanoman/hanoman-attack.mp4", "use": "unlimited" },
+        "skill": { "name": "sabit beruntun", "damage": 300, "preview": "animation/hanoman/hanoman-skill.mp4", "use": 3 },
+        "ultimate": { "name": "putaran maut", "damage": 520, "preview": "animation/hanoman/hanoman-ultimate.mp4", "use": 1 },
+        "shield": { "name": "perisai tengkorak", "armor": 80, "preview": "animation/hanoman/hanoman-defend.mp4", "use": 1 }
+      }
+    },
+
     "kliwon": {
       "preview": "animation/kliwon/kliwon.mp4",
       "role": "jagal",
