@@ -25,7 +25,7 @@
             <div class="main-lobby-title-overlay">
                 <h1 id="nama-khodam">WIRO SABLENG</h1>
             </div>
-            <img id="background-video-main-lobby" src="animation/wirosableng/wirosableng.png" alt="Preview Khodam">
+            <img id="background-video-main-lobby" src="asset/wirosableng.png" alt="Preview Khodam">
             <div class="input-name-overlay">
                 <input type="text" id="player-name-input" placeholder="Ketik Nama Kamu . . .">
             </div>
@@ -69,7 +69,7 @@
                     <p class="status-meta" id="player-status-meta">1000 / 1000 HP</p>
                 </div>
                 <div class="card-player battle-card">
-                    <img class="card-art" id="player-card-art" src="animation/wirosableng/wirosableng.png" alt="Kartu pemain">
+                    <img class="card-art" id="player-card-art" src="asset/wirosableng.png" alt="Kartu pemain">
                 </div>
             </div>
             <div class="opponent combatant">
@@ -84,25 +84,28 @@
                     <p class="status-meta" id="opponent-status-meta">1000 / 1000 HP</p>
                 </div>
                 <div class="card-opponent battle-card">
-                    <img class="card-art" id="opponent-card-art" src="animation/sipitung/sipitung.png" alt="Kartu lawan">
+                    <img class="card-art" id="opponent-card-art" src="asset/pitung.png" alt="Kartu lawan">
                 </div>
             </div>
         </div>
 
-        <div class="surrender-overlay">
+        <div class="surrender-overlay" hidden>
             <button class="surrender-button" id="surrender-button">🏳️</button>
         </div>
-        <div class="action-menu-overlay">
-            <button class="action-button" data-action="attack" title="Attack">🗡️</button>
-            <button class="action-button" data-action="skill" title="Skill">⚔️</button>
-            <button class="action-button" data-action="ultimate" title="Ultimate">💥</button>
-            <button class="action-button" data-action="shield" title="Shield">🛡️</button>
+        <div class="action-menu-overlay" hidden>
+            <div>
+                <button class="action-button" data-action="attack" title="Attack">ATK</button>
+                <button class="action-button" data-action="skill" title="Skill">SKILL</button>
+            </div>
+            <div>
+                <button class="action-button" data-action="ultimate" title="Ultimate">ULT</button>
+                <button class="action-button" data-action="shield" title="Shield">DEF</button>
+            </div>
+            
         </div>
 
         <div class="fullscreen-animation-in-game">
-            <video class="animasi-fullscreen-video" playsinline>
-                <source src="animation/wirosableng/wirosableng.mp4" type="video/mp4">
-            </video>
+            <video class="animasi-fullscreen-video" playsinline></video>
         </div>
         <div class="skip-animation-overlay">
             <button class="skip-animation-button">SKIP ⏭</button>

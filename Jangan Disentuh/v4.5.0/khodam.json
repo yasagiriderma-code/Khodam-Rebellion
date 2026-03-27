@@ -1,0 +1,156 @@
+{
+  "banaspati": {
+    "preview": "asset/banaspati.png",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "action": {
+      "attack": { "name": "bara gentayangan", "damage": 104, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "sabet lahar murka", "damage": 224, "preview": "none", "use": 3 },
+      "ultimate": { "name": "kiamat kobaran arwah", "damage": 452, "preview": "none", "use": 1 },
+      "shield": { "name": "selimut abu kutuk", "armor": 176, "preview": "none", "use": 3 }
+    }
+  },
+  "buto ijo": {
+    "preview": "asset/butoijo.png",
+    "hp": 1000,
+    "critical": { "chance": 28, "multiplier": 1.8 },
+    "action": {
+      "attack": { "name": "bogem raksasa", "damage": 118, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "bantingan pohon tua", "damage": 242, "preview": "none", "use": 3 },
+      "ultimate": { "name": "amukan bukit hijau", "damage": 468, "preview": "none", "use": 1 },
+      "shield": { "name": "kulit badak rawa", "armor": 188, "preview": "none", "use": 3 }
+    }
+  },
+  "garuda": {
+    "preview": "asset/garuda.png",
+    "hp": 1000,
+    "critical": { "chance": 24, "multiplier": 1.7 },
+    "action": {
+      "attack": { "name": "cakar cakrawala", "damage": 110, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "sayap badai petir", "damage": 236, "preview": "none", "use": 3 },
+      "ultimate": { "name": "turun takhta langit", "damage": 459, "preview": "none", "use": 1 },
+      "shield": { "name": "perisai bulu agung", "armor": 172, "preview": "none", "use": 3 }
+    }
+  },
+  "hanoman": {
+    "preview": "asset/hanoman.png",
+    "hp": 1000,
+    "critical": { "chance": 27, "multiplier": 1.9 },
+    "action": {
+      "attack": { "name": "tonjok ekor putih", "damage": 114, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "loncat gada angin", "damage": 245, "preview": "none", "use": 3 },
+      "ultimate": { "name": "murka anoman langit", "damage": 470, "preview": "none", "use": 1 },
+      "shield": { "name": "mantra kapha wanara", "armor": 181, "preview": "none", "use": 3 }
+    }
+  },
+  "kliwon": {
+    "preview": "asset/kliwon.png",
+    "hp": 1000,
+    "critical": { "chance": 21, "multiplier": 1.5 },
+    "action": {
+      "attack": { "name": "sentuh malam pahing", "damage": 92, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "bisik kalender gaib", "damage": 208, "preview": "none", "use": 3 },
+      "ultimate": { "name": "gerhana satu suro", "damage": 438, "preview": "none", "use": 1 },
+      "shield": { "name": "lingkar weton pekat", "armor": 165, "preview": "none", "use": 3 }
+    }
+  },
+  "kuntilanak": {
+    "preview": "asset/kuntilanak.png",
+    "hp": 1000,
+    "critical": { "chance": 26, "multiplier": 1.8 },
+    "action": {
+      "attack": { "name": "silet tawa malam", "damage": 108, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "jerit jendela hujan", "damage": 231, "preview": "none", "use": 3 },
+      "ultimate": { "name": "ratapan pengantin arwah", "damage": 463, "preview": "none", "use": 1 },
+      "shield": { "name": "selendang kabut duka", "armor": 174, "preview": "none", "use": 3 }
+    }
+  },
+  "nenek lampir": {
+    "preview": "asset/neneklampir.png",
+    "hp": 1000,
+    "critical": { "chance": 29, "multiplier": 2.0 },
+    "action": {
+      "attack": { "name": "kuku lampir tajam", "damage": 116, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "hembus santet renta", "damage": 248, "preview": "none", "use": 3 },
+      "ultimate": { "name": "tertawa pemutus nyawa", "damage": 469, "preview": "none", "use": 1 },
+      "shield": { "name": "selubung keriput gaib", "armor": 186, "preview": "none", "use": 3 }
+    }
+  },
+  "ninja pocong": {
+    "preview": "asset/ninjapocong.png",
+    "hp": 1000,
+    "critical": { "chance": 23, "multiplier": 1.6 },
+    "action": {
+      "attack": { "name": "tendang lilit kafan", "damage": 102, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "shuriken kain kubur", "damage": 220, "preview": "none", "use": 3 },
+      "ultimate": { "name": "seribu lompatan makam", "damage": 447, "preview": "none", "use": 1 },
+      "shield": { "name": "simpul kafan rapat", "armor": 169, "preview": "none", "use": 3 }
+    }
+  },
+  "nyi roro kidul": {
+    "preview": "asset/nyirorokidul.png",
+    "hp": 1000,
+    "critical": { "chance": 30, "multiplier": 2.0 },
+    "action": {
+      "attack": { "name": "ciprat ombak hijau", "damage": 120, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "peluk arus selatan", "damage": 250, "preview": "none", "use": 3 },
+      "ultimate": { "name": "mahkota tsunami kidul", "damage": 470, "preview": "none", "use": 1 },
+      "shield": { "name": "dinding pasang ratu", "armor": 190, "preview": "none", "use": 3 }
+    }
+  },
+  "pitung": {
+    "preview": "asset/pitung.png",
+    "hp": 1000,
+    "critical": { "chance": 25, "multiplier": 1.7 },
+    "action": {
+      "attack": { "name": "gebuk golok rawa", "damage": 106, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "langkah silat petir", "damage": 228, "preview": "none", "use": 3 },
+      "ultimate": { "name": "amuk jagoan betawi", "damage": 454, "preview": "none", "use": 1 },
+      "shield": { "name": "kuda-kuda jawara", "armor": 177, "preview": "none", "use": 3 }
+    }
+  },
+  "siliwangi": {
+    "preview": "asset/siliwangi.png",
+    "hp": 1000,
+    "critical": { "chance": 24, "multiplier": 1.8 },
+    "action": {
+      "attack": { "name": "tebas harimau senja", "damage": 112, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "auman tanah pajajaran", "damage": 239, "preview": "none", "use": 3 },
+      "ultimate": { "name": "pralaya raja siliwangi", "damage": 461, "preview": "none", "use": 1 },
+      "shield": { "name": "tameng mahkota sunda", "armor": 183, "preview": "none", "use": 3 }
+    }
+  },
+  "tuyul": {
+    "preview": "asset/tuyul.png",
+    "hp": 1000,
+    "critical": { "chance": 20, "multiplier": 1.5 },
+    "action": {
+      "attack": { "name": "colek receh gaib", "damage": 90, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "curi dompet bayangan", "damage": 200, "preview": "none", "use": 3 },
+      "ultimate": { "name": "rampokan satu kampung", "damage": 435, "preview": "none", "use": 1 },
+      "shield": { "name": "kantong ghaib tebal", "armor": 160, "preview": "none", "use": 3 }
+    }
+  },
+  "wiro sableng": {
+    "preview": "asset/wirosableng.png",
+    "hp": 1000,
+    "critical": { "chance": 27, "multiplier": 1.9 },
+    "action": {
+      "attack": { "name": "kapak naga miring", "damage": 117, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "pukulan matahari gila", "damage": 244, "preview": "none", "use": 3 },
+      "ultimate": { "name": "amukan pendekar 212", "damage": 467, "preview": "none", "use": 1 },
+      "shield": { "name": "jurus tahan banting sableng", "armor": 184, "preview": "none", "use": 3 }
+    }
+  },
+  "admin": {
+    "preview": "asset/admin.png",
+    "hp": 1000,
+    "critical": { "chance": 30, "multiplier": 2.0 },
+    "action": {
+      "attack": { "name": "ban hammer ringan", "damage": 119, "preview": "none", "use": "unlimited" },
+      "skill": { "name": "debug neraka", "damage": 249, "preview": "none", "use": 3 },
+      "ultimate": { "name": "reset semesta server", "damage": 470, "preview": "none", "use": 1 },
+      "shield": { "name": "akses root abadi", "armor": 189, "preview": "none", "use": 3 }
+    }
+  }
+}

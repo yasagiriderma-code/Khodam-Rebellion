@@ -13,6 +13,10 @@
     box-sizing: inherit;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -597,13 +601,44 @@ p {
     align-items: center;
     padding: 20px 10px calc(20px + env(safe-area-inset-bottom, 0px));
     gap: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.action-menu-overlay > div {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .action-button {
-    padding: 20px;
+    position: relative;
+    width: 160px;
+    padding: 10px;
     background: #2f8dff;
-    border-radius: 50%;
-    font-size: 25px;
+    font-size: 18px;
+}
+
+.action-button-label {
+    display: inline-block;
+}
+
+.action-button-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 }
 
 .action-button:disabled {
@@ -718,6 +753,14 @@ p {
     flex-wrap: wrap;
 }
 
+.modal-actions #modal-cancel {
+    order: 1;
+}
+
+.modal-actions #modal-confirm {
+    order: 2;
+}
+
 .modal-button {
     padding: 14px 20px;
     border-radius: 18px;
@@ -727,6 +770,10 @@ p {
 
 .modal-button.danger {
     background: #ef4444;
+}
+
+.modal-button.success {
+    background: #22c55e;
 }
 
 @media (max-width: 768px) {

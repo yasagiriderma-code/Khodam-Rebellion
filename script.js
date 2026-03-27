@@ -73,7 +73,11 @@ const actionMeta = {
 };
 
 const botNames = [
-  "JOKO", "SATRIA", "BAGAS", "RANGGA", "RIZAL", "DANU", "ALDO", "FAJAR", "ARIEF", "GILANG", "HENDRA", "ILHAM", "KURNIAWAN", "LUKMAN", "MULYADI", "NUGROHO", "PRATAMA", "RAMADHAN", "SANTOSO", "TAMBAK", "YUDHA"
+  "⋆༺𓆩☠︎︎𓆪༻⋆", "꧁⎝ 𓆩༺✧༻𓆪 ⎠꧂", "「 ✦ Bagas ✦ 」", "𝗥⟐𝗕𝗟◘𝗫", "ᡕᠵデᡁ᠊╾━", "꧁𓊈𒆜DANU𒆜𓊉꧂", "A for Aldo", 
+  "𝔾𝕆𝕆𝔻 𝔹𝕆𝕐", "▀▄▀▄▀▄ P BALAP", "💪 Setrongmen", "🦸‍♂️ Hero", "Yudi", "Zulfi", "MEIMEI_CANTIQ", "𝄞𝄢", "H.U.G.O",
+  "・✿ Shera", "🐸", "𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦🅾", "Aji", "y4ntiEeee", "ZACK", "ζ͜͡𝕲𝖍𝖔𝖘𝖙", "𝖀𝖈𝖍𝖎𝖍𝖆 𝕺𝖇𝖎𝖙𝖔", "𝐵𝑜𝑟𝑛 𝑡𝑜 𝑑𝑖𝑒.", "(๑-﹏-๑)",
+  "Alex", "Rizky", "Fajar", "Dimas", "Raka", "Bayu", "Ilham", "Agus", "Eko", "Budi", "Charlie", "Dewi", "Eka", "Feri", "Gilang", "Hendra", "Indra", "Joko", "Kurniawan", "Lina",
+  "Maya", "Nina", "Oka", "Putri", "Qori", "Rani", "Sari", "Tina", "Umar", "Vina", "Wawan", "Xena", "Yusuf", "Zara"
 ];
 
 const battleQuotes = {
@@ -105,6 +109,7 @@ const state = {
   },
   battleSession: 0,
   activeAnimationResolver: null,
+  toastTimerId: null,
   battle: null,
   assetCache: {
     ready: new Set(),
@@ -139,12 +144,18 @@ function showScreen(name) {
     element.classList.toggle("screen-visible", key === name);
   });
   state.screen = name;
+
+  if (name !== "gameplay") {
+    showOverlay(overlays.actionMenu, false);
+    showOverlay(overlays.surrender, false);
+  }
 }
 
 function showOverlay(element, visible) {
   if (!element) {
     return;
   }
+  element.hidden = !visible;
   element.classList.toggle("overlay-visible", visible);
 }
 
@@ -152,12 +163,26 @@ function isBattleSessionActive(sessionId) {
   return sessionId === state.battleSession && state.screen === "gameplay";
 }
 
-async function fetchStats() {
-  const response = await fetch("stats.json", { cache: "no-store" });
+async function fetchKhodamData() {
+  const response = await fetch("khodam.json", { cache: "no-store" });
   if (!response.ok) {
-    throw new Error("Gagal membaca stats.json");
+    throw new Error("Gagal membaca khodam.json");
   }
-  return response.json();
+  const rawData = await response.json();
+  return normalizeKhodamData(rawData);
+}
+
+function normalizeKhodamData(rawData) {
+  if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
+    throw new Error("Format khodam.json tidak valid");
+  }
+
+  const source = rawData.khodam && typeof rawData.khodam === "object" ? rawData.khodam : rawData;
+  return source;
+}
+
+function getKhodamMap() {
+  return state.data || {};
 }
 
 function resolvePreviewMedia(src) {
@@ -271,7 +296,7 @@ function queueAssetPreload(src) {
 
 function buildPreviewAssetList(data) {
   const assets = [];
-  Object.entries(data.khodam).forEach(([khodamKey, khodam]) => {
+  Object.entries(data).forEach(([khodamKey, khodam]) => {
     assets.push(getKhodamPreviewSrc(khodamKey, khodam.preview));
   });
   return [...new Set(assets)];
@@ -358,7 +383,7 @@ function applyVideoSource(video, src) {
 }
 
 function renderLobbySelection() {
-  const khodam = state.data.khodam[state.selectedKhodamKey];
+  const khodam = getKhodamMap()[state.selectedKhodamKey];
   elements.lobbyKhodamName.textContent = toTitleCase(state.selectedKhodamKey);
   applyImageSource(elements.lobbyVideo, getKhodamPreviewSrc(state.selectedKhodamKey, khodam.preview));
 }
@@ -367,7 +392,7 @@ function renderSelectionCards() {
   elements.selectionCards.innerHTML = "";
 
   state.khodamList.forEach((key) => {
-    const khodam = state.data.khodam[key];
+    const khodam = getKhodamMap()[key];
     const card = document.createElement("div");
     card.className = "khodam-card";
     card.dataset.khodam = key;
@@ -494,7 +519,8 @@ function rotateOrbit() {
 }
 
 function createBattleParticipant(side, khodamKey, displayName) {
-  const khodam = state.data.khodam[khodamKey];
+  const khodam = getKhodamMap()[khodamKey];
+  const critical = khodam.critical || {};
   return {
     side,
     khodamKey,
@@ -502,6 +528,10 @@ function createBattleParticipant(side, khodamKey, displayName) {
     hp: khodam.hp,
     maxHp: khodam.hp,
     armor: 0,
+    critical: {
+      chance: Number(critical.chance) || 0,
+      multiplier: Number(critical.multiplier) || 1
+    },
     actions: {
       attack: { ...khodam.action.attack },
       skill: { ...khodam.action.skill, remaining: khodam.action.skill.use },
@@ -528,7 +558,7 @@ function syncCombatantUi(side) {
   combatant.hpFill.classList.remove("is-high", "is-medium", "is-low");
   combatant.hpFill.classList.add(hpTone);
 
-  const preview = getKhodamPreviewSrc(participant.khodamKey, state.data.khodam[participant.khodamKey].preview);
+  const preview = getKhodamPreviewSrc(participant.khodamKey, getKhodamMap()[participant.khodamKey].preview);
   applyImageSource(combatant.art, preview);
 }
 
@@ -539,6 +569,18 @@ function syncBattleUi() {
 
 function showToast(message) {
   elements.battleToast.textContent = message;
+  elements.battleToast.classList.remove("show");
+  void elements.battleToast.offsetWidth;
+  elements.battleToast.classList.add("show");
+
+  if (state.toastTimerId) {
+    window.clearTimeout(state.toastTimerId);
+  }
+
+  state.toastTimerId = window.setTimeout(() => {
+    elements.battleToast.classList.remove("show");
+    state.toastTimerId = null;
+  }, 1400);
 }
 
 function showDamageFloat(side, text) {
@@ -550,11 +592,29 @@ function showDamageFloat(side, text) {
 }
 
 function resetBattleFeedback() {
+  if (state.toastTimerId) {
+    window.clearTimeout(state.toastTimerId);
+    state.toastTimerId = null;
+  }
+
   elements.battleToast.classList.remove("show");
   Object.values(elements.combatants).forEach((combatant) => {
     combatant.float.classList.remove("show");
     combatant.float.textContent = "";
   });
+}
+
+function getActionButtonLabel(button, actionKey) {
+  const playerActionName = state.battle?.player?.actions?.[actionKey]?.name;
+  if (playerActionName) {
+    return toTitleCase(playerActionName);
+  }
+
+  if (!button.dataset.baseLabel) {
+    button.dataset.baseLabel = button.textContent.trim() || actionMeta[actionKey]?.label || actionKey.toUpperCase();
+  }
+
+  return button.dataset.baseLabel;
 }
 
 function updateActionButtons() {
@@ -564,11 +624,13 @@ function updateActionButtons() {
   elements.actionButtons.forEach((button) => {
     const actionKey = button.dataset.action;
     const actionData = player?.actions[actionKey];
-    let label = actionMeta[actionKey].icon;
-    if (typeof actionData?.remaining === "number") {
-      label += ` ${actionData.remaining}`;
-    }
-    button.textContent = label;
+    const label = getActionButtonLabel(button, actionKey);
+    const badge =
+      typeof actionData?.remaining === "number"
+        ? `<span class="action-button-badge">${actionData.remaining}</span>`
+        : "";
+
+    button.innerHTML = `<span class="action-button-label">${label}</span>${badge}`;
     button.disabled = disabled || (typeof actionData?.remaining === "number" && actionData.remaining <= 0);
   });
 }
@@ -682,6 +744,20 @@ function applyDamage(target, amount) {
   return { armorBlocked, hpDamage, total: amount };
 }
 
+function rollCritical(participant, amount) {
+  const chance = clamp(Number(participant?.critical?.chance) || 0, 0, 100);
+  const multiplier = Math.max(Number(participant?.critical?.multiplier) || 1, 1);
+  const triggered = chance > 0 && Math.random() * 100 < chance;
+  const total = triggered ? Math.max(1, Math.round(amount * multiplier)) : amount;
+
+  return {
+    triggered,
+    chance,
+    multiplier,
+    total
+  };
+}
+
 function applyShield(target, amount) {
   target.armor += amount;
   return amount;
@@ -737,8 +813,12 @@ async function runAction(actorSide, actionKey) {
     showDamageFloat(actorSide, `+${gained}`);
     syncBattleUi();
   } else {
-    const result = applyDamage(target, action.damage);
-    showDamageFloat(targetSide, `-${result.total}`);
+    const criticalHit = rollCritical(actor, action.damage);
+    const result = applyDamage(target, criticalHit.total);
+    showDamageFloat(targetSide, criticalHit.triggered ? `CRIT! -${result.total}` : `-${result.total}`);
+    if (criticalHit.triggered) {
+      showToast(`${toTitleCase(actor.khodamKey)} CRITICAL x${criticalHit.multiplier.toFixed(1)}`);
+    }
     syncBattleUi();
   }
 
@@ -778,11 +858,15 @@ async function runBotTurn() {
   await runAction("opponent", botAction);
 }
 
-function openModal({ title, description, confirmText = "YA", cancelText = "TIDAK" }) {
+function openModal({ title, description, confirmText = "YA", cancelText = "TIDAK", confirmVariant = "danger" }) {
   elements.modalTitle.textContent = title;
   elements.modalDescription.textContent = description;
   elements.modalConfirm.textContent = confirmText;
   elements.modalCancel.textContent = cancelText;
+  elements.modalConfirm.className = "modal-button";
+  if (confirmVariant) {
+    elements.modalConfirm.classList.add(confirmVariant);
+  }
   showOverlay(overlays.modal, true);
 
   return new Promise((resolve) => {
@@ -807,7 +891,8 @@ async function finishBattle(result) {
   const confirmed = await openModal({
     title: isVictory ? "VICTORY" : "DEFEAT",
     description: isVictory ? "Khodammu menang. Mau lanjut rematch?" : "Kali ini kalah. Mau coba lagi?",
-    confirmText: "ULANGI",
+    confirmText: isVictory ? "LANJUT" : "ULANGI",
+    confirmVariant: isVictory ? "success" : "danger",
     cancelText: "KE LOBBY"
   });
 
@@ -933,6 +1018,7 @@ function bindEvents() {
       title: "SURRENDER?",
       description: "Kalau menyerah, pertarungan langsung kalah.",
       confirmText: "YA",
+      confirmVariant: "danger",
       cancelText: "TIDAK"
     });
 
@@ -965,10 +1051,10 @@ async function runIntro() {
 async function init() {
   bindEvents();
   await runIntro();
-  state.data = await fetchStats();
-  state.khodamList = Object.keys(state.data.khodam);
+  state.data = await fetchKhodamData();
+  state.khodamList = Object.keys(getKhodamMap());
 
-  if (!state.data.khodam[state.selectedKhodamKey]) {
+  if (!getKhodamMap()[state.selectedKhodamKey]) {
     state.selectedKhodamKey = state.khodamList[0];
   }
 
