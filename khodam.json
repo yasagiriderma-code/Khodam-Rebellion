@@ -1,19 +1,19 @@
 {
   "bara": {
-    "preview": "asset/banaspati.png",
+    "preview": "asset/banaspati/banaspati.png",
     "hp": 1000,
     "critical": { "chance": 22, "multiplier": 1.6 },
     "effect":"burn",
     "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "bola api", "damage": 104, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "ledakan tengkorak", "damage": 224, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "laser lava", "damage": 452, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "ledakan tengkorak", "damage": 224, "preview": "asset/banaspati/banaspati-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "laser lava", "damage": 452, "preview": "asset/banaspati/banaspati-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "perisai magma", "armor": 176, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
   "buto ijo": {
-    "preview": "asset/butoijo.png",
+    "preview": "asset/butoijo/butoijo.png",
     "hp": 1180,
     "critical": { "chance": 28, "multiplier": 1.8 },
     "effect":"stun",
@@ -26,7 +26,7 @@
     }
   },
   "garuda": {
-    "preview": "asset/garuda.png",
+    "preview": "asset/garuda/garuda.png",
     "hp": 1120,
     "critical": { "chance": 24, "multiplier": 1.7 },
     "effect":"slow",
@@ -39,7 +39,7 @@
     }
   },
   "anoman": {
-    "preview": "asset/hanoman.png",
+    "preview": "asset/hanoman/hanoman.png",
     "hp": 1020,
     "critical": { "chance": 27, "multiplier": 1.9 },
     "effect":"rage",
@@ -52,7 +52,7 @@
     }
   },
   "kliwon": {
-    "preview": "asset/kliwon.png",
+    "preview": "asset/kliwon/kliwon.png",
     "hp": 950,
     "critical": { "chance": 21, "multiplier": 1.5 },
     "effect":"lifeFlip",
@@ -65,7 +65,7 @@
     }
   },
   "kuni": {
-    "preview": "asset/kuntilanak.png",
+    "preview": "asset/kuntilanak/kuntilanak.png",
     "hp": 920,
     "critical": { "chance": 26, "multiplier": 1.8 },
     "effect":"bleed",
@@ -78,7 +78,7 @@
     }
   },
   "nenek lampir": {
-    "preview": "asset/neneklampir.png",
+    "preview": "asset/neneklampir/neneklampir.png",
     "hp": 900,
     "critical": { "chance": 29, "multiplier": 2.0 },
     "effect":"poison",
@@ -91,7 +91,7 @@
     }
   },
   "hood": {
-    "preview": "asset/ninjapocong.png",
+    "preview": "asset/ninjapocong/ninjapocong.png",
     "hp": 980,
     "critical": { "chance": 23, "multiplier": 1.6 },
     "effect":"berserk",
@@ -104,7 +104,7 @@
     }
   },
   "roro": {
-    "preview": "asset/nyirorokidul.png",
+    "preview": "asset/nyirorokidul/nyirorokidul.png",
     "hp": 890,
     "critical": { "chance": 30, "multiplier": 2.0 },
     "effect":"blocked",
@@ -117,7 +117,7 @@
     }
   },
   "pitung": {
-    "preview": "asset/pitung.png",
+    "preview": "asset/pitung/pitung.png",
     "hp": 1080,
     "critical": { "chance": 25, "multiplier": 1.7 },
     "effect":"strength",
@@ -130,7 +130,7 @@
     }
   },
   "siliwangi": {
-    "preview": "asset/siliwangi.png",
+    "preview": "asset/siliwangi/siliwangi.png",
     "hp": 1100,
     "critical": { "chance": 24, "multiplier": 1.8 },
     "effect":"weakness",
@@ -143,7 +143,7 @@
     }
   },
   "tuyul": {
-    "preview": "asset/tuyul.png",
+    "preview": "asset/tuyul/tuyul.png",
     "hp": 940,
     "critical": { "chance": 20, "multiplier": 1.5 },
     "effect":"lucky",
@@ -156,7 +156,7 @@
     }
   },
   " admin ": {
-    "preview": "asset/admin.png",
+    "preview": "asset/admin/admin.png",
     "hp": 880,
     "critical": { "chance": 30, "multiplier": 2.0 },
     "effect":"dispel",
