@@ -253,6 +253,10 @@ function getKhodamPreviewSrc(khodamKey, previewSrc = "none") {
   return `asset/${toAssetSlug(khodamKey)}.png`;
 }
 
+function getKhodamCelebrationSrc(khodamKey) {
+  return getKhodamMap()[khodamKey]?.selebrasi || "none";
+}
+
 function isVideoAsset(src) { return /\.(mp4|webm)$/i.test(src || ""); }
 
 async function preloadVideo(src) {
@@ -598,6 +602,77 @@ function clearBotTurnTimeout() {
   }
 }
 
+function clearCelebrationState() {
+  Object.values(elements.combatants).forEach((combatant) => {
+    combatant.wrapper.classList.remove("is-celebrating", "is-watching");
+    const previousVideo = combatant.wrapper.querySelector(".card-celebration-video");
+    if (previousVideo) {
+      previousVideo.pause();
+      previousVideo.removeAttribute("src");
+      previousVideo.remove();
+    }
+  });
+}
+
+function playCardCelebration(side, src) {
+  if (!src || src === "none") return delay(1800);
+
+  const wrapper = elements.combatants[side]?.wrapper;
+  const battleCard = wrapper?.querySelector(".battle-card");
+  if (!battleCard) return delay(1800);
+
+  const video = document.createElement("video");
+  video.className = "card-celebration-video";
+  video.muted = true;
+  video.autoplay = true;
+  video.playsInline = true;
+  video.setAttribute("playsinline", "");
+  video.src = chooseCompatibleMedia(src);
+  battleCard.appendChild(video);
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      video.pause();
+      video.removeAttribute("src");
+      video.remove();
+      resolve();
+    };
+    video.addEventListener("ended", finish, { once: true });
+    video.addEventListener("error", finish, { once: true });
+    const playPromise = video.play();
+    if (playPromise?.catch) playPromise.catch(() => finish());
+    window.setTimeout(finish, 3200);
+  });
+}
+
+async function playBattleCelebration(result) {
+  const winnerSide = result === "victory" ? "player" : "opponent";
+  const loserSide = winnerSide === "player" ? "opponent" : "player";
+  const winner = state.battle?.[winnerSide];
+  if (!winner) return;
+
+  clearCelebrationState();
+  state.turnOwner = winnerSide;
+  syncBattleUi();
+  await rotateOrbit(winnerSide);
+  syncBattleUi();
+
+  elements.combatants[winnerSide].wrapper.classList.add("is-celebrating");
+  elements.combatants[loserSide].wrapper.classList.add("is-watching");
+  showToast(`${toTitleCase(winner.khodamKey)} menang!`);
+
+  const celebrationSrc = getKhodamCelebrationSrc(winner.khodamKey);
+  await queueAssetPreload(celebrationSrc);
+  await Promise.all([
+    playCardCelebration(winnerSide, celebrationSrc),
+    playFullscreenAnimation(celebrationSrc, "", { allowSkip: false, muted: false })
+  ]);
+  clearCelebrationState();
+}
+
 // ─── ACTION BUTTONS ───────────────────────────────────────────────────────────
 function getActionButtonLabel(button, actionKey) {
   const playerActionName = state.battle?.player?.actions?.[actionKey]?.name;
@@ -632,10 +707,11 @@ function updateActionButtons() {
 }
 
 // ─── FULLSCREEN ANIMATION ─────────────────────────────────────────────────────
-async function playFullscreenAnimation(src, quote) {
+async function playFullscreenAnimation(src, quote, options = {}) {
   if (!src || src === "none") return;
+  const { allowSkip = true, muted = false } = options;
   showOverlay(overlays.fullscreen, true);
-  showOverlay(overlays.skip, true);
+  showOverlay(overlays.skip, allowSkip);
   if (quote) {
     elements.kataText.textContent = `"${quote}"`;
     showOverlay(overlays.kata, true);
@@ -643,6 +719,8 @@ async function playFullscreenAnimation(src, quote) {
     showOverlay(overlays.kata, false);
   }
   const video = elements.fullscreenVideo;
+  video.muted = muted;
+  video.volume = muted ? 0 : 1;
   applyVideoSource(video, src);
   video.currentTime = 0;
   await new Promise((resolve) => {
@@ -657,11 +735,13 @@ async function playFullscreenAnimation(src, quote) {
     };
     state.activeAnimationResolver = finish;
     video.addEventListener("ended", finish, { once: true });
-    elements.skipAnimationButton.addEventListener("click", finish, { once: true });
+    if (allowSkip) elements.skipAnimationButton.addEventListener("click", finish, { once: true });
     const playPromise = video.play();
     if (playPromise?.catch) playPromise.catch(() => finish());
   });
   video.pause();
+  video.muted = true;
+  video.volume = 0;
   showOverlay(overlays.fullscreen, false);
   showOverlay(overlays.skip, false);
   showOverlay(overlays.kata, false);
@@ -681,9 +761,12 @@ function stopFullscreenAnimation() {
 
 function getParticipantActionAssets(participant) {
   if (!participant) return [];
-  return ["skill", "ultimate"]
+  const assets = ["skill", "ultimate"]
     .map((actionKey) => participant.actions[actionKey]?.preview)
     .filter((src) => src && src !== "none");
+  const celebration = getKhodamCelebrationSrc(participant.khodamKey);
+  if (celebration && celebration !== "none") assets.push(celebration);
+  return assets;
 }
 
 async function warmupBattleAssets(onProgress) {
@@ -909,6 +992,7 @@ async function enterBotBattle() {
   state.battleSession += 1;
   state.turnOwner = "player";
   resetOrbit();
+  clearCelebrationState();
   resetBattleFeedback();
   clearBotTurnTimeout();
   state.gameOver = false;
@@ -1130,11 +1214,23 @@ async function runPlayerAction(actionKey) {
   await runOnlineAction("player", actionKey);
 }
 
-function openModal({ title, description, confirmText = "YA", cancelText = "TIDAK", confirmVariant = "danger" }) {
+function openModal({
+  title,
+  description,
+  confirmText = "YA",
+  cancelText = "TIDAK",
+  confirmVariant = "danger",
+  layout = "default"
+}) {
   elements.modalTitle.textContent = title;
   elements.modalDescription.textContent = description;
   elements.modalConfirm.textContent = confirmText;
   elements.modalCancel.textContent = cancelText;
+  overlays.modal.classList.remove("result-layout", "victory-layout", "defeat-layout");
+  if (layout === "result") {
+    overlays.modal.classList.add("result-layout");
+    overlays.modal.classList.add(confirmVariant === "success" ? "victory-layout" : "defeat-layout");
+  }
   elements.modalConfirm.className = "modal-button";
   if (confirmVariant) elements.modalConfirm.classList.add(confirmVariant);
   showOverlay(overlays.modal, true);
@@ -1143,6 +1239,7 @@ function openModal({ title, description, confirmText = "YA", cancelText = "TIDAK
 
 function closeModal(result) {
   showOverlay(overlays.modal, false);
+  overlays.modal.classList.remove("result-layout", "victory-layout", "defeat-layout");
   if (state.modalResolver) { state.modalResolver(result); state.modalResolver = null; }
 }
 
@@ -1412,6 +1509,7 @@ function enterOnlineBattle() {
   // Host goes first
   state.turnOwner = state.online.mySide === "host" ? "player" : "opponent";
   resetOrbit();
+  clearCelebrationState();
   resetBattleFeedback();
   clearBotTurnTimeout();
   state.gameOver = false;
@@ -1695,6 +1793,7 @@ async function finishBattle(result) {
   clearBotTurnTimeout();
   detachAllOnlineListeners();
   updateActionButtons();
+  await playBattleCelebration(result);
 
   const isVictory = result === "victory";
   const confirmed = await openModal({
@@ -1702,7 +1801,8 @@ async function finishBattle(result) {
     description: isVictory ? "Khodammu menang. Mau rematch?" : "Kali ini kalah. Mau coba lagi?",
     confirmText: isVictory ? "LANJUT" : "ULANGI",
     confirmVariant: isVictory ? "success" : "danger",
-    cancelText: "KE LOBBY"
+    cancelText: "KE LOBBY",
+    layout: "result"
   });
 
   // Clean up room
@@ -1730,6 +1830,7 @@ function leaveBattleToLobby() {
   state.battleMode = null;
   resetOnlineMatchState();
   clearBotTurnTimeout();
+  clearCelebrationState();
   stopFullscreenAnimation();
   resetBattleFeedback();
   showOverlay(overlays.actionMenu, false);

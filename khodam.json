@@ -10,7 +10,8 @@
       "skill": { "name": "ledakan tengkorak", "damage": 224, "preview": "asset/banaspati/banaspati-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "laser lava", "damage": 452, "preview": "asset/banaspati/banaspati-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "perisai magma", "armor": 176, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/banaspati/banaspati-selebrasi.mp4"
   },
   "buto ijo": {
     "preview": "asset/butoijo/butoijo.png",
@@ -23,7 +24,8 @@
       "skill": { "name": "bantingan maskulin", "damage": 242, "preview": "asset/butoijo/butoijo-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "amukan brutal", "damage": 468, "preview": "asset/butoijo/butoijo-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kulit baja", "armor": 188, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/butoijo/butoijo-selebrasi.mp4"
   },
   "garuda": {
     "preview": "asset/garuda/garuda.png",
@@ -36,7 +38,8 @@
       "skill": { "name": "sayap kesatuan", "damage": 236, "preview": "asset/garuda/garuda-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "turun takhta langit", "damage": 459, "preview": "asset/garuda/garuda-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "bulu suci", "armor": 172, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/garuda/garuda-selebrasi.mp4"
   },
   "anoman": {
     "preview": "asset/hanoman/hanoman.png",
@@ -49,7 +52,8 @@
       "skill": { "name": "gada petir", "damage": 245, "preview": "asset/hanoman/hanoman-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "peremuk tekad", "damage": 470, "preview": "asset/hanoman/hanoman-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "percaya diri", "armor": 181, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/anoman/anoman-selebrasi.mp4"
   },
   "kliwon": {
     "preview": "asset/kliwon/kliwon.png",
@@ -62,7 +66,8 @@
       "skill": { "name": "pukulan bayangan", "damage": 208, "preview": "asset/kliwon/kliwon-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "tendangan bayangan", "damage": 438, "preview": "asset/kliwon/kliwon-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "life flip", "armor": 165, "preview": "none", "use": 2, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/kliwon/kliwon-selebrasi.mp4"
   },
   "kuni": {
     "preview": "asset/kuntilanak/kuntilanak.png",
@@ -75,7 +80,8 @@
       "skill": { "name": "hujan petir", "damage": 231, "preview": "asset/kuntilanak/kuntilanak-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "badai arwah", "damage": 463, "preview": "asset/kuntilanak/kuntilanak-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kabut", "armor": 174, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/kuntilanak/kuntilanak-selebrasi.mp4"
   },
   "nenek lampir": {
     "preview": "asset/neneklampir/neneklampir.png",
@@ -88,7 +94,8 @@
       "skill": { "name": "kutukan", "damage": 248, "preview": "asset/neneklampir/neneklampir-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "ledakan racun", "damage": 469, "preview": "asset/neneklampir/neneklampir-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "menghindar", "armor": 186, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/neneklampir/neneklampir-selebrasi.mp4"
   },
   "hood": {
     "preview": "asset/ninjapocong/ninjapocong.png",
@@ -101,7 +108,8 @@
       "skill": { "name": "pedang arwah", "damage": 220, "preview": "asset/ninjapocong/ninjapocong-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "tebasan jiwa", "damage": 447, "preview": "asset/ninjapocong/ninjapocong-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kabut", "armor": 169, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/ninjapocong/ninjapocong-selebrasi.mp4"
   },
   "roro": {
     "preview": "asset/nyirorokidul/nyirorokidul.png",
@@ -114,7 +122,8 @@
       "skill": { "name": "kereta kencana", "damage": 250, "preview": "asset/nyirorokidul/nyirorokidul-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "7 naga laut", "damage": 470, "preview": "asset/nyirorokidul/nyirorokidul-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "tameng laut", "armor": 190, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/nyirorokidul/nyirorokidul-selebrasi.mp4"
   },
   "pitung": {
     "preview": "asset/pitung/pitung.png",
@@ -127,7 +136,8 @@
       "skill": { "name": "silat betawi", "damage": 228, "preview": "asset/pitung/pitung-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "golok terbang", "damage": 454, "preview": "asset/pitung/pitung-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kuda-kuda", "armor": 177, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/pitung/pitung-selebrasi.mp4"
   },
   "siliwangi": {
     "preview": "asset/siliwangi/siliwangi.png",
@@ -140,7 +150,8 @@
       "skill": { "name": "gigitan macan", "damage": 239, "preview": "asset/siliwangi/siliwangi-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "manusia macan", "damage": 461, "preview": "asset/siliwangi/siliwangi-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "aura", "armor": 183, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/siliwangi/siliwangi-selebrasi.mp4"
   },
   "tuyul": {
     "preview": "asset/tuyul/tuyul.png",
@@ -153,7 +164,8 @@
       "skill": { "name": "copet dompet", "damage": 200, "preview": "asset/tuyul/tuyul-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "rampok sekampung", "damage": 435, "preview": "asset/tuyul/tuyul-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "ngumpet", "armor": 160, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/tuyul/tuyul-selebrasi.mp4"
   },
   "yasa": {
     "preview": "asset/admin/admin.png",
@@ -166,6 +178,7 @@
       "skill": { "name": "hack sistem", "damage": 249, "preview": "asset/admin/admin-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
       "ultimate": { "name": "ban player", "damage": 470, "preview": "asset/admin/admin-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "debug error", "armor": 189, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    }
+    },
+    "selebrasi":"asset/admin/admin-selebrasi.mp4"
   }
 }
