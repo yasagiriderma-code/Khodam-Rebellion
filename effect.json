@@ -2,17 +2,17 @@
     "burn": {
         "target":"musuh",
         "duration": 3,
-        "damagePerTurn": 10
+        "damagePerTurn": 20
     },
     "poison": {
         "target":"musuh",
         "duration": 3,
-        "damagePerTurn": 5
+        "damagePerTurn": 18
     },
     "bleed": {
         "target":"musuh",
         "duration": 4,
-        "damagePerTurn": 8
+        "damagePerTurn": 18
     },
 
 
@@ -66,7 +66,7 @@
     "berserk":{
         "target":"sendiri",
         "duration": 3,
-        "damageIncrease": 65,
+        "damageIncrease": 55,
         "hpDrain": 10
     },
 
