@@ -127,6 +127,7 @@ const state = {
   data: null,
   effects: null,
   khodamList: [],
+  defaultPlayerName: null,
   selectedKhodamKey: "anoman",
   pendingKhodamKey: null,
   screen: null,
@@ -171,6 +172,14 @@ function toTitleCase(value) {
 }
 
 function clamp(number, min, max) { return Math.min(Math.max(number, min), max); }
+
+function generateDefaultPlayerName() {
+  return `player${Math.floor(Math.random() * 99999) + 1}`;
+}
+
+function getPlayerDisplayName() {
+  return elements.playerNameInput.value.trim() || state.defaultPlayerName || "player1";
+}
 
 function getHpTone(hpPercent) {
   if (hpPercent < 30) return "is-low";
@@ -430,6 +439,10 @@ function getScale(y, centerY, radiusY) {
   return 0.72 + t * 0.56;
 }
 
+function getOrbitAngleForTurnOwner(turnOwner = state.turnOwner) {
+  return turnOwner === "opponent" ? -Math.PI / 2 : Math.PI / 2;
+}
+
 function setCombatantState(combatant, x, y, scale) {
   const width = combatant.wrapper.offsetWidth;
   const height = combatant.wrapper.offsetHeight;
@@ -448,9 +461,15 @@ function updateOrbitFrame() {
       orbit.isSwitching = false;
     }
   }
+
+  const playerY = centerY + Math.sin(orbit.angle) * radiusY;
+  const opponentY = centerY + Math.sin(orbit.angle + Math.PI) * radiusY;
+  const playerOffsetX = playerY >= centerY ? -70 : 70;
+  const opponentOffsetX = opponentY >= centerY ? -70 : 70;
+
   const positions = [
-    { x: centerX + Math.cos(orbit.angle) * radiusX + elements.combatants.player.offsetX, y: centerY + Math.sin(orbit.angle) * radiusY, combatant: elements.combatants.player },
-    { x: centerX + Math.cos(orbit.angle + Math.PI) * radiusX + elements.combatants.opponent.offsetX, y: centerY + Math.sin(orbit.angle + Math.PI) * radiusY, combatant: elements.combatants.opponent }
+    { x: centerX + Math.cos(orbit.angle) * radiusX + playerOffsetX, y: playerY, combatant: elements.combatants.player },
+    { x: centerX + Math.cos(orbit.angle + Math.PI) * radiusX + opponentOffsetX, y: opponentY, combatant: elements.combatants.opponent }
   ].sort((a, b) => a.y - b.y);
   positions.forEach(({ x, y, combatant }) => {
     setCombatantState(combatant, x, y, getScale(y, centerY, radiusY));
@@ -463,15 +482,16 @@ function startOrbitLoop() {
   state.orbit.rafId = requestAnimationFrame(updateOrbitFrame);
 }
 
-function rotateOrbit() {
-  state.orbit.targetAngle += Math.PI;
+function rotateOrbit(nextTurnOwner) {
+  state.orbit.targetAngle = getOrbitAngleForTurnOwner(nextTurnOwner);
   state.orbit.isSwitching = true;
   return delay(600);
 }
 
 function resetOrbit() {
-  state.orbit.angle = Math.PI / 2;
-  state.orbit.targetAngle = Math.PI / 2;
+  const angle = getOrbitAngleForTurnOwner();
+  state.orbit.angle = angle;
+  state.orbit.targetAngle = angle;
   state.orbit.isSwitching = false;
 }
 
@@ -516,7 +536,7 @@ function syncCombatantUi(side) {
   const armorPercent = clamp((participant.armor / participant.maxHp) * 100, 0, 100);
   const hpTone = getHpTone(hpPercent);
 
-  combatant.label.textContent = side === "player" ? (state.battle.playerName || "KAMU") : participant.displayName;
+  combatant.label.textContent = side === "player" ? getPlayerDisplayName() : participant.displayName;
   combatant.name.textContent = toTitleCase(participant.khodamKey);
   combatant.hpFill.style.width = `${hpPercent}%`;
   combatant.hpTrailFill.style.width = `${hpPercent}%`;
@@ -887,12 +907,12 @@ function chooseBotAction(participant, target) {
 async function enterBotBattle() {
   state.battleMode = "bot";
   state.battleSession += 1;
+  state.turnOwner = "player";
   resetOrbit();
   resetBattleFeedback();
   clearBotTurnTimeout();
   state.gameOver = false;
   state.isBattleBusy = false;
-  state.turnOwner = "player";
 
   syncBattleUi();
   showScreen("gameplay");
@@ -943,6 +963,7 @@ async function beginLocalPlayerTurn() {
   if (!usable.length) {
     showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
     await delay(700);
+    await rotateOrbit("opponent");
     await beginBotTurn();
     return;
   }
@@ -988,6 +1009,7 @@ async function beginBotTurn() {
     if (!actionKey) {
       showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
       await delay(700);
+      await rotateOrbit("player");
       await beginLocalPlayerTurn();
       return;
     }
@@ -1030,7 +1052,7 @@ async function runBotAction(actionKey) {
 
   syncBattleUi();
   await delay(420);
-  await rotateOrbit();
+  await rotateOrbit("player");
 
   if (state.screen !== "gameplay" || state.battleMode !== "bot") return;
 
@@ -1087,7 +1109,7 @@ async function runLocalBotPlayerAction(actionKey) {
   if (!isBattleSessionActive(sessionId) || state.battleMode !== "bot") return;
 
   await delay(420);
-  await rotateOrbit();
+  await rotateOrbit("opponent");
 
   if (!isBattleSessionActive(sessionId) || state.battleMode !== "bot") return;
   syncBattleUi();
@@ -1261,7 +1283,7 @@ async function pushGameOverToFirebase(winner) {
 
 async function startMatchmaking() {
   const { playerId } = state.online;
-  const playerName = elements.playerNameInput.value.trim() || "KAMU";
+  const playerName = getPlayerDisplayName();
   const khodamKey = state.selectedKhodamKey;
   resetOnlineMatchState();
   clearBotTurnTimeout();
@@ -1387,14 +1409,13 @@ async function startMatchmaking() {
 function enterOnlineBattle() {
   state.battleMode = "online";
   state.battleSession += 1;
+  // Host goes first
+  state.turnOwner = state.online.mySide === "host" ? "player" : "opponent";
   resetOrbit();
   resetBattleFeedback();
   clearBotTurnTimeout();
   state.gameOver = false;
   state.isBattleBusy = false;
-
-  // Host goes first
-  state.turnOwner = state.online.mySide === "host" ? "player" : "opponent";
 
   syncBattleUi();
   showScreen("gameplay");
@@ -1525,7 +1546,7 @@ async function handleOpponentAction(actionData) {
 
   syncBattleUi();
   await delay(420);
-  await rotateOrbit();
+  await rotateOrbit("player");
 
   if (state.screen !== "gameplay") return;
 
@@ -1573,6 +1594,7 @@ async function beginMyTurn() {
   if (!usable.length) {
     showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
     await delay(700);
+    await rotateOrbit("opponent");
     // Pass turn to opponent
     const nextTurn = state.online.mySide === "host" ? "guest" : "host";
     await pushTurnToFirebase(nextTurn);
@@ -1646,7 +1668,7 @@ async function runOnlineAction(actorSide, actionKey) {
   if (!isBattleSessionActive(sessionId)) return;
 
   await delay(420);
-  await rotateOrbit();
+  await rotateOrbit("opponent");
 
   if (!isBattleSessionActive(sessionId)) return;
   syncBattleUi();
@@ -1744,7 +1766,7 @@ function bindEvents() {
 
   elements.playerNameInput.addEventListener("input", () => {
     if (!state.battle) return;
-    state.battle.playerName = elements.playerNameInput.value.trim() || "KAMU";
+    state.battle.playerName = getPlayerDisplayName();
     syncCombatantUi("player");
   });
 
@@ -1807,6 +1829,8 @@ async function runIntro() {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 async function init() {
   bindEvents();
+  state.defaultPlayerName = generateDefaultPlayerName();
+  elements.playerNameInput.placeholder = state.defaultPlayerName;
   await runIntro();
   const [khodamData, effectData] = await Promise.all([fetchKhodamData(), fetchEffectData()]);
   state.data = khodamData;
