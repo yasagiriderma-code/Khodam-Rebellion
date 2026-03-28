@@ -111,6 +111,7 @@ const actionMeta = {
 };
 
 const ENERGY_SETTINGS = { max: 300, perTurn: 80 };
+const MATCHMAKING_BOT_TIMEOUT_MS = 10000;
 
 const battleQuotes = {
   attack: ["Hajar!", "Masuk!", "Serang terus!"],
@@ -143,6 +144,7 @@ const state = {
   activeAnimationResolver: null,
   toastTimerId: null,
   battle: null,
+  battleMode: null,
   assetCache: { ready: new Set(), pending: new Map() },
 
   // ── Online multiplayer state ──
@@ -152,8 +154,10 @@ const state = {
     mySide: null,          // "host" | "guest"
     listeners: [],         // Firebase listeners to detach on leave
     matchmakingRef: null,
+    matchmakingCallback: null,
     waitingTimeout: null
-  }
+  },
+  botTurnTimeout: null
 };
 
 // Generate a unique player ID once per session
@@ -567,6 +571,13 @@ function resetBattleFeedback() {
   });
 }
 
+function clearBotTurnTimeout() {
+  if (state.botTurnTimeout) {
+    clearTimeout(state.botTurnTimeout);
+    state.botTurnTimeout = null;
+  }
+}
+
 // ─── ACTION BUTTONS ───────────────────────────────────────────────────────────
 function getActionButtonLabel(button, actionKey) {
   const playerActionName = state.battle?.player?.actions?.[actionKey]?.name;
@@ -849,6 +860,254 @@ function getUsableActions(participant) {
 }
 
 // ─── MODAL ────────────────────────────────────────────────────────────────────
+function pickBotKhodamKey(playerKhodamKey) {
+  const pool = state.khodamList.filter((key) => key !== playerKhodamKey);
+  const source = pool.length ? pool : state.khodamList;
+  return source[Math.floor(Math.random() * source.length)] || playerKhodamKey;
+}
+
+function chooseBotAction(participant, target) {
+  const usable = getUsableActions(participant);
+  if (!usable.length) return null;
+
+  const finisher = usable.find((actionKey) => {
+    if (actionKey === "shield") return false;
+    const action = participant.actions[actionKey];
+    return Number(action?.damage || 0) >= target.hp + target.armor;
+  });
+  if (finisher) return finisher;
+
+  if (participant.hp <= participant.maxHp * 0.35 && usable.includes("shield")) return "shield";
+  if (usable.includes("ultimate")) return "ultimate";
+  if (usable.includes("skill")) return "skill";
+  if (usable.includes("attack")) return "attack";
+  return usable[0];
+}
+
+async function enterBotBattle() {
+  state.battleMode = "bot";
+  state.battleSession += 1;
+  resetOrbit();
+  resetBattleFeedback();
+  clearBotTurnTimeout();
+  state.gameOver = false;
+  state.isBattleBusy = false;
+  state.turnOwner = "player";
+
+  syncBattleUi();
+  showScreen("gameplay");
+  showOverlay(overlays.actionMenu, true);
+  showOverlay(overlays.surrender, true);
+  startOrbitLoop();
+  updateActionButtons();
+  showToast("Lawan bot ditemukan!");
+}
+
+async function startBotBattle(playerName, khodamKey) {
+  const botKhodamKey = pickBotKhodamKey(khodamKey);
+  resetOnlineMatchState();
+
+  state.battle = {
+    playerName,
+    player: createBattleParticipant("player", khodamKey, playerName),
+    opponent: createBattleParticipant("opponent", botKhodamKey, "BOT")
+  };
+
+  await warmupBattleAssets();
+  await enterBotBattle();
+}
+
+async function beginLocalPlayerTurn() {
+  if (state.gameOver || state.screen !== "gameplay" || state.battleMode !== "bot") return;
+
+  const actor = state.battle.player;
+  actor.energy = clamp(actor.energy + ENERGY_SETTINGS.perTurn, 0, actor.maxEnergy || ENERGY_SETTINGS.max);
+  Object.values(actor.actions).forEach((action) => {
+    if (action.cooldownRemaining > 0) action.cooldownRemaining = Math.max(0, action.cooldownRemaining - 1);
+  });
+
+  const effectEvents = resolveTurnEffects(actor);
+  syncBattleUi();
+
+  if (effectEvents.length) {
+    showToast(`${toTitleCase(actor.khodamKey)} ${effectEvents.join(", ")}`);
+    await delay(700);
+  }
+
+  if (actor.hp <= 0) {
+    await finishBattle("defeat");
+    return;
+  }
+
+  const usable = getUsableActions(actor);
+  if (!usable.length) {
+    showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
+    await delay(700);
+    await beginBotTurn();
+    return;
+  }
+
+  state.isBattleBusy = false;
+  state.turnOwner = "player";
+  updateActionButtons();
+  showToast("Giliran kamu!");
+}
+
+async function beginBotTurn() {
+  if (state.gameOver || state.screen !== "gameplay" || state.battleMode !== "bot") return;
+
+  clearBotTurnTimeout();
+  state.isBattleBusy = true;
+  state.turnOwner = "opponent";
+  updateActionButtons();
+
+  state.botTurnTimeout = setTimeout(async () => {
+    state.botTurnTimeout = null;
+    if (state.gameOver || state.screen !== "gameplay" || state.battleMode !== "bot") return;
+
+    const actor = state.battle.opponent;
+    actor.energy = clamp(actor.energy + ENERGY_SETTINGS.perTurn, 0, actor.maxEnergy || ENERGY_SETTINGS.max);
+    Object.values(actor.actions).forEach((action) => {
+      if (action.cooldownRemaining > 0) action.cooldownRemaining = Math.max(0, action.cooldownRemaining - 1);
+    });
+
+    const effectEvents = resolveTurnEffects(actor);
+    syncBattleUi();
+
+    if (effectEvents.length) {
+      showToast(`${toTitleCase(actor.khodamKey)} ${effectEvents.join(", ")}`);
+      await delay(700);
+    }
+
+    if (actor.hp <= 0) {
+      await finishBattle("victory");
+      return;
+    }
+
+    const actionKey = chooseBotAction(actor, state.battle.player);
+    if (!actionKey) {
+      showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
+      await delay(700);
+      await beginLocalPlayerTurn();
+      return;
+    }
+
+    await runBotAction(actionKey);
+  }, 900);
+}
+
+async function runBotAction(actionKey) {
+  if (state.gameOver || state.screen !== "gameplay" || state.battleMode !== "bot") return;
+
+  const opponent = state.battle.opponent;
+  const player = state.battle.player;
+  const action = opponent.actions[actionKey];
+  if (!action) return;
+
+  await queueAssetPreload(action.preview);
+  await playFullscreenAnimation(action.preview, action.katakata || "");
+
+  if (state.screen !== "gameplay" || state.battleMode !== "bot") return;
+
+  if (action.cooldown > 0) action.cooldownRemaining = action.cooldown;
+  opponent.energy = clamp(opponent.energy - (action.energyCost || 0) + (action.energyGain || 0), 0, ENERGY_SETTINGS.max);
+  if (typeof action.remaining === "number") action.remaining -= 1;
+
+  if (actionKey === "shield") {
+    const gainedArmor = Number(action.armor) || 0;
+    applyShield(opponent, gainedArmor);
+    showDamageFloat("opponent", `+${gainedArmor}`);
+  } else {
+    const damageWithEffects = Math.max(0, Math.round((Number(action.damage) || 0) * getDamageMultiplier(opponent)));
+    const critResult = rollCritical(opponent, damageWithEffects);
+    const result = applyDamage(player, critResult.total);
+    showDamageFloat("player", critResult.triggered ? `CRIT! -${result.total}` : `-${result.total}`);
+    if (critResult.triggered) showToast(`${toTitleCase(opponent.khodamKey)} CRITICAL x${critResult.multiplier.toFixed(1)}`);
+  }
+
+  const effectResult = tryApplyActionEffect(opponent, player, actionKey);
+  if (effectResult?.toast) showToast(effectResult.toast);
+
+  syncBattleUi();
+  await delay(420);
+  await rotateOrbit();
+
+  if (state.screen !== "gameplay" || state.battleMode !== "bot") return;
+
+  syncBattleUi();
+
+  if (player.hp <= 0) {
+    await finishBattle("defeat");
+    return;
+  }
+
+  await beginLocalPlayerTurn();
+}
+
+async function runLocalBotPlayerAction(actionKey) {
+  const sessionId = state.battleSession;
+  const actor = state.battle.player;
+  const target = state.battle.opponent;
+  const action = actor.actions[actionKey];
+
+  if (!action) return;
+  if (action.cooldownRemaining > 0) { showToast(`${actionKey.toUpperCase()} cooldown ${action.cooldownRemaining}`); return; }
+  if (isActionDisabledByEffects(actor, actionKey)) { showToast(`${actionKey.toUpperCase()} sedang terkunci`); return; }
+  if (typeof action.remaining === "number" && action.remaining <= 0) return;
+  if (action.energyCost > 0 && actor.energy < action.energyCost) { showToast("Energi tidak cukup!"); return; }
+
+  actor.energy = clamp(actor.energy - action.energyCost + action.energyGain, 0, ENERGY_SETTINGS.max);
+  if (action.cooldown > 0) action.cooldownRemaining = action.cooldown;
+
+  state.isBattleBusy = true;
+  updateActionButtons();
+
+  if (actionKey === "shield") {
+    const gainedArmor = Number(action.armor) || 0;
+    applyShield(actor, gainedArmor);
+    showDamageFloat("player", `+${gainedArmor}`);
+  } else {
+    const damageWithEffects = Math.max(0, Math.round((Number(action.damage) || 0) * getDamageMultiplier(actor)));
+    const critResult = rollCritical(actor, damageWithEffects);
+    const result = applyDamage(target, critResult.total);
+    showDamageFloat("opponent", critResult.triggered ? `CRIT! -${result.total}` : `-${result.total}`);
+    if (critResult.triggered) showToast(`${toTitleCase(actor.khodamKey)} CRITICAL x${critResult.multiplier.toFixed(1)}`);
+  }
+
+  const effectResult = tryApplyActionEffect(actor, target, actionKey);
+  if (effectResult?.toast) showToast(effectResult.toast);
+
+  if (typeof action.remaining === "number") action.remaining -= 1;
+
+  syncBattleUi();
+
+  await queueAssetPreload(action.preview);
+  await playFullscreenAnimation(action.preview, action.katakata || "");
+
+  if (!isBattleSessionActive(sessionId) || state.battleMode !== "bot") return;
+
+  await delay(420);
+  await rotateOrbit();
+
+  if (!isBattleSessionActive(sessionId) || state.battleMode !== "bot") return;
+  syncBattleUi();
+
+  if (target.hp <= 0) {
+    await finishBattle("victory");
+    return;
+  }
+
+  await beginBotTurn();
+}
+
+async function runPlayerAction(actionKey) {
+  if (state.battleMode === "bot") {
+    await runLocalBotPlayerAction(actionKey);
+    return;
+  }
+  await runOnlineAction("player", actionKey);
+}
+
 function openModal({ title, description, confirmText = "YA", cancelText = "TIDAK", confirmVariant = "danger" }) {
   elements.modalTitle.textContent = title;
   elements.modalDescription.textContent = description;
@@ -882,6 +1141,22 @@ function clearWaitingTimeout() {
     clearTimeout(state.online.waitingTimeout);
     state.online.waitingTimeout = null;
   }
+}
+
+function clearMatchmakingListener() {
+  if (state.online.matchmakingRef && state.online.matchmakingCallback) {
+    off(state.online.matchmakingRef, "value", state.online.matchmakingCallback);
+  }
+  state.online.matchmakingRef = null;
+  state.online.matchmakingCallback = null;
+}
+
+function resetOnlineMatchState() {
+  clearWaitingTimeout();
+  clearMatchmakingListener();
+  detachAllOnlineListeners();
+  state.online.roomId = null;
+  state.online.mySide = null;
 }
 
 // Serialize battle participant for Firebase (remove circular / function refs)
@@ -988,6 +1263,9 @@ async function startMatchmaking() {
   const { playerId } = state.online;
   const playerName = elements.playerNameInput.value.trim() || "KAMU";
   const khodamKey = state.selectedKhodamKey;
+  resetOnlineMatchState();
+  clearBotTurnTimeout();
+  state.battleMode = null;
 
   showScreen("search");
   showOverlay(overlays.actionMenu, false);
@@ -1010,6 +1288,7 @@ async function startMatchmaking() {
     }
 
     if (foundRoom) {
+      state.battleMode = "online";
       // Join as guest
       const { roomId, host } = foundRoom;
       state.online.roomId = roomId;
@@ -1044,6 +1323,7 @@ async function startMatchmaking() {
 
     } else {
       // Create a new room, wait as host
+      state.battleMode = "online";
       state.online.mySide = "host";
       const newRoomRef = push(ref(db, "queue"));
       const roomId = newRoomRef.key;
@@ -1059,20 +1339,20 @@ async function startMatchmaking() {
       // Wait for guest to join (listen on rooms/{roomId})
       showToast("Menunggu lawan...");
 
-      // Timeout after 30 s — cancel matchmaking
+      // Fallback ke bot kalau 10 detik belum dapat lawan
       state.online.waitingTimeout = setTimeout(async () => {
-        await remove(ref(db, `queue/${roomId}`));
-        state.online.roomId = null;
-        state.online.mySide = null;
-        showToast("Tidak ada lawan. Coba lagi!");
-        showScreen("lobby");
-      }, 30000);
+        clearWaitingTimeout();
+        clearMatchmakingListener();
+        try { await remove(ref(db, `queue/${roomId}`)); } catch (_) {}
+        showToast("Tidak ada lawan, masuk bot...");
+        await startBotBattle(playerName, khodamKey);
+      }, MATCHMAKING_BOT_TIMEOUT_MS);
 
       // Listen for room creation by guest
       const roomRef = ref(db, `rooms/${roomId}`);
-      const unsub = onValue(roomRef, async (snap) => {
-        if (!snap.exists()) return;
-        off(roomRef, "value", unsub);
+      const matchmakingCallback = async (snap) => {
+        if (!snap.exists() || state.online.roomId !== roomId || state.battleMode !== "online") return;
+        clearMatchmakingListener();
         clearWaitingTimeout();
 
         const roomData = snap.val();
@@ -1088,10 +1368,15 @@ async function startMatchmaking() {
 
         await warmupBattleAssets();
         enterOnlineBattle();
-      });
+      };
+      state.online.matchmakingRef = roomRef;
+      state.online.matchmakingCallback = matchmakingCallback;
+      onValue(roomRef, matchmakingCallback);
     }
   } catch (err) {
     console.error("Matchmaking error:", err);
+    resetOnlineMatchState();
+    state.battleMode = null;
     showToast("Gagal konek ke server!");
     showScreen("lobby");
   }
@@ -1100,9 +1385,11 @@ async function startMatchmaking() {
 // ─── ONLINE: BATTLE ENTRY ────────────────────────────────────────────────────
 
 function enterOnlineBattle() {
+  state.battleMode = "online";
   state.battleSession += 1;
   resetOrbit();
   resetBattleFeedback();
+  clearBotTurnTimeout();
   state.gameOver = false;
   state.isBattleBusy = false;
 
@@ -1383,6 +1670,7 @@ async function runOnlineAction(actorSide, actionKey) {
 async function finishBattle(result) {
   state.gameOver = true;
   state.isBattleBusy = true;
+  clearBotTurnTimeout();
   detachAllOnlineListeners();
   updateActionButtons();
 
@@ -1409,17 +1697,17 @@ async function cleanupRoom() {
   const { roomId } = state.online;
   if (roomId) {
     try { await remove(ref(db, `rooms/${roomId}`)); } catch (_) {}
-    state.online.roomId = null;
-    state.online.mySide = null;
   }
+  resetOnlineMatchState();
 }
 
 function leaveBattleToLobby() {
   state.battleSession += 1;
   state.gameOver = false;
   state.isBattleBusy = false;
-  detachAllOnlineListeners();
-  clearWaitingTimeout();
+  state.battleMode = null;
+  resetOnlineMatchState();
+  clearBotTurnTimeout();
   stopFullscreenAnimation();
   resetBattleFeedback();
   showOverlay(overlays.actionMenu, false);
@@ -1463,7 +1751,7 @@ function bindEvents() {
   elements.actionButtons.forEach((button) => {
     button.addEventListener("click", async () => {
       if (state.isBattleBusy || state.turnOwner !== "player" || state.gameOver) return;
-      await runOnlineAction("player", button.dataset.action);
+      await runPlayerAction(button.dataset.action);
     });
   });
 
@@ -1477,8 +1765,12 @@ function bindEvents() {
       cancelText: "TIDAK"
     });
     if (confirmed) {
-      // Tell Firebase we lost
-      if (!state.gameOver) await pushGameOverToFirebase(state.online.mySide === "host" ? "guest" : "host");
+      if (state.battleMode === "bot") {
+        await finishBattle("defeat");
+      } else if (!state.gameOver) {
+        // Tell Firebase we lost
+        await pushGameOverToFirebase(state.online.mySide === "host" ? "guest" : "host");
+      }
     }
   });
 
