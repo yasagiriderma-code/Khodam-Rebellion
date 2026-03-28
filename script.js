@@ -45,9 +45,13 @@ const elements = {
       hpFill: document.getElementById("player-hp-fill"),
       hpTrailFill: document.getElementById("player-hp-trail-fill"),
       armorFill: document.getElementById("player-armor-fill"),
+      energyFill: document.getElementById("player-energy-fill"),
+      energyMeta: document.getElementById("player-energy-meta"),
       meta: document.getElementById("player-status-meta"),
       art: document.getElementById("player-card-art"),
       float: document.getElementById("player-damage-float"),
+      hpText: document.getElementById("player-hp-text"),
+      energyText: document.getElementById("player-energy-text"),
       offsetX: -70
     },
     opponent: {
@@ -57,9 +61,13 @@ const elements = {
       hpFill: document.getElementById("opponent-hp-fill"),
       hpTrailFill: document.getElementById("opponent-hp-trail-fill"),
       armorFill: document.getElementById("opponent-armor-fill"),
+      energyFill: document.getElementById("opponent-energy-fill"),
+      energyMeta: document.getElementById("opponent-energy-meta"),
       meta: document.getElementById("opponent-status-meta"),
       art: document.getElementById("opponent-card-art"),
       float: document.getElementById("opponent-damage-float"),
+      hpText: document.getElementById("opponent-hp-text"),
+      energyText: document.getElementById("opponent-energy-text"),
       offsetX: 70
     }
   }
@@ -70,6 +78,11 @@ const actionMeta = {
   skill: { icon: "⚔️", label: "skill" },
   ultimate: { icon: "💥", label: "ultimate" },
   shield: { icon: "🛡️", label: "shield" }
+};
+
+const ENERGY_SETTINGS = {
+  max: 300,
+  perTurn: 80
 };
 
 const botNames = [
@@ -93,8 +106,9 @@ const khodamAssetAliases = {
 
 const state = {
   data: null,
+  effects: null,
   khodamList: [],
-  selectedKhodamKey: "wiro sableng",
+  selectedKhodamKey: "anoman",
   pendingKhodamKey: null,
   screen: null,
   modalResolver: null,
@@ -172,6 +186,15 @@ async function fetchKhodamData() {
   return normalizeKhodamData(rawData);
 }
 
+async function fetchEffectData() {
+  const response = await fetch("effect.json", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Gagal membaca effect.json");
+  }
+  const rawData = await response.json();
+  return normalizeEffectData(rawData);
+}
+
 function normalizeKhodamData(rawData) {
   if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
     throw new Error("Format khodam.json tidak valid");
@@ -181,8 +204,20 @@ function normalizeKhodamData(rawData) {
   return source;
 }
 
+function normalizeEffectData(rawData) {
+  if (!rawData || typeof rawData !== "object" || Array.isArray(rawData)) {
+    throw new Error("Format effect.json tidak valid");
+  }
+
+  return rawData;
+}
+
 function getKhodamMap() {
   return state.data || {};
+}
+
+function getEffectMap() {
+  return state.effects || {};
 }
 
 function resolvePreviewMedia(src) {
@@ -521,22 +556,46 @@ function rotateOrbit() {
 function createBattleParticipant(side, khodamKey, displayName) {
   const khodam = getKhodamMap()[khodamKey];
   const critical = khodam.critical || {};
+
+  const buildAction = (actionKey) => {
+    const base = khodam.action[actionKey] || {};
+    const remaining = base.use === "unlimited" || typeof base.use === "undefined"
+      ? undefined
+      : Number(base.use);
+
+    return {
+      ...base,
+      remaining,
+      energyCost: Number(base.energyCost ?? 0),
+      energyGain: Number(base.energyGain ?? 0),
+      cooldown: Number(base.cooldown ?? 0),
+      cooldownRemaining: 0
+    };
+  };
+
   return {
     side,
     khodamKey,
     displayName,
     hp: khodam.hp,
     maxHp: khodam.hp,
+    energy: ENERGY_SETTINGS.perTurn,
+    maxEnergy: ENERGY_SETTINGS.max,
     armor: 0,
     critical: {
       chance: Number(critical.chance) || 0,
       multiplier: Number(critical.multiplier) || 1
     },
+    effectAction: {
+      effectKey: khodam.effect || null,
+      chanceByAction: khodam.effectChance || {}
+    },
+    activeEffects: [],
     actions: {
-      attack: { ...khodam.action.attack },
-      skill: { ...khodam.action.skill, remaining: khodam.action.skill.use },
-      ultimate: { ...khodam.action.ultimate, remaining: khodam.action.ultimate.use },
-      shield: { ...khodam.action.shield, remaining: khodam.action.shield.use }
+      attack: buildAction("attack"),
+      skill: buildAction("skill"),
+      ultimate: buildAction("ultimate"),
+      shield: buildAction("shield")
     }
   };
 }
@@ -554,9 +613,24 @@ function syncCombatantUi(side) {
   combatant.hpTrailFill.style.width = `${hpPercent}%`;
   combatant.armorFill.style.left = `${hpPercent}%`;
   combatant.armorFill.style.width = `${armorPercent}%`;
-  combatant.meta.textContent = `${Math.ceil(participant.hp)} / ${participant.maxHp} HP${participant.armor ? ` + ${participant.armor} armor` : ""}`;
   combatant.hpFill.classList.remove("is-high", "is-medium", "is-low");
   combatant.hpFill.classList.add(hpTone);
+
+  const energyPercent = clamp((participant.energy / (participant.maxEnergy || ENERGY_SETTINGS.max)) * 100, 0, 100);
+  if (combatant.energyFill) {
+    combatant.energyFill.style.width = `${energyPercent}%`;
+  }
+  if (combatant.energyText) {
+    combatant.energyText.textContent = `${Math.ceil(participant.energy)} / ${participant.maxEnergy || ENERGY_SETTINGS.max} ⚡`;
+  }
+
+  const hpText = `${Math.ceil(participant.hp)} ❤️${participant.armor ? ` + ${participant.armor} 🛡️` : ""}`;
+  if (combatant.hpText) {
+    combatant.hpText.textContent = hpText;
+  }
+  if (combatant.meta) {
+    combatant.meta.textContent = hpText;
+  }
 
   const preview = getKhodamPreviewSrc(participant.khodamKey, getKhodamMap()[participant.khodamKey].preview);
   applyImageSource(combatant.art, preview);
@@ -625,13 +699,24 @@ function updateActionButtons() {
     const actionKey = button.dataset.action;
     const actionData = player?.actions[actionKey];
     const label = getActionButtonLabel(button, actionKey);
-    const badge =
-      typeof actionData?.remaining === "number"
-        ? `<span class="action-button-badge">${actionData.remaining}</span>`
-        : "";
 
-    button.innerHTML = `<span class="action-button-label">${label}</span>${badge}`;
-    button.disabled = disabled || (typeof actionData?.remaining === "number" && actionData.remaining <= 0);
+    const remainingBadge =
+      typeof actionData?.remaining === "number" ? `<span class="action-button-badge">${actionData.remaining}</span>` : "";
+    const cooldownBadge =
+      actionData?.cooldownRemaining > 0 ? `<span class="action-button-badge">⏳ ${actionData.cooldownRemaining}</span>` : "";
+    const energyBadge = actionData?.energyCost > 0 ? `<span class="action-button-badge">⚡ ${actionData.energyCost}</span>` : "";
+    const badgeGroup = remainingBadge || cooldownBadge || energyBadge
+      ? `<span class="action-button-badges">${remainingBadge}${cooldownBadge}${energyBadge}</span>`
+      : "";
+
+    button.innerHTML = `<span class="action-button-label">${label}</span>${badgeGroup}`;
+
+    const notEnoughEnergy = actionData?.energyCost > (player?.energy || 0);
+    const onCooldown = actionData?.cooldownRemaining > 0;
+    const noUses = typeof actionData?.remaining === "number" && actionData.remaining <= 0;
+    const blockedByEffect = player ? isActionDisabledByEffects(player, actionKey) : false;
+
+    button.disabled = disabled || notEnoughEnergy || onCooldown || noUses || blockedByEffect;
   });
 }
 
@@ -763,9 +848,267 @@ function applyShield(target, amount) {
   return amount;
 }
 
+function getEffectDefinition(effectKey) {
+  return getEffectMap()[effectKey] || null;
+}
+
+function normalizeActionList(list) {
+  if (!Array.isArray(list)) {
+    return [];
+  }
+
+  return list
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+}
+
+function isSupportEffect(effectConfig = {}) {
+  return Boolean(
+    effectConfig.healPerTurn ||
+      effectConfig.armorPerTurn ||
+      effectConfig.getEnergy ||
+      effectConfig.removeEffect ||
+      effectConfig.damageIncrease ||
+      effectConfig.hpDrain ||
+      effectConfig.hpFlip
+  );
+}
+
+function getActionEffectChance(participant, actionKey) {
+  return clamp(Number(participant?.effectAction?.chanceByAction?.[actionKey]) || 0, 0, 1);
+}
+
+function findActiveEffect(participant, effectKey) {
+  return participant.activeEffects.find((effect) => effect.key === effectKey);
+}
+
+function addOrRefreshEffect(participant, effectKey, effectConfig) {
+  const existingEffect = findActiveEffect(participant, effectKey);
+  if (existingEffect) {
+    existingEffect.remainingTurns = Math.max(existingEffect.remainingTurns, Number(effectConfig.duration) || 0);
+    return existingEffect;
+  }
+
+  const activeEffect = {
+    key: effectKey,
+    remainingTurns: Number(effectConfig.duration) || 0,
+    config: effectConfig
+  };
+
+  participant.activeEffects.push(activeEffect);
+  return activeEffect;
+}
+
+function removeExpiredEffects(participant) {
+  participant.activeEffects = participant.activeEffects.filter((effect) => effect.remainingTurns > 0);
+}
+
+function clearEffects(participant) {
+  participant.activeEffects = [];
+}
+
+function getDamageMultiplier(participant) {
+  const bonusPercent = participant.activeEffects.reduce((total, effect) => {
+    return total + (Number(effect.config.damageIncrease) || 0);
+  }, 0);
+
+  return 1 + bonusPercent / 100;
+}
+
+function isActionDisabledByEffects(participant, actionKey) {
+  return participant.activeEffects.some((effect) => {
+    const disabledActions = normalizeActionList(effect.config.disableActions);
+    return disabledActions.includes(actionKey);
+  });
+}
+
+function applyCooldownEffect(participant, effectConfig) {
+  const affectedActions = normalizeActionList(effectConfig.addCooldown);
+  const cooldownIncrease = Number(effectConfig.cooldownIncrease) || 0;
+
+  if (!affectedActions.length || cooldownIncrease <= 0) {
+    return false;
+  }
+
+  affectedActions.forEach((actionKey) => {
+    const action = participant.actions[actionKey];
+    if (!action) {
+      return;
+    }
+
+    action.cooldownRemaining += cooldownIncrease;
+  });
+
+  return true;
+}
+
+function applyImmediateEffect(actor, target, effectConfig) {
+  if (effectConfig.removeEffect) {
+    clearEffects(actor);
+    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} membersihkan efek` };
+  }
+
+  if (effectConfig.getEnergy) {
+    const gained = Number(effectConfig.getEnergy) || 0;
+    actor.energy = clamp(actor.energy + gained, 0, actor.maxEnergy || ENERGY_SETTINGS.max);
+    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} +${gained} energi` };
+  }
+
+  if (effectConfig.hpFlip) {
+    const actorHp = actor.hp;
+    actor.hp = clamp(target.hp, 0, actor.maxHp);
+    target.hp = clamp(actorHp, 0, target.maxHp);
+    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menukar HP` };
+  }
+
+  if (applyCooldownEffect(target, effectConfig)) {
+    return { applied: true, toast: `${toTitleCase(target.khodamKey)} terkena cooldown` };
+  }
+
+  return { applied: false, toast: "" };
+}
+
+function tryApplyActionEffect(actor, target, actionKey) {
+  const effectKey = actor.effectAction?.effectKey;
+  const effectConfig = getEffectDefinition(effectKey);
+  const chance = getActionEffectChance(actor, actionKey);
+
+  if (!effectKey || !effectConfig || chance <= 0 || Math.random() > chance) {
+    return null;
+  }
+
+  const recipient = isSupportEffect(effectConfig) ? actor : target;
+  const immediateResult = applyImmediateEffect(actor, target, effectConfig);
+
+  if (immediateResult.applied) {
+    return {
+      effectKey,
+      recipient: recipient.side,
+      toast: immediateResult.toast
+    };
+  }
+
+  if (Number(effectConfig.duration) > 0) {
+    addOrRefreshEffect(recipient, effectKey, effectConfig);
+    return {
+      effectKey,
+      recipient: recipient.side,
+      toast: `${toTitleCase(recipient.khodamKey)} terkena ${effectKey}`
+    };
+  }
+
+  return null;
+}
+
+function resolveTurnEffects(participant) {
+  const events = [];
+
+  participant.activeEffects.forEach((effect) => {
+    const effectConfig = effect.config || {};
+
+    if (effectConfig.damagePerTurn) {
+      const amount = Number(effectConfig.damagePerTurn) || 0;
+      const result = applyDamage(participant, amount);
+      events.push(`-${result.total} ${effect.key}`);
+    }
+
+    if (effectConfig.healPerTurn) {
+      const healed = Number(effectConfig.healPerTurn) || 0;
+      participant.hp = clamp(participant.hp + healed, 0, participant.maxHp);
+      events.push(`+${healed} HP`);
+    }
+
+    if (effectConfig.armorPerTurn) {
+      const armorGain = Number(effectConfig.armorPerTurn) || 0;
+      participant.armor += armorGain;
+      events.push(`+${armorGain} armor`);
+    }
+
+    if (effectConfig.hpDrain) {
+      const drain = Number(effectConfig.hpDrain) || 0;
+      participant.hp = clamp(participant.hp - drain, 0, participant.maxHp);
+      events.push(`-${drain} HP`);
+    }
+
+    if (typeof effect.remainingTurns === "number" && effect.remainingTurns > 0) {
+      effect.remainingTurns -= 1;
+    }
+  });
+
+  removeExpiredEffects(participant);
+  return events;
+}
+
+async function beginTurn(side) {
+  const sessionId = state.battleSession;
+  const actor = state.battle[side];
+
+  state.turnOwner = side;
+  actor.energy = clamp(actor.energy + ENERGY_SETTINGS.perTurn, 0, actor.maxEnergy || ENERGY_SETTINGS.max);
+  Object.values(actor.actions).forEach((nextAction) => {
+    if (nextAction.cooldownRemaining > 0) {
+      nextAction.cooldownRemaining = Math.max(0, nextAction.cooldownRemaining - 1);
+    }
+  });
+
+  const effectEvents = resolveTurnEffects(actor);
+  syncBattleUi();
+
+  if (effectEvents.length) {
+    showToast(`${toTitleCase(actor.khodamKey)} ${effectEvents.join(", ")}`);
+    await delay(700);
+  }
+
+  if (!isBattleSessionActive(sessionId)) {
+    return false;
+  }
+
+  if (state.battle.player.hp <= 0 || state.battle.opponent.hp <= 0) {
+    await finishBattle(state.battle.player.hp > 0 ? "victory" : "defeat");
+    return false;
+  }
+
+  const usableActions = getUsableActions(actor);
+  if (!usableActions.length) {
+    showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
+    await delay(700);
+    if (!isBattleSessionActive(sessionId)) {
+      return false;
+    }
+    await endTurn(side === "player" ? "opponent" : "player");
+    return false;
+  }
+
+  updateActionButtons();
+  return true;
+}
+
+async function endTurn(nextSide) {
+  if (!isBattleSessionActive(state.battleSession)) {
+    return;
+  }
+
+  state.isBattleBusy = false;
+  const canAct = await beginTurn(nextSide);
+  if (!canAct || state.turnOwner !== "opponent") {
+    return;
+  }
+
+  state.isBattleBusy = true;
+  updateActionButtons();
+  await delay(850);
+  await runBotTurn();
+}
+
 function getUsableActions(participant) {
   return Object.entries(participant.actions)
-    .filter(([, action]) => action.use === "unlimited" || action.remaining > 0)
+    .filter(([actionKey, action]) => {
+      const hasUses = typeof action.remaining !== "number" || action.remaining > 0;
+      const hasEnergy = !action.energyCost || participant.energy >= action.energyCost;
+      const offCooldown = !action.cooldownRemaining || action.cooldownRemaining <= 0;
+      const notBlocked = !isActionDisabledByEffects(participant, actionKey);
+      return hasUses && hasEnergy && offCooldown && notBlocked;
+    })
     .map(([key]) => key);
 }
 
@@ -794,8 +1137,30 @@ async function runAction(actorSide, actionKey) {
     return;
   }
 
+  if (action.cooldownRemaining > 0) {
+    showToast(`${toTitleCase(actor.khodamKey)} ${actionKey.toUpperCase()} cooldown ${action.cooldownRemaining}`);
+    return;
+  }
+
+  if (isActionDisabledByEffects(actor, actionKey)) {
+    showToast(`${actionKey.toUpperCase()} sedang terkunci`);
+    return;
+  }
+
   if (typeof action.remaining === "number" && action.remaining <= 0) {
     return;
+  }
+
+  if (action.energyCost > 0 && actor.energy < action.energyCost) {
+    showToast("Energi tidak cukup!");
+    return;
+  }
+
+  actor.energy = clamp(actor.energy - action.energyCost, 0, ENERGY_SETTINGS.max);
+  actor.energy = clamp(actor.energy + action.energyGain, 0, ENERGY_SETTINGS.max);
+
+  if (action.cooldown > 0) {
+    action.cooldownRemaining = action.cooldown;
   }
 
   state.isBattleBusy = true;
@@ -813,12 +1178,19 @@ async function runAction(actorSide, actionKey) {
     showDamageFloat(actorSide, `+${gained}`);
     syncBattleUi();
   } else {
-    const criticalHit = rollCritical(actor, action.damage);
+    const damageWithEffects = Math.max(0, Math.round((Number(action.damage) || 0) * getDamageMultiplier(actor)));
+    const criticalHit = rollCritical(actor, damageWithEffects);
     const result = applyDamage(target, criticalHit.total);
     showDamageFloat(targetSide, criticalHit.triggered ? `CRIT! -${result.total}` : `-${result.total}`);
     if (criticalHit.triggered) {
       showToast(`${toTitleCase(actor.khodamKey)} CRITICAL x${criticalHit.multiplier.toFixed(1)}`);
     }
+    syncBattleUi();
+  }
+
+  const effectResult = tryApplyActionEffect(actor, target, actionKey);
+  if (effectResult?.toast) {
+    showToast(effectResult.toast);
     syncBattleUi();
   }
 
@@ -840,14 +1212,7 @@ async function runAction(actorSide, actionKey) {
     return;
   }
 
-  state.turnOwner = targetSide;
-  state.isBattleBusy = false;
-  updateActionButtons();
-
-  if (state.turnOwner === "opponent") {
-    await delay(850);
-    await runBotTurn();
-  }
+  await endTurn(targetSide);
 }
 
 async function runBotTurn() {
@@ -1051,7 +1416,9 @@ async function runIntro() {
 async function init() {
   bindEvents();
   await runIntro();
-  state.data = await fetchKhodamData();
+  const [khodamData, effectData] = await Promise.all([fetchKhodamData(), fetchEffectData()]);
+  state.data = khodamData;
+  state.effects = effectData;
   state.khodamList = Object.keys(getKhodamMap());
 
   if (!getKhodamMap()[state.selectedKhodamKey]) {
