@@ -20,8 +20,8 @@
     "effectChance": {"attack": 0.1,"skill": 0.1,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "bogem raksasa", "damage": 118, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "bantingan maskulin", "damage": 242, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "amukan brutal", "damage": 468, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "bantingan maskulin", "damage": 242, "preview": "asset/butoijo/butoijo-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "amukan brutal", "damage": 468, "preview": "asset/butoijo/butoijo-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kulit baja", "armor": 188, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -33,8 +33,8 @@
     "effectChance": {"attack": 0,"skill": 0.4,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "cakar petir", "damage": 110, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "sayap kesatuan", "damage": 236, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "turun takhta langit", "damage": 459, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "sayap kesatuan", "damage": 236, "preview": "asset/garuda/garuda-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "turun takhta langit", "damage": 459, "preview": "asset/garuda/garuda-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "bulu suci", "armor": 172, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -46,8 +46,8 @@
     "effectChance": {"attack": 0.2,"skill": 0.2,"ultimate": 1,"shield": 0.5},
     "action": {
       "attack": { "name": "gempur", "damage": 114, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "gada petir", "damage": 245, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "peremuk tekad", "damage": 470, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "gada petir", "damage": 245, "preview": "asset/hanoman/hanoman-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "peremuk tekad", "damage": 470, "preview": "asset/hanoman/hanoman-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "percaya diri", "armor": 181, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -56,12 +56,12 @@
     "hp": 950,
     "critical": { "chance": 21, "multiplier": 1.5 },
     "effect":"lifeFlip",
-    "effectChance": {"attack": 0,"skill": 0,"ultimate": 0,"shield": 0.5},
+    "effectChance": {"attack": 0,"skill": 0,"ultimate": 0,"shield": 1},
     "action": {
       "attack": { "name": "tinju", "damage": 92, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "pukulan bayangan", "damage": 208, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "tendangan bayangan", "damage": 438, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "aura gelap", "armor": 165, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "skill": { "name": "pukulan bayangan", "damage": 208, "preview": "asset/kliwon/kliwon-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "tendangan bayangan", "damage": 438, "preview": "asset/kliwon/kliwon-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "life flip", "armor": 165, "preview": "none", "use": 2, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
   "kuni": {
@@ -72,8 +72,8 @@
     "effectChance": {"attack": 0.7,"skill": 0,"ultimate": 0,"shield": 0},
     "action": {
       "attack": { "name": "cakar", "damage": 108, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "hujan petir", "damage": 231, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "badai arwah", "damage": 463, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "hujan petir", "damage": 231, "preview": "asset/kuntilanak/kuntilanak-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "badai arwah", "damage": 463, "preview": "asset/kuntilanak/kuntilanak-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kabut", "armor": 174, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -85,8 +85,8 @@
     "effectChance": {"attack": 0.2,"skill": 0.2,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "bola racun", "damage": 116, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "kutukan", "damage": 248, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "ledakan racun", "damage": 469, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "kutukan", "damage": 248, "preview": "asset/neneklampir/neneklampir-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ledakan racun", "damage": 469, "preview": "asset/neneklampir/neneklampir-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "menghindar", "armor": 186, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -98,8 +98,8 @@
     "effectChance": {"attack": 0.2,"skill": 0.5,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "lempar kunai", "damage": 102, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "pedang arwah", "damage": 220, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "tebasan jiwa", "damage": 447, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "pedang arwah", "damage": 220, "preview": "asset/ninjapocong/ninjapocong-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "tebasan jiwa", "damage": 447, "preview": "asset/ninjapocong/ninjapocong-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kabut", "armor": 169, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -111,8 +111,8 @@
     "effectChance": {"attack": 0,"skill": 0,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "gelombang air", "damage": 120, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "kereta kencana", "damage": 250, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "7 naga laut", "damage": 470, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "kereta kencana", "damage": 250, "preview": "asset/nyirorokidul/nyirorokidul-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "7 naga laut", "damage": 470, "preview": "asset/nyirorokidul/nyirorokidul-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "tameng laut", "armor": 190, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -124,8 +124,8 @@
     "effectChance": {"attack": 0,"skill": 0.5,"ultimate": 0,"shield": 1},
     "action": {
       "attack": { "name": "tebas", "damage": 106, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "silat betawi", "damage": 228, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "golok terbang", "damage": 454, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "silat betawi", "damage": 228, "preview": "asset/pitung/pitung-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "golok terbang", "damage": 454, "preview": "asset/pitung/pitung-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "kuda-kuda", "armor": 177, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -137,8 +137,8 @@
     "effectChance": {"attack": 0,"skill": 1,"ultimate": 0.3,"shield": 0},
     "action": {
       "attack": { "name": "tebas", "damage": 112, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "gigitan macan", "damage": 239, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "manusia macan", "damage": 461, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "gigitan macan", "damage": 239, "preview": "asset/siliwangi/siliwangi-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "manusia macan", "damage": 461, "preview": "asset/siliwangi/siliwangi-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "aura", "armor": 183, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
@@ -150,12 +150,12 @@
     "effectChance": {"attack": 0.5,"skill": 0.7,"ultimate": 1,"shield": 0},
     "action": {
       "attack": { "name": "curi duit", "damage": 90, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "copet dompet", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "rampok sekampung", "damage": 435, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "copet dompet", "damage": 200, "preview": "asset/tuyul/tuyul-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "rampok sekampung", "damage": 435, "preview": "asset/tuyul/tuyul-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "ngumpet", "armor": 160, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   },
-  " admin ": {
+  "yasa": {
     "preview": "asset/admin/admin.png",
     "hp": 880,
     "critical": { "chance": 30, "multiplier": 2.0 },
@@ -163,8 +163,8 @@
     "effectChance": {"attack": 0.2,"skill": 0.5,"ultimate": 0.8,"shield": 1},
     "action": {
       "attack": { "name": "update game", "damage": 119, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "hack sistem", "damage": 249, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "ban player", "damage": 470, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "skill": { "name": "hack sistem", "damage": 249, "preview": "asset/admin/admin-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ban player", "damage": 470, "preview": "asset/admin/admin-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
       "shield": { "name": "debug error", "armor": 189, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     }
   }

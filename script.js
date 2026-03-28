@@ -874,6 +874,18 @@ function isSupportEffect(effectConfig = {}) {
   );
 }
 
+function getEffectRecipient(actor, target, effectConfig = {}) {
+  if (effectConfig.target === "sendiri") {
+    return actor;
+  }
+
+  if (effectConfig.target === "musuh") {
+    return target;
+  }
+
+  return isSupportEffect(effectConfig) ? actor : target;
+}
+
 function getActionEffectChance(participant, actionKey) {
   return clamp(Number(participant?.effectAction?.chanceByAction?.[actionKey]) || 0, 0, 1);
 }
@@ -942,23 +954,23 @@ function applyCooldownEffect(participant, effectConfig) {
   return true;
 }
 
-function applyImmediateEffect(actor, target, effectConfig) {
+function applyImmediateEffect(actor, target, effectKey, effectConfig) {
   if (effectConfig.removeEffect) {
     clearEffects(actor);
-    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} membersihkan efek` };
+    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}` };
   }
 
   if (effectConfig.getEnergy) {
     const gained = Number(effectConfig.getEnergy) || 0;
     actor.energy = clamp(actor.energy + gained, 0, actor.maxEnergy || ENERGY_SETTINGS.max);
-    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} +${gained} energi` };
+    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}` };
   }
 
   if (effectConfig.hpFlip) {
     const actorHp = actor.hp;
     actor.hp = clamp(target.hp, 0, actor.maxHp);
     target.hp = clamp(actorHp, 0, target.maxHp);
-    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menukar HP` };
+    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}` };
   }
 
   if (applyCooldownEffect(target, effectConfig)) {
@@ -977,8 +989,8 @@ function tryApplyActionEffect(actor, target, actionKey) {
     return null;
   }
 
-  const recipient = isSupportEffect(effectConfig) ? actor : target;
-  const immediateResult = applyImmediateEffect(actor, target, effectConfig);
+  const recipient = getEffectRecipient(actor, target, effectConfig);
+  const immediateResult = applyImmediateEffect(actor, target, effectKey, effectConfig);
 
   if (immediateResult.applied) {
     return {
@@ -993,7 +1005,10 @@ function tryApplyActionEffect(actor, target, actionKey) {
     return {
       effectKey,
       recipient: recipient.side,
-      toast: `${toTitleCase(recipient.khodamKey)} terkena ${effectKey}`
+      toast:
+        effectConfig.target === "sendiri"
+          ? `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}`
+          : `${toTitleCase(recipient.khodamKey)} terkena ${effectKey}`
     };
   }
 
