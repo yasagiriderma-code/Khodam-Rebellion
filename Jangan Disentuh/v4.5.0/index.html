@@ -23,9 +23,9 @@
 
         <div class="main-lobby">
             <div class="main-lobby-title-overlay">
-                <h1 id="nama-khodam">WIRO SABLENG</h1>
+                <h1 id="nama-khodam">HANOMAN</h1>
             </div>
-            <img id="background-video-main-lobby" src="asset/wirosableng.png" alt="Preview Khodam">
+            <img id="background-video-main-lobby" src="asset/hanoman.png" alt="Preview Khodam">
             <div class="input-name-overlay">
                 <input type="text" id="player-name-input" placeholder="Ketik Nama Kamu . . .">
             </div>
@@ -60,16 +60,22 @@
             <div class="player combatant">
                 <div class="status-card-player status-card">
                     <p class="label" id="nama-player">KAMU</p>
-                    <h2 class="name" id="player-battle-name">SABLENG</h2>
+                    <h2 class="name" id="player-battle-name">HANOMAN</h2>
                     <div class="hp-track">
                         <div class="hp-trail-fill" id="player-hp-trail-fill" style="width: 100%;"></div>
                         <div class="hp-fill" id="player-hp-fill" style="width: 100%;"></div>
                         <div class="armor-fill" id="player-armor-fill" style="width: 0%; left: 100%;"></div>
+                        <span class="track-text" id="player-hp-text">1000 / 1000 HP</span>
                     </div>
-                    <p class="status-meta" id="player-status-meta">1000 / 1000 HP</p>
+                    <div class="energy-track">
+                        <div class="energy-fill" id="player-energy-fill" style="width: 0%;"></div>
+                        <span class="track-text" id="player-energy-text">0 / 300 EN</span>
+                    </div>
+                    <p class="energy-meta" id="player-energy-meta" hidden>0 / 300 EN</p>
+                    <p class="status-meta" id="player-status-meta" hidden>1000 / 1000 HP</p>
                 </div>
                 <div class="card-player battle-card">
-                    <img class="card-art" id="player-card-art" src="asset/wirosableng.png" alt="Kartu pemain">
+                    <img class="card-art" id="player-card-art" src="asset/hanoman.png" alt="Kartu pemain">
                 </div>
             </div>
             <div class="opponent combatant">
@@ -80,8 +86,14 @@
                         <div class="hp-trail-fill enemy-trail-fill" id="opponent-hp-trail-fill" style="width: 100%;"></div>
                         <div class="hp-fill" id="opponent-hp-fill" style="width: 100%;"></div>
                         <div class="armor-fill enemy-armor-fill" id="opponent-armor-fill" style="width: 0%; left: 100%;"></div>
+                        <span class="track-text" id="opponent-hp-text">1000 / 1000 HP</span>
                     </div>
-                    <p class="status-meta" id="opponent-status-meta">1000 / 1000 HP</p>
+                    <div class="energy-track">
+                        <div class="energy-fill" id="opponent-energy-fill" style="width: 0%;"></div>
+                        <span class="track-text" id="opponent-energy-text">0 / 300 EN</span>
+                    </div>
+                    <p class="energy-meta" id="opponent-energy-meta" hidden>0 / 300 EN</p>
+                    <p class="status-meta" id="opponent-status-meta" hidden>1000 / 1000 HP</p>
                 </div>
                 <div class="card-opponent battle-card">
                     <img class="card-art" id="opponent-card-art" src="asset/pitung.png" alt="Kartu lawan">

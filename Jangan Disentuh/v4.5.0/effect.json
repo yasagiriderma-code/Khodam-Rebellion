@@ -1,0 +1,67 @@
+{
+    "burn": {
+      "duration": 3,
+      "damagePerTurn": 10
+    },
+    "poison": {
+      "duration": 3,
+      "damagePerTurn": 5
+    },
+    "bleed": {
+      "duration": 4,
+      "damagePerTurn": 8
+    },
+
+
+    "stun": {
+      "duration": 1,
+      "disableActions": ["attack"," skill"," ultimate"]
+    },
+    "blocked": {
+      "duration": 2,
+      "disableActions": ["attack"," skill"," ultimate"]
+    },
+    "weakness": {
+      "duration": 3,
+      "disableActions": ["shield"]
+    },
+
+    "recovery": {
+      "duration": 3,
+      "healPerTurn": 15
+    },
+    "strength": {
+      "duration": 3,
+      "armorPerTurn": 10
+    },
+    "lifeFlip":{
+      "hpFlip": true
+    },
+
+    "freeze": {
+      "addCooldown": [" skill"," ultimate"],
+      "cooldownIncrease": 2
+    },
+    "slow": {
+      "addCooldown": [" skill"," ultimate"],
+      "cooldownIncrease": 1
+    },
+
+    "rage":{
+      "duration": 3,
+      "damageIncrease": 20
+    },
+    "berserk":{
+      "duration": 3,
+      "damageIncrease": 65,
+      "hpDrain": 10
+    },
+
+    "lucky": {
+      "getEnergy": 20
+    },
+
+    "dispel": {
+      "removeEffect": true
+    }
+}

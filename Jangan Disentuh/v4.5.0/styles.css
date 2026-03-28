@@ -270,7 +270,7 @@ p {
 
 .khodam-card {
     width: 150px;
-    flex: 0 0 150px;
+    /* flex: 0 0 150px; */
     margin: 10px;
     padding: 10px;
     background: #ffffff;
@@ -438,6 +438,55 @@ p {
     border: 3px solid rgb(0, 0, 0);
 }
 
+.energy-track {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    margin-top: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #1f2937;
+    border: 2px solid rgb(0, 0, 0);
+}
+
+.energy-fill,
+.hp-fill,
+.hp-trail-fill,
+.armor-fill {
+    z-index: 1;
+}
+
+.track-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.hp-track .track-text {
+    font-size: 12px;
+}
+
+.hp-track,
+.energy-track {
+    min-height: 18px;
+}
+
+.energy-meta {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.2;
+    color: #ffffff;
+    text-align: center;
+}
+
 .hp-fill,
 .hp-trail-fill,
 .armor-fill {
@@ -445,6 +494,17 @@ p {
     top: 0;
     height: 100%;
     border-radius: inherit;
+}
+
+.energy-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #38bdf8 0%, #2563eb 100%);
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.18);
+    transition: width 0.35s ease;
 }
 
 .hp-fill,
@@ -458,14 +518,19 @@ p {
 }
 
 .hp-fill {
-    z-index: 2;
+    z-index: 1;
     left: 0;
     background: rgb(34, 197, 94);
     transition: width 0.55s ease, left 0.55s ease, background-color 0.3s ease;
 }
 
 .hp-trail-fill {
-    z-index: 1;
+    z-index: 0;
+    background: #facc15;
+}
+
+.hp-trail-fill {
+    z-index: 0;
     background: #facc15;
 }
 
@@ -623,10 +688,16 @@ p {
     display: inline-block;
 }
 
-.action-button-badge {
+.action-button-badges {
     position: absolute;
     top: -10px;
     right: -10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-button-badge {
     min-width: 28px;
     height: 28px;
     padding: 0 8px;
