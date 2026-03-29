@@ -1,5 +1,5 @@
 {
-  "bara": {
+  "banaspati": {
     "preview": "asset/banaspati/banaspati.png",
     "hp": 1050,
     "critical": { "chance": 22, "multiplier": 1.6 },
@@ -13,7 +13,7 @@
     },
     "selebrasi":"asset/banaspati/banaspati-selebrasi.mp4"
   },
-  "buto ijo": {
+  "buto": {
     "preview": "asset/butoijo/butoijo.png",
     "hp": 1100,
     "critical": { "chance": 28, "multiplier": 1.8 },
