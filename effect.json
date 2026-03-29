@@ -2,7 +2,7 @@
     "burn": {
         "target":"musuh",
         "duration": 3,
-        "damagePerTurn": 20
+        "damagePerTurn": 23
     },
     "poison": {
         "target":"musuh",
@@ -23,7 +23,7 @@
     },
     "blocked": {
         "target":"musuh",
-        "duration": 2,
+        "duration": 1,
         "disableActions": ["attack"," skill"," ultimate"]
     },
     "weakness": {
@@ -67,7 +67,7 @@
         "target":"sendiri",
         "duration": 3,
         "damageIncrease": 55,
-        "hpDrain": 10
+        "hpDrain": 15
     },
 
     "lucky": {

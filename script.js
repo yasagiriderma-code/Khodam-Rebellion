@@ -52,6 +52,12 @@ const elements = {
   lobbyVideo: document.getElementById("background-video-main-lobby"),
   playerNameInput: document.getElementById("player-name-input"),
   selectionButton: document.getElementById("khodam-selection-button"),
+  selectionTitle: document.getElementById("khodam-selection-title"),
+  selectionStats: document.getElementById("khodam-selection-stats"),
+  selectionStatHp: document.getElementById("khodam-stat-hp"),
+  selectionStatAtk: document.getElementById("khodam-stat-atk"),
+  selectionStatDef: document.getElementById("khodam-stat-def"),
+  selectionStatSp: document.getElementById("khodam-stat-sp"),
   playButton: document.getElementById("play-button"),
   selectionCards: document.getElementById("khodam-selection-cards"),
   cancelSelectionButton: document.getElementById("cancel-khodam-selection"),
@@ -126,6 +132,7 @@ const khodamAssetAliases = { "si pitung": "pitung" };
 const state = {
   data: null,
   effects: null,
+  sfx: null,
   khodamList: [],
   defaultPlayerName: null,
   selectedKhodamKey: "anoman",
@@ -147,6 +154,22 @@ const state = {
   battle: null,
   battleMode: null,
   assetCache: { ready: new Set(), pending: new Map() },
+  audio: {
+    unlocked: false,
+    unlockBound: false,
+    activeMusic: null,
+    music: {
+      lobby: null,
+      gameplay: null
+    }
+  },
+  idleHints: {
+    intervalMs: 3000,
+    durationMs: 550,
+    lobbyTimer: null,
+    selectionTimer: null,
+    actionTimer: null
+  },
 
   // ── Online multiplayer state ──
   online: {
@@ -187,6 +210,181 @@ function getHpTone(hpPercent) {
   return "is-high";
 }
 
+function getSfxMap() { return state.sfx || {}; }
+
+function createAudioInstance(src, { loop = false, volume = 1 } = {}) {
+  if (!src || src === "none") return null;
+  const audio = new Audio(src);
+  audio.preload = "auto";
+  audio.loop = loop;
+  audio.volume = volume;
+  return audio;
+}
+
+function initializeAudioSystem() {
+  const sfx = getSfxMap();
+  state.audio.music.lobby = createAudioInstance(sfx["lobby-music"], { loop: true, volume: 0.45 });
+  state.audio.music.gameplay = createAudioInstance(sfx["gameplay-music"], { loop: true, volume: 0.4 });
+}
+
+function tryPlayAudio(audio) {
+  if (!audio) return;
+  const playPromise = audio.play();
+  if (playPromise?.catch) {
+    playPromise.catch(() => {
+      bindAudioUnlock();
+    });
+  }
+}
+
+function stopAudio(audio) {
+  if (!audio) return;
+  audio.pause();
+  audio.currentTime = 0;
+}
+
+function stopAllMusic() {
+  stopAudio(state.audio.music.lobby);
+  stopAudio(state.audio.music.gameplay);
+  state.audio.activeMusic = null;
+}
+
+function playMusic(trackName) {
+  const nextTrack = state.audio.music[trackName];
+  if (!nextTrack) return;
+  if (state.audio.activeMusic === nextTrack && !nextTrack.paused) return;
+
+  Object.values(state.audio.music).forEach((audio) => {
+    if (audio && audio !== nextTrack) stopAudio(audio);
+  });
+
+  nextTrack.currentTime = 0;
+  state.audio.activeMusic = nextTrack;
+  tryPlayAudio(nextTrack);
+}
+
+function ensureMusic(trackName) {
+  const track = state.audio.music[trackName];
+  if (!track) return;
+  if (state.audio.activeMusic === track && !track.paused) return;
+  if (state.audio.activeMusic && state.audio.activeMusic !== track) {
+    playMusic(trackName);
+    return;
+  }
+  state.audio.activeMusic = track;
+  tryPlayAudio(track);
+}
+
+function bindAudioUnlock() {
+  if (state.audio.unlockBound) return;
+  state.audio.unlockBound = true;
+
+  const unlock = () => {
+    if (state.audio.unlocked) return;
+    state.audio.unlocked = true;
+    window.removeEventListener("pointerdown", unlock);
+    window.removeEventListener("keydown", unlock);
+    state.audio.unlockBound = false;
+
+    if (state.screen === "lobby" || state.screen === "selection") {
+      ensureMusic("lobby");
+    } else if (state.screen === "gameplay") {
+      ensureMusic("gameplay");
+    }
+  };
+
+  window.addEventListener("pointerdown", unlock, { once: true });
+  window.addEventListener("keydown", unlock, { once: true });
+}
+
+function playSfx(name, { volume = 1 } = {}) {
+  const src = getSfxMap()[name];
+  if (!src || src === "none") return;
+  const audio = createAudioInstance(src, { volume });
+  tryPlayAudio(audio);
+}
+
+function playActionSfx(actionKey) {
+  if (actionKey === "attack") {
+    playSfx("atk-sfx", { volume: 0.7 });
+    return;
+  }
+  if (actionKey === "shield") {
+    playSfx("def-sfx", { volume: 0.7 });
+  }
+}
+
+function isElementVisible(element) {
+  if (!element) return false;
+  if (element.hidden) return false;
+  return window.getComputedStyle(element).display !== "none";
+}
+
+function triggerIdleNudge(elementsToAnimate) {
+  elementsToAnimate.forEach((element) => {
+    if (!element || !isElementVisible(element) || element.disabled) return;
+    element.classList.remove("idle-nudge");
+    void element.offsetWidth;
+    element.classList.add("idle-nudge");
+  });
+
+  window.setTimeout(() => {
+    elementsToAnimate.forEach((element) => element?.classList.remove("idle-nudge"));
+  }, state.idleHints.durationMs);
+}
+
+function clearIdleHintTimer(timerKey) {
+  const timerId = state.idleHints[timerKey];
+  if (timerId) {
+    window.clearTimeout(timerId);
+    state.idleHints[timerKey] = null;
+  }
+}
+
+function scheduleIdleHint(timerKey, getTargets, shouldRun) {
+  clearIdleHintTimer(timerKey);
+
+  const queueNext = () => {
+    clearIdleHintTimer(timerKey);
+    state.idleHints[timerKey] = window.setTimeout(() => {
+      if (!shouldRun()) {
+        queueNext();
+        return;
+      }
+
+      const targets = getTargets().filter((element) => element && isElementVisible(element) && !element.disabled);
+      if (targets.length) triggerIdleNudge(targets);
+      queueNext();
+    }, state.idleHints.intervalMs);
+  };
+
+  queueNext();
+}
+
+function resetLobbyIdleHint() {
+  scheduleIdleHint(
+    "lobbyTimer",
+    () => [elements.selectionButton, elements.playButton],
+    () => state.screen === "lobby"
+  );
+}
+
+function resetSelectionIdleHint() {
+  scheduleIdleHint(
+    "selectionTimer",
+    () => [elements.cancelSelectionButton, elements.confirmSelectionButton],
+    () => state.screen === "selection"
+  );
+}
+
+function resetActionIdleHint() {
+  scheduleIdleHint(
+    "actionTimer",
+    () => elements.actionButtons.filter((button) => !button.disabled),
+    () => state.screen === "gameplay" && !state.gameOver && state.turnOwner === "player" && !state.isBattleBusy
+  );
+}
+
 // ─── SCREEN MANAGEMENT ───────────────────────────────────────────────────────
 function showScreen(name) {
   Object.entries(screens).forEach(([key, element]) => {
@@ -223,6 +421,12 @@ async function fetchEffectData() {
   return normalizeEffectData(await response.json());
 }
 
+async function fetchSfxData() {
+  const response = await fetch("sfx.json", { cache: "no-store" });
+  if (!response.ok) throw new Error("Gagal membaca sfx.json");
+  return normalizeSfxData(await response.json());
+}
+
 function normalizeKhodamData(rawData) {
   if (!rawData || typeof rawData !== "object" || Array.isArray(rawData))
     throw new Error("Format khodam.json tidak valid");
@@ -232,6 +436,12 @@ function normalizeKhodamData(rawData) {
 function normalizeEffectData(rawData) {
   if (!rawData || typeof rawData !== "object" || Array.isArray(rawData))
     throw new Error("Format effect.json tidak valid");
+  return rawData;
+}
+
+function normalizeSfxData(rawData) {
+  if (!rawData || typeof rawData !== "object" || Array.isArray(rawData))
+    throw new Error("Format sfx.json tidak valid");
   return rawData;
 }
 
@@ -265,14 +475,38 @@ async function preloadVideo(src) {
     const video = document.createElement("video");
     video.preload = "auto";
     video.muted = true;
+    video.playsInline = true;
+    video.setAttribute("playsinline", "");
     video.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;";
     document.body.appendChild(video);
     let settled = false;
-    const finish = () => { if (settled) return; settled = true; resolve(); };
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    const warmPlayback = () => {
+      const playPromise = video.play();
+      if (playPromise?.catch) {
+        playPromise
+          .then(() => {
+            window.setTimeout(() => {
+              video.pause();
+              finish();
+            }, 120);
+          })
+          .catch(() => {
+            if (video.readyState >= 2) finish();
+          });
+      } else if (video.readyState >= 2) {
+        finish();
+      }
+    };
     video.addEventListener("canplaythrough", finish, { once: true });
-    video.addEventListener("loadeddata", finish, { once: true });
+    video.addEventListener("loadeddata", warmPlayback, { once: true });
+    video.addEventListener("loadedmetadata", warmPlayback, { once: true });
     video.addEventListener("error", finish, { once: true });
-    window.setTimeout(finish, 8000);
+    window.setTimeout(finish, 15000);
     video.src = chooseCompatibleMedia(src);
     video.load();
   });
@@ -387,7 +621,32 @@ function renderSelectionCards() {
     if (state.pendingKhodamKey === key) card.classList.add("is-selected");
     elements.selectionCards.appendChild(card);
   });
+  renderSelectionHeader();
   syncSelectionButtons();
+}
+
+function renderSelectionHeader() {
+  const pendingKey = state.pendingKhodamKey;
+
+  if (!pendingKey) {
+    elements.selectionTitle.hidden = false;
+    elements.selectionStats.hidden = true;
+    return;
+  }
+
+  const khodam = getKhodamMap()[pendingKey];
+  if (!khodam) {
+    elements.selectionTitle.hidden = false;
+    elements.selectionStats.hidden = true;
+    return;
+  }
+
+  elements.selectionTitle.hidden = true;
+  elements.selectionStats.hidden = false;
+  elements.selectionStatHp.textContent = String(khodam.hp ?? 0);
+  elements.selectionStatAtk.textContent = String(khodam.action?.attack?.damage ?? 0);
+  elements.selectionStatDef.textContent = String(khodam.action?.shield?.armor ?? 0);
+  elements.selectionStatSp.textContent = String(khodam.effect ?? "-").toUpperCase();
 }
 
 function syncSelectionButtons() {
@@ -397,18 +656,22 @@ function syncSelectionButtons() {
   cards.forEach((card) => {
     card.classList.toggle("is-selected", card.dataset.khodam === state.pendingKhodamKey);
   });
+  renderSelectionHeader();
+  if (state.screen === "selection") resetSelectionIdleHint();
 }
 
 function openSelectionScreen() {
   state.pendingKhodamKey = null;
   syncSelectionButtons();
   showScreen("selection");
+  resetSelectionIdleHint();
 }
 
 function closeSelectionScreen() {
   state.pendingKhodamKey = null;
   showScreen("lobby");
   syncSelectionButtons();
+  resetLobbyIdleHint();
 }
 
 function selectPendingKhodam(key) {
@@ -422,6 +685,7 @@ function confirmPendingKhodam() {
     renderLobbySelection();
   }
   closeSelectionScreen();
+  resetLobbyIdleHint();
 }
 
 // ─── ORBIT (arena animation) ─────────────────────────────────────────────────
@@ -654,6 +918,9 @@ async function playBattleCelebration(result) {
   const winner = state.battle?.[winnerSide];
   if (!winner) return;
 
+  stopAudio(state.audio.music.gameplay);
+  state.audio.activeMusic = null;
+
   clearCelebrationState();
   state.turnOwner = winnerSide;
   syncBattleUi();
@@ -666,10 +933,8 @@ async function playBattleCelebration(result) {
 
   const celebrationSrc = getKhodamCelebrationSrc(winner.khodamKey);
   await queueAssetPreload(celebrationSrc);
-  await Promise.all([
-    playCardCelebration(winnerSide, celebrationSrc),
-    playFullscreenAnimation(celebrationSrc, "", { allowSkip: false, muted: false })
-  ]);
+  await delay(520);
+  await playFullscreenAnimation(celebrationSrc, "", { allowSkip: false, muted: false });
   clearCelebrationState();
 }
 
@@ -704,12 +969,26 @@ function updateActionButtons() {
     const blockedByEffect = player ? isActionDisabledByEffects(player, actionKey) : false;
     button.disabled = disabled || notEnoughEnergy || onCooldown || noUses || blockedByEffect;
   });
+  if (state.screen === "gameplay") resetActionIdleHint();
 }
 
 // ─── FULLSCREEN ANIMATION ─────────────────────────────────────────────────────
 async function playFullscreenAnimation(src, quote, options = {}) {
   if (!src || src === "none") return;
-  const { allowSkip = true, muted = false } = options;
+  const { allowSkip = true, muted = false, pauseGameplayMusic = false } = options;
+  const gameplayMusic = state.audio.music.gameplay;
+  const shouldResumeGameplayMusic = Boolean(
+    pauseGameplayMusic &&
+    gameplayMusic &&
+    state.audio.activeMusic === gameplayMusic &&
+    !gameplayMusic.paused
+  );
+
+  await queueAssetPreload(src);
+  if (pauseGameplayMusic && gameplayMusic && !gameplayMusic.paused) {
+    gameplayMusic.pause();
+  }
+
   showOverlay(overlays.fullscreen, true);
   showOverlay(overlays.skip, allowSkip);
   if (quote) {
@@ -745,6 +1024,15 @@ async function playFullscreenAnimation(src, quote, options = {}) {
   showOverlay(overlays.fullscreen, false);
   showOverlay(overlays.skip, false);
   showOverlay(overlays.kata, false);
+
+  if (
+    shouldResumeGameplayMusic &&
+    state.screen === "gameplay" &&
+    !state.gameOver &&
+    !overlays.fullscreen.classList.contains("overlay-visible")
+  ) {
+    tryPlayAudio(gameplayMusic);
+  }
 }
 
 function stopFullscreenAnimation() {
@@ -1000,6 +1288,7 @@ async function enterBotBattle() {
 
   syncBattleUi();
   showScreen("gameplay");
+  playMusic("gameplay");
   showOverlay(overlays.actionMenu, true);
   showOverlay(overlays.surrender, true);
   startOrbitLoop();
@@ -1109,9 +1398,12 @@ async function runBotAction(actionKey) {
   const player = state.battle.player;
   const action = opponent.actions[actionKey];
   if (!action) return;
+  playActionSfx(actionKey);
 
   await queueAssetPreload(action.preview);
-  await playFullscreenAnimation(action.preview, action.katakata || "");
+  await playFullscreenAnimation(action.preview, action.katakata || "", {
+    pauseGameplayMusic: actionKey === "skill" || actionKey === "ultimate"
+  });
 
   if (state.screen !== "gameplay" || state.battleMode !== "bot") return;
 
@@ -1164,6 +1456,7 @@ async function runLocalBotPlayerAction(actionKey) {
 
   actor.energy = clamp(actor.energy - action.energyCost + action.energyGain, 0, ENERGY_SETTINGS.max);
   if (action.cooldown > 0) action.cooldownRemaining = action.cooldown;
+  playActionSfx(actionKey);
 
   state.isBattleBusy = true;
   updateActionButtons();
@@ -1188,7 +1481,9 @@ async function runLocalBotPlayerAction(actionKey) {
   syncBattleUi();
 
   await queueAssetPreload(action.preview);
-  await playFullscreenAnimation(action.preview, action.katakata || "");
+  await playFullscreenAnimation(action.preview, action.katakata || "", {
+    pauseGameplayMusic: actionKey === "skill" || actionKey === "ultimate"
+  });
 
   if (!isBattleSessionActive(sessionId) || state.battleMode !== "bot") return;
 
@@ -1384,6 +1679,7 @@ async function startMatchmaking() {
   const khodamKey = state.selectedKhodamKey;
   resetOnlineMatchState();
   clearBotTurnTimeout();
+  stopAllMusic();
   state.battleMode = null;
 
   showScreen("search");
@@ -1517,6 +1813,7 @@ function enterOnlineBattle() {
 
   syncBattleUi();
   showScreen("gameplay");
+  playMusic("gameplay");
   showOverlay(overlays.actionMenu, true);
   showOverlay(overlays.surrender, true);
   startOrbitLoop();
@@ -1596,6 +1893,7 @@ async function handleOpponentAction(actionData) {
 
   state.isBattleBusy = true;
   updateActionButtons();
+  playActionSfx(actionKey);
 
   const opponent = state.battle.opponent;
   const player = state.battle.player;
@@ -1604,7 +1902,9 @@ async function handleOpponentAction(actionData) {
   if (!action) { state.isBattleBusy = false; return; }
 
   await queueAssetPreload(action.preview);
-  await playFullscreenAnimation(action.preview, "");
+  await playFullscreenAnimation(action.preview, "", {
+    pauseGameplayMusic: actionKey === "skill" || actionKey === "ultimate"
+  });
 
   if (state.screen !== "gameplay") return;
 
@@ -1722,6 +2022,7 @@ async function runOnlineAction(actorSide, actionKey) {
 
   actor.energy = clamp(actor.energy - action.energyCost + action.energyGain, 0, ENERGY_SETTINGS.max);
   if (action.cooldown > 0) action.cooldownRemaining = action.cooldown;
+  playActionSfx(actionKey);
 
   state.isBattleBusy = true;
   updateActionButtons();
@@ -1761,7 +2062,9 @@ async function runOnlineAction(actorSide, actionKey) {
   await pushActionToFirebase(actionKey, resolvedDamage, resolvedArmor, critTriggered, critMultiplier, effectResult, Math.random());
 
   await queueAssetPreload(action.preview);
-  await playFullscreenAnimation(action.preview, action.katakata || "");
+  await playFullscreenAnimation(action.preview, action.katakata || "", {
+    pauseGameplayMusic: actionKey === "skill" || actionKey === "ultimate"
+  });
 
   if (!isBattleSessionActive(sessionId)) return;
 
@@ -1796,7 +2099,7 @@ async function finishBattle(result) {
   await playBattleCelebration(result);
 
   const isVictory = result === "victory";
-  const confirmed = await openModal({
+  const modalPromise = openModal({
     title: isVictory ? "VICTORY" : "DEFEAT",
     description: isVictory ? "Khodammu menang. Mau rematch?" : "Kali ini kalah. Mau coba lagi?",
     confirmText: isVictory ? "LANJUT" : "ULANGI",
@@ -1804,6 +2107,8 @@ async function finishBattle(result) {
     cancelText: "KE LOBBY",
     layout: "result"
   });
+  playSfx(isVictory ? "win-sfx" : "lose-sfx", { volume: 0.85 });
+  const confirmed = await modalPromise;
 
   // Clean up room
   await cleanupRoom();
@@ -1832,22 +2137,35 @@ function leaveBattleToLobby() {
   clearBotTurnTimeout();
   clearCelebrationState();
   stopFullscreenAnimation();
+  stopAllMusic();
   resetBattleFeedback();
   showOverlay(overlays.actionMenu, false);
   showOverlay(overlays.surrender, false);
   showScreen("lobby");
+  ensureMusic("lobby");
 }
 
 // ─── EVENT BINDING ────────────────────────────────────────────────────────────
 function bindEvents() {
-  elements.selectionButton.addEventListener("click", openSelectionScreen);
-  elements.cancelSelectionButton.addEventListener("click", closeSelectionScreen);
-  elements.confirmSelectionButton.addEventListener("click", confirmPendingKhodam);
+  elements.selectionButton.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    openSelectionScreen();
+  });
+  elements.cancelSelectionButton.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    closeSelectionScreen();
+  });
+  elements.confirmSelectionButton.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    confirmPendingKhodam();
+  });
 
   elements.selectionCards.addEventListener("click", (event) => {
     const card = event.target.closest(".khodam-card");
     if (!card) return;
+    playSfx("ui-sfx", { volume: 0.65 });
     selectPendingKhodam(card.dataset.khodam);
+    resetSelectionIdleHint();
   });
 
   document.addEventListener("click", (event) => {
@@ -1862,10 +2180,12 @@ function bindEvents() {
   });
 
   elements.playButton.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.75 });
     startMatchmaking();
   });
 
   elements.playerNameInput.addEventListener("input", () => {
+    if (state.screen === "lobby") resetLobbyIdleHint();
     if (!state.battle) return;
     state.battle.playerName = getPlayerDisplayName();
     syncCombatantUi("player");
@@ -1874,12 +2194,14 @@ function bindEvents() {
   elements.actionButtons.forEach((button) => {
     button.addEventListener("click", async () => {
       if (state.isBattleBusy || state.turnOwner !== "player" || state.gameOver) return;
+      resetActionIdleHint();
       await runPlayerAction(button.dataset.action);
     });
   });
 
   elements.surrenderButton.addEventListener("click", async () => {
     if (state.gameOver || state.screen !== "gameplay") return;
+    playSfx("ui-sfx", { volume: 0.7 });
     const confirmed = await openModal({
       title: "SURRENDER?",
       description: "Kalau menyerah, pertarungan langsung kalah.",
@@ -1897,11 +2219,23 @@ function bindEvents() {
     }
   });
 
-  elements.modalConfirm.addEventListener("click", () => closeModal(true));
-  elements.modalCancel.addEventListener("click", () => closeModal(false));
+  elements.modalConfirm.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    closeModal(true);
+  });
+  elements.modalCancel.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    closeModal(false);
+  });
 
   window.addEventListener("resize", () => {
     if (state.screen === "gameplay") syncBattleUi();
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (state.screen === "lobby" && event.target.closest(".main-lobby")) resetLobbyIdleHint();
+    if (state.screen === "selection" && event.target.closest(".khodam-selection")) resetSelectionIdleHint();
+    if (state.screen === "gameplay" && event.target.closest(".gameplay, .action-menu-overlay")) resetActionIdleHint();
   });
 
   // Clean up when tab closes
@@ -1930,12 +2264,15 @@ async function runIntro() {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 async function init() {
   bindEvents();
+  bindAudioUnlock();
   state.defaultPlayerName = generateDefaultPlayerName();
   elements.playerNameInput.placeholder = state.defaultPlayerName;
   await runIntro();
-  const [khodamData, effectData] = await Promise.all([fetchKhodamData(), fetchEffectData()]);
+  const [khodamData, effectData, sfxData] = await Promise.all([fetchKhodamData(), fetchEffectData(), fetchSfxData()]);
   state.data = khodamData;
   state.effects = effectData;
+  state.sfx = sfxData;
+  initializeAudioSystem();
   state.khodamList = Object.keys(getKhodamMap());
 
   if (!getKhodamMap()[state.selectedKhodamKey]) {
@@ -1946,10 +2283,12 @@ async function init() {
   renderLobbySelection();
   renderSelectionCards();
   showScreen("lobby");
+  ensureMusic("lobby");
 }
 
 init().catch((error) => {
   console.error(error);
+  stopAllMusic();
   showScreen("lobby");
   showToast("Gagal memuat data game");
 });
