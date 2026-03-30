@@ -1,0 +1,9 @@
+{
+    "ui-sfx":"sfx/click.mp3",
+    "atk-sfx":"sfx/punch.mp3",
+    "def-sfx":"sfx/bonus.mp3",
+    "win-sfx":"sfx/achievement.mp3",
+    "lose-sfx":"sfx/failure.mp3",
+    "lobby-music":"sfx/lobby.mp3",
+    "gameplay-music":"sfx/arena.mp3"
+}

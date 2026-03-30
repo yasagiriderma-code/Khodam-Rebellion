@@ -32,6 +32,7 @@ const screens = {
   cache: document.querySelector(".early-caching"),
   lobby: document.querySelector(".main-lobby"),
   selection: document.querySelector(".khodam-selection"),
+  creator: document.querySelector(".khodam-creator"),
   search: document.querySelector(".cari-lawan"),
   gameplay: document.querySelector(".gameplay")
 };
@@ -60,6 +61,17 @@ const elements = {
   selectionStatSp: document.getElementById("khodam-stat-sp"),
   playButton: document.getElementById("play-button"),
   selectionCards: document.getElementById("khodam-selection-cards"),
+  createKhodamButton: document.getElementById("create-khodam"),
+  creatorScreen: document.querySelector(".khodam-creator"),
+  creatorCanvas: document.getElementById("creator-canvas"),
+  creatorColorInput: document.getElementById("creator-color"),
+  creatorSizeInput: document.getElementById("creator-size"),
+  creatorSizeDisplay: document.getElementById("creator-size-display"),
+  creatorEraserButton: document.getElementById("creator-eraser-button"),
+  creatorClearButton: document.getElementById("creator-clear-button"),
+  creatorNameInput: document.getElementById("creator-name-input"),
+  creatorSaveButton: document.getElementById("save-khodam-button"),
+  creatorCancelButton: document.getElementById("close-creator-screen"),
   cancelSelectionButton: document.getElementById("cancel-khodam-selection"),
   confirmSelectionButton: document.getElementById("confirm-khodam-selection"),
   actionButtons: Array.from(document.querySelectorAll(".action-button")),
@@ -404,6 +416,186 @@ function showOverlay(element, visible) {
   element.classList.toggle("overlay-visible", visible);
 }
 
+function initializeKhodamCreator() {
+  if (!elements.creatorCanvas || !elements.creatorColorInput || !elements.creatorSizeInput) return;
+  state.creator = state.creator || {};
+  const canvas = elements.creatorCanvas;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  state.creator.ctx = ctx;
+  state.creator.canvas = canvas;
+  state.creator.isDrawing = false;
+  state.creator.eraserMode = false;
+  state.creator.color = elements.creatorColorInput.value || "#1E3A8A";
+  state.creator.size = parseInt(elements.creatorSizeInput.value || "6", 10);
+  updateCreatorBrush();
+  clearCreatorCanvas();
+
+  canvas.addEventListener("pointerdown", startCreatorDraw);
+  window.addEventListener("pointermove", drawCreator);
+  window.addEventListener("pointerup", endCreatorDraw);
+  canvas.addEventListener("pointerleave", endCreatorDraw);
+  canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+
+  elements.creatorColorInput.addEventListener("input", (event) => {
+    state.creator.color = event.target.value;
+    updateCreatorBrush();
+  });
+  elements.creatorSizeInput.addEventListener("input", (event) => {
+    const size = parseInt(event.target.value, 10);
+    state.creator.size = Number.isFinite(size) ? size : 6;
+    elements.creatorSizeDisplay.textContent = `${state.creator.size}px`;
+    updateCreatorBrush();
+  });
+  elements.creatorClearButton.addEventListener("click", () => {
+    clearCreatorCanvas();
+  });
+  elements.creatorEraserButton.addEventListener("click", toggleCreatorEraser);
+  elements.creatorSaveButton.addEventListener("click", async () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    await saveCustomKhodam();
+  });
+  elements.creatorCancelButton?.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    closeCreatorScreen();
+  });
+}
+
+function getCreatorCanvasCoords(event) {
+  const canvas = elements.creatorCanvas;
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  const x = ((event.clientX || 0) - rect.left) * (canvas.width / rect.width);
+  const y = ((event.clientY || 0) - rect.top) * (canvas.height / rect.height);
+  return {
+    x: Math.min(Math.max(0, x), canvas.width),
+    y: Math.min(Math.max(0, y), canvas.height)
+  };
+}
+
+function updateCreatorBrush() {
+  const ctx = state.creator?.ctx;
+  if (!ctx) return;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.lineWidth = state.creator.size;
+  ctx.globalCompositeOperation = "source-over";
+  ctx.strokeStyle = state.creator.eraserMode ? "#FFFFFF" : state.creator.color;
+}
+
+function clearCreatorCanvas() {
+  const canvas = elements.creatorCanvas;
+  const ctx = state.creator?.ctx;
+  if (!canvas || !ctx) return;
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  state.creator.isDrawing = false;
+}
+
+function startCreatorDraw(event) {
+  if (!state.creator || state.screen !== "creator") return;
+  event.preventDefault();
+  const coords = getCreatorCanvasCoords(event);
+  if (!coords) return;
+  if (!state.creator.ctx) return;
+  state.creator.isDrawing = true;
+  state.creator.lastX = coords.x;
+  state.creator.lastY = coords.y;
+  state.creator.ctx.beginPath();
+  state.creator.ctx.moveTo(coords.x, coords.y);
+  state.creator.ctx.lineTo(coords.x + 0.5, coords.y + 0.5);
+  state.creator.ctx.stroke();
+}
+
+function drawCreator(event) {
+  if (!state.creator?.isDrawing || state.screen !== "creator") return;
+  event.preventDefault();
+  const coords = getCreatorCanvasCoords(event);
+  if (!coords || !state.creator?.ctx) return;
+  state.creator.ctx.beginPath();
+  state.creator.ctx.moveTo(state.creator.lastX, state.creator.lastY);
+  state.creator.ctx.lineTo(coords.x, coords.y);
+  state.creator.ctx.stroke();
+  state.creator.lastX = coords.x;
+  state.creator.lastY = coords.y;
+}
+
+function endCreatorDraw() {
+  if (!state.creator || state.screen !== "creator") return;
+  state.creator.isDrawing = false;
+  state.creator?.ctx?.beginPath();
+}
+
+function toggleCreatorEraser() {
+  if (!state.creator) return;
+  state.creator.eraserMode = !state.creator.eraserMode;
+  elements.creatorEraserButton.textContent = state.creator.eraserMode ? "✏️ Mode Gambar" : "✖️ Penghapus";
+  elements.creatorEraserButton.classList.toggle("active", state.creator.eraserMode);
+  updateCreatorBrush();
+}
+
+function openCreatorScreen() {
+  if (!state.creator) return;
+  state.pendingKhodamKey = null;
+  state.creator.eraserMode = false;
+  state.creator.color = elements.creatorColorInput?.value || "#1E3A8A";
+  state.creator.size = parseInt(elements.creatorSizeInput?.value || "6", 10);
+  elements.creatorNameInput.value = "";
+  elements.creatorEraserButton.textContent = "✖️ Penghapus";
+  elements.creatorEraserButton.classList.remove("active");
+  updateCreatorBrush();
+  clearCreatorCanvas();
+  showScreen("creator");
+}
+
+function closeCreatorScreen() {
+  showScreen("selection");
+}
+
+function createCustomKhodamObject(name, previewSrc) {
+  const effectKeys = Object.keys(getEffectMap());
+  const effect = effectKeys[Math.floor(Math.random() * effectKeys.length)] || "burn";
+  const hp = randomInt(900, 1200);
+  const atk = randomInt(90, 120);
+  const skill = randomInt(230, 270);
+  const ult = randomInt(420, 470);
+  const def = randomInt(150, 175);
+  return {
+    preview: previewSrc,
+    name,
+    hp,
+    critical: { chance: randomInt(20, 30), multiplier: randomFloat(1.5, 2.0) },
+    effect,
+    effectChance: { attack: 0.2, skill: 0.3, ultimate: 1, shield: 0 },
+    action: {
+      attack: { name: "Serang ⚔️", damage: atk, preview: "none", use: "unlimited", energyCost: 0, energyGain: 10, cooldown: 0 },
+      skill: { name: "Skill Khodam", damage: skill, preview: "none", use: 3, energyCost: 100, energyGain: 0, cooldown: 2 },
+      ultimate: { name: "Ultimate Khodam", damage: ult, preview: "none", use: 1, energyCost: 300, energyGain: 0, cooldown: 4 },
+      shield: { name: "Bertahan 🛡️", armor: def, preview: "none", use: 3, energyCost: 0, energyGain: 40, cooldown: 0 }
+    },
+    selebrasi: "none"
+  };
+}
+
+async function saveCustomKhodam() {
+  const name = elements.creatorNameInput.value.trim();
+  if (!name) {
+    showToast("Masukkan nama khodam terlebih dahulu.");
+    return;
+  }
+  const previewSrc = elements.creatorCanvas.toDataURL("image/jpeg", 0.92);
+  const key = createCustomKhodamKey(name);
+  const customKhodam = createCustomKhodamObject(name, previewSrc);
+  state.data[key] = customKhodam;
+  state.khodamList.push(key);
+  saveCustomKhodams();
+  renderSelectionCards();
+  selectPendingKhodam(key);
+  showToast("Khodam baru berhasil dibuat.");
+  closeCreatorScreen();
+}
+
 function isBattleSessionActive(sessionId) {
   return sessionId === state.battleSession && state.screen === "gameplay";
 }
@@ -465,6 +657,48 @@ function getKhodamPreviewSrc(khodamKey, previewSrc = "none") {
 
 function getKhodamCelebrationSrc(khodamKey) {
   return getKhodamMap()[khodamKey]?.selebrasi || "none";
+}
+
+function getKhodamDisplayName(key) {
+  const khodam = getKhodamMap()[key];
+  return khodam?.name ? khodam.name : toTitleCase(key);
+}
+
+function createCustomKhodamKey(name) {
+  const slug = String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  return `custom-${slug || "khodam"}-${Date.now()}`;
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomFloat(min, max, precision = 2) {
+  return parseFloat((min + Math.random() * (max - min)).toFixed(precision));
+}
+
+function loadCustomKhodams() {
+  try {
+    const raw = localStorage.getItem("customKhodams");
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveCustomKhodams() {
+  try {
+    const customEntries = Object.entries(state.data || {}).filter(([key]) => key.startsWith("custom-"));
+    const customData = Object.fromEntries(customEntries);
+    localStorage.setItem("customKhodams", JSON.stringify(customData));
+  } catch {
+    // ignore storage failures
+  }
 }
 
 function isVideoAsset(src) { return /\.(mp4|webm)$/i.test(src || ""); }
@@ -603,7 +837,7 @@ function applyVideoSource(video, src) {
 // ─── LOBBY / SELECTION ───────────────────────────────────────────────────────
 function renderLobbySelection() {
   const khodam = getKhodamMap()[state.selectedKhodamKey];
-  elements.lobbyKhodamName.textContent = toTitleCase(state.selectedKhodamKey);
+  elements.lobbyKhodamName.textContent = getKhodamDisplayName(state.selectedKhodamKey);
   applyImageSource(elements.lobbyVideo, getKhodamPreviewSrc(state.selectedKhodamKey, khodam.preview));
 }
 
@@ -615,8 +849,8 @@ function renderSelectionCards() {
     card.className = "khodam-card";
     card.dataset.khodam = key;
     card.innerHTML = `
-      <img src="${getKhodamPreviewSrc(key, khodam.preview)}" alt="${toTitleCase(key)}">
-      <h2>${toTitleCase(key)}</h2>
+      <img src="${getKhodamPreviewSrc(key, khodam.preview)}" alt="${getKhodamDisplayName(key)}">
+      <h2>${getKhodamDisplayName(key)}</h2>
     `;
     if (state.pendingKhodamKey === key) card.classList.add("is-selected");
     elements.selectionCards.appendChild(card);
@@ -805,7 +1039,7 @@ function syncCombatantUi(side) {
   const hpTone = getHpTone(hpPercent);
 
   combatant.label.textContent = side === "player" ? getPlayerDisplayName() : participant.displayName;
-  combatant.name.textContent = toTitleCase(participant.khodamKey);
+  combatant.name.textContent = getKhodamDisplayName(participant.khodamKey);
   combatant.hpFill.style.width = `${hpPercent}%`;
   combatant.hpTrailFill.style.width = `${hpPercent}%`;
   combatant.armorFill.style.left = `${hpPercent}%`;
@@ -2155,6 +2389,10 @@ function bindEvents() {
     playSfx("ui-sfx", { volume: 0.7 });
     closeSelectionScreen();
   });
+  elements.createKhodamButton?.addEventListener("click", () => {
+    playSfx("ui-sfx", { volume: 0.7 });
+    openCreatorScreen();
+  });
   elements.confirmSelectionButton.addEventListener("click", () => {
     playSfx("ui-sfx", { volume: 0.7 });
     confirmPendingKhodam();
@@ -2228,6 +2466,8 @@ function bindEvents() {
     closeModal(false);
   });
 
+  initializeKhodamCreator();
+
   window.addEventListener("resize", () => {
     if (state.screen === "gameplay") syncBattleUi();
   });
@@ -2269,7 +2509,8 @@ async function init() {
   elements.playerNameInput.placeholder = state.defaultPlayerName;
   await runIntro();
   const [khodamData, effectData, sfxData] = await Promise.all([fetchKhodamData(), fetchEffectData(), fetchSfxData()]);
-  state.data = khodamData;
+  const customKhodams = loadCustomKhodams();
+  state.data = { ...khodamData, ...customKhodams };
   state.effects = effectData;
   state.sfx = sfxData;
   initializeAudioSystem();

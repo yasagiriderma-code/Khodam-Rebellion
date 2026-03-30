@@ -1,0 +1,82 @@
+{
+    "burn": {
+        "target":"musuh",
+        "duration": 3,
+        "damagePerTurn": 23
+    },
+    "poison": {
+        "target":"musuh",
+        "duration": 3,
+        "damagePerTurn": 18
+    },
+    "bleed": {
+        "target":"musuh",
+        "duration": 4,
+        "damagePerTurn": 18
+    },
+
+
+    "stun": {
+        "target":"musuh",
+        "duration": 1,
+        "disableActions": ["attack"," skill"," ultimate"]
+    },
+    "blocked": {
+        "target":"musuh",
+        "duration": 1,
+        "disableActions": ["attack"," skill"," ultimate"]
+    },
+    "weakness": {
+        "target":"musuh",
+        "duration": 3,
+        "disableActions": ["shield"]
+    },
+
+    "recovery": {
+        "target":"sendiri",
+        "duration": 3,
+        "healPerTurn": 15
+    },
+    "strength": {
+        "target":"sendiri",
+        "duration": 3,
+        "armorPerTurn": 10
+    },
+    "lifeFlip":{
+        "target":"sendiri",
+        "hpFlip": true
+    },
+
+    "freeze": {
+        "target":"musuh",
+        "addCooldown": [" skill"," ultimate"],
+        "cooldownIncrease": 2
+    },
+    "slow": {
+        "target":"musuh",
+        "addCooldown": [" skill"," ultimate"],
+        "cooldownIncrease": 1
+    },
+
+    "rage":{
+        "target":"sendiri",
+        "duration": 3,
+        "damageIncrease": 20
+    },
+    "berserk":{
+        "target":"sendiri",
+        "duration": 3,
+        "damageIncrease": 55,
+        "hpDrain": 15
+    },
+
+    "lucky": {
+        "target":"sendiri",
+        "getEnergy": 20
+    },
+
+    "dispel": {
+        "target":"sendiri",
+        "removeEffect": true
+    }
+}
