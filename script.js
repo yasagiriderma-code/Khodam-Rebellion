@@ -180,6 +180,7 @@ const state = {
     durationMs: 550,
     lobbyTimer: null,
     selectionTimer: null,
+    creatorTimer: null,
     actionTimer: null
   },
 
@@ -384,8 +385,16 @@ function resetLobbyIdleHint() {
 function resetSelectionIdleHint() {
   scheduleIdleHint(
     "selectionTimer",
-    () => [elements.cancelSelectionButton, elements.confirmSelectionButton],
+    () => [elements.cancelSelectionButton, elements.confirmSelectionButton, elements.createKhodamButton],
     () => state.screen === "selection"
+  );
+}
+
+function resetCreatorIdleHint() {
+  scheduleIdleHint(
+    "creatorTimer",
+    () => [elements.creatorCancelButton, elements.creatorSaveButton, elements.creatorEraserButton, elements.creatorClearButton],
+    () => state.screen === "creator"
   );
 }
 
@@ -547,10 +556,13 @@ function openCreatorScreen() {
   updateCreatorBrush();
   clearCreatorCanvas();
   showScreen("creator");
+  resetCreatorIdleHint();
 }
 
 function closeCreatorScreen() {
+  clearIdleHintTimer("creatorTimer");
   showScreen("selection");
+  resetSelectionIdleHint();
 }
 
 function createCustomKhodamObject(name, previewSrc) {
@@ -2475,6 +2487,7 @@ function bindEvents() {
   document.addEventListener("pointerdown", (event) => {
     if (state.screen === "lobby" && event.target.closest(".main-lobby")) resetLobbyIdleHint();
     if (state.screen === "selection" && event.target.closest(".khodam-selection")) resetSelectionIdleHint();
+    if (state.screen === "creator" && event.target.closest(".khodam-creator")) resetCreatorIdleHint();
     if (state.screen === "gameplay" && event.target.closest(".gameplay, .action-menu-overlay")) resetActionIdleHint();
   });
 
