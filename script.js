@@ -1163,7 +1163,7 @@ async function playBattleCelebration(result) {
 
   elements.combatants[winnerSide].wrapper.classList.add("is-celebrating");
   elements.combatants[loserSide].wrapper.classList.add("is-watching");
-  showToast(`${toTitleCase(winner.khodamKey)} menang!`);
+  showToast(`${getKhodamDisplayName(winner.khodamKey)} menang!`);
 
   const celebrationSrc = getKhodamCelebrationSrc(winner.khodamKey);
   await queueAssetPreload(celebrationSrc);
@@ -1399,21 +1399,21 @@ function applyCooldownEffect(participant, effectConfig) {
 function applyImmediateEffect(actor, target, effectKey, effectConfig) {
   if (effectConfig.removeEffect) {
     clearEffects(actor);
-    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}` };
+    return { applied: true, toast: `${getKhodamDisplayName(actor.khodamKey)} menggunakan ${effectKey}` };
   }
   if (effectConfig.getEnergy) {
     const gained = Number(effectConfig.getEnergy) || 0;
     actor.energy = clamp(actor.energy + gained, 0, actor.maxEnergy || ENERGY_SETTINGS.max);
-    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}` };
+    return { applied: true, toast: `${getKhodamDisplayName(actor.khodamKey)} menggunakan ${effectKey}` };
   }
   if (effectConfig.hpFlip) {
     const actorHp = actor.hp;
     actor.hp = clamp(target.hp, 0, actor.maxHp);
     target.hp = clamp(actorHp, 0, target.maxHp);
-    return { applied: true, toast: `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}` };
+    return { applied: true, toast: `${getKhodamDisplayName(actor.khodamKey)} menggunakan ${effectKey}` };
   }
   if (applyCooldownEffect(target, effectConfig)) {
-    return { applied: true, toast: `${toTitleCase(target.khodamKey)} terkena cooldown` };
+    return { applied: true, toast: `${getKhodamDisplayName(target.khodamKey)} terkena cooldown` };
   }
   return { applied: false, toast: "" };
 }
@@ -1433,8 +1433,8 @@ function tryApplyActionEffect(actor, target, actionKey) {
     return {
       effectKey, recipient: recipient.side,
       toast: effectConfig.target === "sendiri"
-        ? `${toTitleCase(actor.khodamKey)} menggunakan ${effectKey}`
-        : `${toTitleCase(recipient.khodamKey)} terkena ${effectKey}`
+        ? `${getKhodamDisplayName(actor.khodamKey)} menggunakan ${effectKey}`
+        : `${getKhodamDisplayName(recipient.khodamKey)} terkena ${effectKey}`
     };
   }
   return null;
@@ -1557,7 +1557,7 @@ async function beginLocalPlayerTurn() {
   syncBattleUi();
 
   if (effectEvents.length) {
-    showToast(`${toTitleCase(actor.khodamKey)} ${effectEvents.join(", ")}`);
+    showToast(`${getKhodamDisplayName(actor.khodamKey)} ${effectEvents.join(", ")}`);
     await delay(700);
   }
 
@@ -1568,7 +1568,7 @@ async function beginLocalPlayerTurn() {
 
   const usable = getUsableActions(actor);
   if (!usable.length) {
-    showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
+    showToast(`${getKhodamDisplayName(actor.khodamKey)} tidak bisa bertindak`);
     await delay(700);
     await rotateOrbit("opponent");
     await beginBotTurn();
@@ -1603,7 +1603,7 @@ async function beginBotTurn() {
     syncBattleUi();
 
     if (effectEvents.length) {
-      showToast(`${toTitleCase(actor.khodamKey)} ${effectEvents.join(", ")}`);
+      showToast(`${getKhodamDisplayName(actor.khodamKey)} ${effectEvents.join(", ")}`);
       await delay(700);
     }
 
@@ -1614,7 +1614,7 @@ async function beginBotTurn() {
 
     const actionKey = chooseBotAction(actor, state.battle.player);
     if (!actionKey) {
-      showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
+      showToast(`${getKhodamDisplayName(actor.khodamKey)} tidak bisa bertindak`);
       await delay(700);
       await rotateOrbit("player");
       await beginLocalPlayerTurn();
@@ -1654,7 +1654,7 @@ async function runBotAction(actionKey) {
     const critResult = rollCritical(opponent, damageWithEffects);
     const result = applyDamage(player, critResult.total);
     showDamageFloat("player", critResult.triggered ? `CRIT! -${result.total}` : `-${result.total}`);
-    if (critResult.triggered) showToast(`${toTitleCase(opponent.khodamKey)} CRITICAL x${critResult.multiplier.toFixed(1)}`);
+    if (critResult.triggered) showToast(`${getKhodamDisplayName(opponent.khodamKey)} CRITICAL x${critResult.multiplier.toFixed(1)}`);
   }
 
   const effectResult = tryApplyActionEffect(opponent, player, actionKey);
@@ -1704,7 +1704,7 @@ async function runLocalBotPlayerAction(actionKey) {
     const critResult = rollCritical(actor, damageWithEffects);
     const result = applyDamage(target, critResult.total);
     showDamageFloat("opponent", critResult.triggered ? `CRIT! -${result.total}` : `-${result.total}`);
-    if (critResult.triggered) showToast(`${toTitleCase(actor.khodamKey)} CRITICAL x${critResult.multiplier.toFixed(1)}`);
+    if (critResult.triggered) showToast(`${getKhodamDisplayName(actor.khodamKey)} CRITICAL x${critResult.multiplier.toFixed(1)}`);
   }
 
   const effectResult = tryApplyActionEffect(actor, target, actionKey);
@@ -2153,7 +2153,7 @@ async function handleOpponentAction(actionData) {
     player.armor -= armorBlocked;
     player.hp = Math.max(0, player.hp - (total - armorBlocked));
     showDamageFloat("player", critTriggered ? `CRIT! -${total}` : `-${total}`);
-    if (critTriggered) showToast(`${toTitleCase(opponent.khodamKey)} CRITICAL x${critMultiplier?.toFixed(1)}`);
+    if (critTriggered) showToast(`${getKhodamDisplayName(opponent.khodamKey)} CRITICAL x${critMultiplier?.toFixed(1)}`);
   }
 
   // Apply effect from opponent if any
@@ -2163,11 +2163,11 @@ async function handleOpponentAction(actionData) {
       // Effect targeting us (the player)
       if (effectResult.recipient === (state.online.mySide === "host" ? "host" : "guest")) {
         addOrRefreshEffect(player, effectResult.effectKey, effectConfig);
-        showToast(`${toTitleCase(player.khodamKey)} terkena ${effectResult.effectKey}`);
+        showToast(`${getKhodamDisplayName(player.khodamKey)} terkena ${effectResult.effectKey}`);
       } else {
         // Effect on opponent themselves
         addOrRefreshEffect(opponent, effectResult.effectKey, effectConfig);
-        showToast(`${toTitleCase(opponent.khodamKey)} menggunakan ${effectResult.effectKey}`);
+        showToast(`${getKhodamDisplayName(opponent.khodamKey)} menggunakan ${effectResult.effectKey}`);
       }
     }
   }
@@ -2213,7 +2213,7 @@ async function beginMyTurn() {
   await pushMyStateToFirebase();
 
   if (effectEvents.length) {
-    showToast(`${toTitleCase(actor.khodamKey)} ${effectEvents.join(", ")}`);
+    showToast(`${getKhodamDisplayName(actor.khodamKey)} ${effectEvents.join(", ")}`);
     await delay(700);
   }
 
@@ -2224,7 +2224,7 @@ async function beginMyTurn() {
 
   const usable = getUsableActions(actor);
   if (!usable.length) {
-    showToast(`${toTitleCase(actor.khodamKey)} tidak bisa bertindak`);
+    showToast(`${getKhodamDisplayName(actor.khodamKey)} tidak bisa bertindak`);
     await delay(700);
     await rotateOrbit("opponent");
     // Pass turn to opponent
@@ -2280,7 +2280,7 @@ async function runOnlineAction(actorSide, actionKey) {
     resolvedDamage = critResult.total;
     const result = applyDamage(target, resolvedDamage);
     showDamageFloat("opponent", critTriggered ? `CRIT! -${result.total}` : `-${result.total}`);
-    if (critTriggered) showToast(`${toTitleCase(actor.khodamKey)} CRITICAL x${critMultiplier.toFixed(1)}`);
+    if (critTriggered) showToast(`${getKhodamDisplayName(actor.khodamKey)} CRITICAL x${critMultiplier.toFixed(1)}`);
   }
 
   // Try to apply effect
@@ -2533,3 +2533,4 @@ init().catch((error) => {
   showScreen("lobby");
   showToast("Gagal memuat data game");
 });
+
