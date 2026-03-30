@@ -600,7 +600,17 @@ async function saveCustomKhodam() {
   const key = createCustomKhodamKey(name);
   const customKhodam = createCustomKhodamObject(name, previewSrc);
   state.data[key] = customKhodam;
-  state.khodamList.push(key);
+
+  // Add new custom khodam at the beginning of custom khodams section
+  const customIndex = state.khodamList.findIndex(k => !k.startsWith("custom-"));
+  if (customIndex === -1) {
+    // No default khodams, add at the end
+    state.khodamList.push(key);
+  } else {
+    // Insert before the first default khodam
+    state.khodamList.splice(customIndex, 0, key);
+  }
+
   saveCustomKhodams();
   renderSelectionCards();
   selectPendingKhodam(key);
@@ -711,6 +721,33 @@ function saveCustomKhodams() {
   } catch {
     // ignore storage failures
   }
+}
+
+function deleteCustomKhodam(key) {
+  if (!key.startsWith("custom-")) return;
+
+  // Remove from state.data
+  delete state.data[key];
+
+  // Remove from khodamList if present
+  const index = state.khodamList.indexOf(key);
+  if (index > -1) {
+    state.khodamList.splice(index, 1);
+  }
+
+  // If this was the selected khodam, reset selection
+  if (state.selectedKhodamKey === key) {
+    state.selectedKhodamKey = "anoman"; // fallback to default
+  }
+  if (state.pendingKhodamKey === key) {
+    state.pendingKhodamKey = null;
+  }
+
+  // Save updated custom khodams
+  saveCustomKhodams();
+
+  // Re-render cards
+  renderSelectionCards();
 }
 
 function isVideoAsset(src) { return /\.(mp4|webm)$/i.test(src || ""); }
@@ -855,18 +892,54 @@ function renderLobbySelection() {
 
 function renderSelectionCards() {
   elements.selectionCards.innerHTML = "";
+
+  // Separate custom and default khodams
+  const customKhodams = [];
+  const defaultKhodams = [];
+
   state.khodamList.forEach((key) => {
+    if (key.startsWith("custom-")) {
+      customKhodams.push(key);
+    } else {
+      defaultKhodams.push(key);
+    }
+  });
+
+  // Render custom khodams first (at the top)
+  customKhodams.forEach((key) => {
+    const khodam = getKhodamMap()[key];
+    const card = document.createElement("div");
+    card.className = "khodam-card khodam-card-custom";
+    card.dataset.khodam = key;
+
+    const deleteButton = `<button class="khodam-delete-btn" data-khodam="${key}" title="Hapus Khodam">🗑️</button>`;
+
+    card.innerHTML = `
+      <img src="${getKhodamPreviewSrc(key, khodam.preview)}" alt="${getKhodamDisplayName(key)}">
+      <h2>${getKhodamDisplayName(key)}</h2>
+      ${deleteButton}
+    `;
+
+    if (state.pendingKhodamKey === key) card.classList.add("is-selected");
+    elements.selectionCards.appendChild(card);
+  });
+
+  // Render default khodams after custom ones
+  defaultKhodams.forEach((key) => {
     const khodam = getKhodamMap()[key];
     const card = document.createElement("div");
     card.className = "khodam-card";
     card.dataset.khodam = key;
+
     card.innerHTML = `
       <img src="${getKhodamPreviewSrc(key, khodam.preview)}" alt="${getKhodamDisplayName(key)}">
       <h2>${getKhodamDisplayName(key)}</h2>
     `;
+
     if (state.pendingKhodamKey === key) card.classList.add("is-selected");
     elements.selectionCards.appendChild(card);
   });
+
   renderSelectionHeader();
   syncSelectionButtons();
 }
@@ -2411,6 +2484,14 @@ function bindEvents() {
   });
 
   elements.selectionCards.addEventListener("click", (event) => {
+    const deleteBtn = event.target.closest(".khodam-delete-btn");
+    if (deleteBtn) {
+      event.stopPropagation();
+      playSfx("ui-sfx", { volume: 0.7 });
+      deleteCustomKhodam(deleteBtn.dataset.khodam);
+      return;
+    }
+
     const card = event.target.closest(".khodam-card");
     if (!card) return;
     playSfx("ui-sfx", { volume: 0.65 });
@@ -2527,7 +2608,12 @@ async function init() {
   state.effects = effectData;
   state.sfx = sfxData;
   initializeAudioSystem();
-  state.khodamList = Object.keys(getKhodamMap());
+
+  // Sort khodamList: custom khodams first, then default khodams
+  const allKhodamKeys = Object.keys(getKhodamMap());
+  const customKeys = allKhodamKeys.filter(key => key.startsWith("custom-"));
+  const defaultKeys = allKhodamKeys.filter(key => !key.startsWith("custom-"));
+  state.khodamList = [...customKeys, ...defaultKeys];
 
   if (!getKhodamMap()[state.selectedKhodamKey]) {
     state.selectedKhodamKey = state.khodamList[0];
