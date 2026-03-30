@@ -530,7 +530,7 @@ function endCreatorDraw() {
 function toggleCreatorEraser() {
   if (!state.creator) return;
   state.creator.eraserMode = !state.creator.eraserMode;
-  elements.creatorEraserButton.textContent = state.creator.eraserMode ? "✏️ Mode Gambar" : "✖️ Penghapus";
+  elements.creatorEraserButton.textContent = state.creator.eraserMode ? "✏️ PENSIL" : "🧽 PENGHAPUS";
   elements.creatorEraserButton.classList.toggle("active", state.creator.eraserMode);
   updateCreatorBrush();
 }
@@ -542,7 +542,7 @@ function openCreatorScreen() {
   state.creator.color = elements.creatorColorInput?.value || "#1E3A8A";
   state.creator.size = parseInt(elements.creatorSizeInput?.value || "6", 10);
   elements.creatorNameInput.value = "";
-  elements.creatorEraserButton.textContent = "✖️ Penghapus";
+  elements.creatorEraserButton.textContent = "🧽 PENGHAPUS";
   elements.creatorEraserButton.classList.remove("active");
   updateCreatorBrush();
   clearCreatorCanvas();
