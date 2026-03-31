@@ -1943,6 +1943,12 @@ async function startMatchmaking() {
       state.online.roomId = roomId;
       state.online.mySide = "guest";
 
+      // Verify the host queue entry still exists and belongs to the selected host.
+      const hostQueueSnap = await get(ref(db, `queue/${roomId}`));
+      if (!hostQueueSnap.exists() || hostQueueSnap.val().playerId !== host.playerId) {
+        return startMatchmaking();
+      }
+
       // Remove from queue
       await remove(ref(db, `queue/${roomId}`));
 
@@ -1953,7 +1959,7 @@ async function startMatchmaking() {
       state.battle = {
         playerName,
         player: guestParticipant,
-        opponent: deserializeParticipant({ ...createBattleParticipant("opponent", host.khodamKey, host.playerName) }, "opponent")
+        opponent: deserializeParticipant(hostParticipant, "opponent")
       };
 
       await set(ref(db, `rooms/${roomId}`), {
