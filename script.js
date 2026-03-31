@@ -225,19 +225,39 @@ function getHpTone(hpPercent) {
 
 function getSfxMap() { return state.sfx || {}; }
 
+function preloadAudio(audio) {
+  if (!audio) return Promise.resolve();
+  return new Promise((resolve) => {
+    const finish = () => {
+      audio.removeEventListener("canplaythrough", finish);
+      audio.removeEventListener("error", finish);
+      resolve();
+    };
+    audio.addEventListener("canplaythrough", finish, { once: true });
+    audio.addEventListener("error", finish, { once: true });
+    audio.load();
+    window.setTimeout(finish, 5000);
+  });
+}
+
 function createAudioInstance(src, { loop = false, volume = 1 } = {}) {
   if (!src || src === "none") return null;
   const audio = new Audio(src);
   audio.preload = "auto";
   audio.loop = loop;
   audio.volume = volume;
+  audio.load();
   return audio;
 }
 
-function initializeAudioSystem() {
+async function initializeAudioSystem() {
   const sfx = getSfxMap();
   state.audio.music.lobby = createAudioInstance(sfx["lobby-music"], { loop: true, volume: 0.45 });
   state.audio.music.gameplay = createAudioInstance(sfx["gameplay-music"], { loop: true, volume: 0.4 });
+  await Promise.all([
+    preloadAudio(state.audio.music.lobby),
+    preloadAudio(state.audio.music.gameplay)
+  ]);
 }
 
 function tryPlayAudio(audio) {
@@ -827,8 +847,14 @@ function buildPreviewAssetList(data) {
   const assets = [];
   Object.entries(data).forEach(([khodamKey, khodam]) => {
     assets.push(getKhodamPreviewSrc(khodamKey, khodam.preview));
+    if (khodam.action) {
+      Object.values(khodam.action).forEach((action) => {
+        if (action && action.preview) assets.push(action.preview);
+      });
+    }
+    assets.push(getKhodamCelebrationSrc(khodamKey));
   });
-  return [...new Set(assets)];
+  return [...new Set(assets.filter(Boolean))];
 }
 
 async function runEarlyCaching(data) {
@@ -1321,6 +1347,7 @@ async function playFullscreenAnimation(src, quote, options = {}) {
   video.volume = muted ? 0 : 1;
   applyVideoSource(video, src);
   video.currentTime = 0;
+  await waitVideoReady(video);
   await new Promise((resolve) => {
     let settled = false;
     const finish = () => {
@@ -2613,7 +2640,6 @@ async function init() {
   state.data = { ...khodamData, ...customKhodams };
   state.effects = effectData;
   state.sfx = sfxData;
-  initializeAudioSystem();
 
   // Sort khodamList: custom khodams first, then default khodams
   const allKhodamKeys = Object.keys(getKhodamMap());
@@ -2625,6 +2651,7 @@ async function init() {
     state.selectedKhodamKey = state.khodamList[0];
   }
 
+  await initializeAudioSystem();
   await runEarlyCaching(state.data);
   renderLobbySelection();
   renderSelectionCards();
