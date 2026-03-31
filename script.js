@@ -783,9 +783,19 @@ async function preloadVideo(src) {
     video.style.cssText = "position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;";
     document.body.appendChild(video);
     let settled = false;
+    const cleanup = () => {
+      if (video.parentNode) video.remove();
+      video.removeAttribute("src");
+      video.load();
+    };
     const finish = () => {
       if (settled) return;
       settled = true;
+      video.removeEventListener("canplaythrough", finish);
+      video.removeEventListener("loadeddata", warmPlayback);
+      video.removeEventListener("loadedmetadata", warmPlayback);
+      video.removeEventListener("error", finish);
+      cleanup();
       resolve();
     };
     const warmPlayback = () => {
@@ -903,10 +913,9 @@ function applyVideoSource(video, src) {
   const resolvedSrc = chooseCompatibleMedia(src);
   if (video.getAttribute("src") === resolvedSrc) return;
   video.pause();
+  video.removeAttribute("src");
   video.setAttribute("src", resolvedSrc);
   video.load();
-  const playPromise = video.play();
-  if (playPromise?.catch) playPromise.catch(() => {});
 }
 
 // ─── LOBBY / SELECTION ───────────────────────────────────────────────────────
@@ -2590,6 +2599,12 @@ function bindEvents() {
   elements.modalCancel.addEventListener("click", () => {
     playSfx("ui-sfx", { volume: 0.7 });
     closeModal(false);
+  });
+
+  elements.skipAnimationButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    stopFullscreenAnimation();
   });
 
   initializeKhodamCreator();
