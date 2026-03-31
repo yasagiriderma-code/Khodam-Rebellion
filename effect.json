@@ -18,12 +18,12 @@
 
     "stun": {
         "target":"musuh",
-        "duration": 1,
+        "duration": 2,
         "disableActions": ["attack"," skill"," ultimate"]
     },
     "blocked": {
         "target":"musuh",
-        "duration": 1,
+        "duration": 2,
         "disableActions": ["attack"," skill"," ultimate"]
     },
     "weakness": {
@@ -55,7 +55,7 @@
     "slow": {
         "target":"musuh",
         "addCooldown": [" skill"," ultimate"],
-        "cooldownIncrease": 1
+        "cooldownIncrease": 2
     },
 
     "rage":{
