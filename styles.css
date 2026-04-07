@@ -74,252 +74,6 @@ p {
     -webkit-overflow-scrolling: touch;
 }
 
-.khodam-creator {
-    display: none;
-    height: 100vh;
-    min-height: 100dvh;
-    padding: 32px 24px;
-    box-sizing: border-box;
-    background: #00ff1a;
-    color: #000000;
-}
-
-.khodam-creator.screen-visible {
-    display: block !important;
-    max-height: 100dvh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-}
-
-.creator-header {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-}
-
-.creator-header h1 {
-    font-size: clamp(1.9rem, 2.6vw, 3rem);
-}
-
-.creator-back-button {
-    background: #000000;
-    border: 5px solid rgb(255, 255, 255);
-    color: #ffffff;
-    padding: 12px 18px;
-    border-radius: 18px;
-    cursor: pointer;
-}
-
-.creator-body {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(320px, 1.7fr) minmax(280px, 1fr);
-    gap: 24px;
-}
-
-.creator-drawing-pane,
-.creator-info-pane {
-    /* background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.14); */
-    border-radius: 28px;
-    padding: 24px;
-    /* box-shadow: 0 30px 70px rgba(0,0,0,0.22); */
-}
-
-.creator-drawing-pane canvas {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 4;
-    border-radius: 22px;
-    background: #ffffff;
-    display: block;
-    border: 5px solid rgb(0, 0, 0);
-    /* box-shadow: inset 0 0 0 1px rgba(0,0,0,0.03); */
-    touch-action: none;
-    cursor: crosshair;
-}
-
-.creator-canvas-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 14px;
-    margin-top: 18px;
-    align-items: end;
-}
-
-.creator-control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 170px;
-}
-
-.creator-control-group label {
-    font-size: 0.95rem;
-    color: #000000;
-}
-
-.creator-control-group input[type="range"] {
-    width: 100%;
-}
-
-.creator-control-group input[type="color"] {
-    width: 100%;
-    height: 45px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: 14px;
-}
-
-.creator-button {
-    border: none;
-    padding: 14px 20px;
-    border-radius: 18px;
-    cursor: pointer;
-    background: rgb(0, 0, 0);
-    color: #ffffff;
-    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-    min-width: 140px;
-    text-align: center;
-}
-
-.creator-button:hover {
-    transform: translateY(-1px);
-    background: rgb(33, 33, 33);
-    box-shadow: 0 12px 24px rgb(36, 36, 36);
-}
-
-.creator-button.primary {
-    background: #000000;
-    color: #ffffff;
-}
-
-.creator-button.active {
-    background: #292929;
-    color: #ffffff;
-}
-
-.creator-info-pane label {
-    display: block;
-    margin-bottom: 8px;
-    color: #f6f0ff;
-}
-
-.creator-info-pane input[type="text"] {
-    width: 100%;
-    padding: 14px 16px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.16);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-}
-
-.creator-preview-label {
-    margin-top: 22px;
-    margin-bottom: 12px;
-    font-size: 0.96rem;
-    color: #c9c0ff;
-}
-
-.creator-preview-wrapper {
-    min-height: 220px;
-    border-radius: 22px;
-    background: #090712;
-    border: 1px solid rgba(255,255,255,0.18);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    padding: 16px;
-}
-
-.creator-preview-wrapper img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    background: #000;
-    display: block;
-}
-
-.creator-preview-wrapper img[src=""],
-.creator-preview-wrapper img:not([src]) {
-    display: none;
-}
-
-.creator-note {
-    margin-top: 20px;
-    color: #b8b1ff;
-    font-size: 0.95rem;
-}
-
-.creator-info-pane label {
-    display: block;
-    margin-bottom: 8px;
-    color: #000000;
-}
-
-.creator-info-pane input[type="text"] {
-    width: 100%;
-    margin-bottom: 20px;
-    padding: 14px 16px;
-    border-radius: 16px;
-    border: 5px solid rgb(0, 0, 0);
-    background: rgb(255, 255, 255);
-    color: #000000;
-}
-
-.creator-preview-label {
-    margin-top: 12px;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    color: #c9c0ff;
-}
-
-.creator-preview-wrapper {
-    min-height: 220px;
-    border-radius: 18px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.creator-preview-wrapper img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
-
-.creator-note {
-    margin-top: 16px;
-    color: #b8b1ff;
-    font-size: 0.95rem;
-}
-
-@media (max-width: 980px) {
-    .creator-body {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 640px) {
-    .creator-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .creator-drawing-pane,
-    .creator-info-pane {
-        padding: 16px;
-    }
-}
-
 .overlay-visible {
     display: flex !important;
 }
@@ -562,14 +316,15 @@ p {
     align-items: stretch;
     flex-wrap: wrap;
     overflow: visible;
+    position: relative;
+    z-index: 1;
 }
 
 .khodam-card {
     position: relative;
     width: 150px;
-    /* flex: 0 0 150px; */
-    margin: 10px;
     padding: 10px;
+    margin: 10px;
     background: #ffffff;
     border: 5px solid #000000;
     box-shadow: 0 6px 8px rgba(0, 0, 0, 0.695);
@@ -577,20 +332,55 @@ p {
     font-size: 18px;
     font-family: 'Lilita One', cursive;
     cursor: pointer;
+    overflow: hidden;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    z-index: 1;
 }
 
-.khodam-card img {
+.khodam-selection-cards {
+    position: relative;
+    z-index: 1;
+}
+
+.khodam-card-layers {
+    position: relative;
     width: 100%;
     height: 150px;
-    object-fit: cover;
-    background: #000;
+    overflow: hidden;
     border-radius: 15px;
+    background: #000;
+    will-change: transform;
+}
+
+.card-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.back-layer { 
+    z-index: 1;
+    animation: drift1 4s infinite ease-in-out;
+}
+
+.middle-layer { 
+    z-index: 2;
+    animation: drift2 3.5s infinite ease-in-out;
+}
+
+.front-layer { 
+    z-index: 3;
+    animation: drift3 4.5s infinite ease-in-out;
 }
 
 .khodam-card h2 {
-    margin-top: 10px;
+    margin: 10px 0 0 0;
+    padding: 0;
     text-align: center;
+    font-size: 16px;
 }
 
 .khodam-card.is-selected {
@@ -608,6 +398,48 @@ p {
 .khodam-card-custom.is-selected {
     border-color: #2cff5d;
     box-shadow: 0 0 0 4px #ffffff, 0 12px 18px rgba(255, 107, 53, 0.3);
+}
+
+/* ─── IDLE ANIMATIONS (FASTER & STRETCHIER) ─── */
+@keyframes drift1 {
+    0% { transform: scale(1) skewY(0deg); }
+    50% { transform: scale(1.05) skewY(-2deg); }
+    100% { transform: scale(1) skewY(0deg); }
+}
+
+@keyframes drift2 {
+    0% { transform: scale(1) skewX(0deg); }
+    50% { transform: scale(1.06) skewX(2.5deg); }
+    100% { transform: scale(1) skewX(0deg); }
+}
+
+@keyframes drift3 {
+    0% { transform: scale(1) scaleY(1); }
+    50% { transform: scale(1.04) scaleY(1.08); }
+    100% { transform: scale(1) scaleY(1); }
+}
+
+/* Main Lobby Preview Animation */
+#background-video-main-lobby {
+    animation: lobby-float 5s infinite ease-in-out;
+}
+
+@keyframes lobby-float {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02) skewY(-0.8deg); }
+    100% { transform: scale(1); }
+}
+
+/* Gameplay Card Animations */
+.battle-card .card-art {
+    animation: gameplay-float 4.5s infinite ease-in-out;
+}
+
+@keyframes gameplay-float {
+    0% { transform: scale(1); }
+    33% { transform: scale(1.03) skewX(1.2deg); }
+    66% { transform: scale(1.02) skewY(-0.8deg); }
+    100% { transform: scale(1); }
 }
 
 .khodam-delete-btn {
@@ -649,6 +481,7 @@ p {
     align-items: center;
     padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
     gap: 20px;
+    z-index: 10;
 }
 
 .khodam-option-button,
