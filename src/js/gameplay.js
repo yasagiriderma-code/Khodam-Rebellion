@@ -14,6 +14,8 @@ import {
   queueAssetPreload,
   applyVideoSource,
   waitVideoReady,
+  isVideoAsset,
+  isAssetReady,
   isBattleSessionActive
 } from "./variable.js";
 import { playActionSfx, playMusic, stopAllMusic, playSfx, ensureMusic } from "./audio.js";

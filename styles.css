@@ -398,17 +398,6 @@ p {
     box-shadow: 0 0 0 4px #ffffff, 0 12px 18px rgba(0, 0, 0, 0.5);
 }
 
-.khodam-card-custom {
-    border-color: #000000;
-    background: linear-gradient(135deg, #ffffff 0%, #fff8f0 100%);
-    box-shadow: 0 6px 8px rgba(255, 107, 53, 0.2), 0 6px 8px rgba(0, 0, 0, 0.695);
-}
-
-.khodam-card-custom.is-selected {
-    border-color: #2cff5d;
-    box-shadow: 0 0 0 4px #ffffff, 0 12px 18px rgba(255, 107, 53, 0.3);
-}
-
 /* ─── IDLE ANIMATIONS (FASTER & STRETCHIER) ─── */
 @keyframes drift1 {
     0% { transform: scale(1) skewY(0deg); }
@@ -449,34 +438,6 @@ p {
     33% { transform: scale(1.03) skewX(1.2deg); }
     66% { transform: scale(1.02) skewY(-0.8deg); }
     100% { transform: scale(1); }
-}
-
-.khodam-delete-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 32px;
-    height: 32px;
-    background: #ff4444;
-    border: 2px solid #ffffff;
-    border-radius: 50%;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.khodam-delete-btn:hover {
-    transform: scale(1.1);
-    background: #cc0000;
-}
-
-.khodam-delete-btn:active {
-    transform: scale(0.95);
 }
 
 .khodam-selection-button-overlay {
