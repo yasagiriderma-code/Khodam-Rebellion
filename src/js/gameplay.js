@@ -571,7 +571,6 @@ async function runBotAction(actionKey) {
   if (!action) return;
   playActionSfx(actionKey);
 
-  await queueAssetPreload(action.preview);
   await playFullscreenAnimation(action.preview, action.katakata || "", {
     pauseGameplayMusic: actionKey === "skill" || actionKey === "ultimate"
   });
@@ -660,7 +659,6 @@ export async function runLocalBotPlayerAction(actionKey) {
 
   syncBattleUi();
 
-  await queueAssetPreload(action.preview);
   await playFullscreenAnimation(action.preview, action.katakata || "", {
     pauseGameplayMusic: actionKey === "skill" || actionKey === "ultimate"
   });
