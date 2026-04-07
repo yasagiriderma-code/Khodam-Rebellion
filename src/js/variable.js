@@ -19,6 +19,7 @@ export const overlays = {
 export const elements = {
   progressFill: document.querySelector(".progress-fill"),
   progressText: document.getElementById("progress-text"),
+  progressFile: document.getElementById("progress-file"),
   lobbyKhodamName: document.getElementById("nama-khodam"),
   lobbyVideo: document.getElementById("background-video-main-lobby"),
   playerNameInput: document.getElementById("player-name-input"),
@@ -182,18 +183,110 @@ async function retryFetch(url, options = {}, retries = 2) {
 }
 
 export async function fetchKhodamData() {
-  const response = await retryFetch("data/khodam.json", { cache: "no-store" });
+  const response = await retryFetch("src/data/khodam.json");
   return normalizeKhodamData(await response.json());
 }
 
 export async function fetchEffectData() {
-  const response = await retryFetch("data/effect.json", { cache: "no-store" });
+  const response = await retryFetch("src/data/effect.json");
   return normalizeEffectData(await response.json());
 }
 
 export async function fetchSfxData() {
-  const response = await retryFetch("data/sfx.json", { cache: "no-store" });
+  const response = await retryFetch("src/data/sfx.json");
   return normalizeSfxData(await response.json());
+}
+
+function extractAssetLabel(filePath) {
+  if (!filePath) return "";
+  return String(filePath).split("/").pop();
+}
+
+export function isAssetReady(src) {
+  if (!src || src === "none") return true;
+  const resolvedSrc = isVideoAsset(src) ? chooseCompatibleMedia(src) : resolvePreviewMedia(src);
+  return state.assetCache.ready.has(resolvedSrc);
+}
+
+export function buildStaticPreviewAssetList(data) {
+  const assets = [];
+  Object.entries(data).forEach(([khodamKey, khodam]) => {
+    assets.push(getKhodamPreviewSrc(khodamKey, khodam.preview));
+  });
+  return [...new Set(assets.filter(Boolean))];
+}
+
+export async function runEarlyCaching(showScreen) {
+  const manifestFiles = [
+    { url: "src/data/khodam.json", label: "khodam.json" },
+    { url: "src/data/effect.json", label: "effect.json" },
+    { url: "src/data/sfx.json", label: "sfx.json" }
+  ];
+
+  showScreen("cache");
+  elements.progressFill.style.width = "0%";
+  elements.progressText.textContent = "0";
+  if (elements.progressFile) elements.progressFile.textContent = "Menunggu unduhan...";
+
+  const khodamData = await (async () => {
+    const label = manifestFiles[0].label;
+    if (elements.progressFile) elements.progressFile.textContent = label;
+    const result = await fetchKhodamData();
+    if (elements.progressFile) elements.progressFile.textContent = `${label} selesai`;
+    return result;
+  })();
+
+  const effectData = await (async () => {
+    const label = manifestFiles[1].label;
+    if (elements.progressFile) elements.progressFile.textContent = label;
+    const result = await fetchEffectData();
+    if (elements.progressFile) elements.progressFile.textContent = `${label} selesai`;
+    return result;
+  })();
+
+  const sfxData = await (async () => {
+    const label = manifestFiles[2].label;
+    if (elements.progressFile) elements.progressFile.textContent = label;
+    const result = await fetchSfxData();
+    if (elements.progressFile) elements.progressFile.textContent = `${label} selesai`;
+    return result;
+  })();
+
+  const customKhodams = loadCustomKhodams();
+  const previewAssets = buildStaticPreviewAssetList({ ...khodamData, ...customKhodams });
+  const totalAssets = manifestFiles.length + previewAssets.length || 1;
+  let loaded = 0;
+
+  const updateProgress = (label) => {
+    const progress = Math.round((loaded / totalAssets) * 100);
+    elements.progressFill.style.width = `${progress}%`;
+    elements.progressText.textContent = String(progress);
+    if (elements.progressFile) elements.progressFile.textContent = label;
+  };
+
+  for (const { label } of manifestFiles) {
+    loaded += 1;
+    updateProgress(`${label} selesai`);
+  }
+
+  if (previewAssets.length) {
+    for (const asset of previewAssets) {
+      const label = extractAssetLabel(asset);
+      if (elements.progressFile) elements.progressFile.textContent = label;
+      await queueAssetPreload(asset);
+      loaded += 1;
+      updateProgress(label);
+    }
+  }
+
+  if (!previewAssets.length) {
+    elements.progressFill.style.width = "100%";
+    elements.progressText.textContent = "100";
+    if (elements.progressFile) elements.progressFile.textContent = "Selesai";
+  }
+
+  await delay(250);
+  return { khodamData, effectData, sfxData };
 }
 
 function normalizeKhodamData(rawData) {
@@ -372,28 +465,6 @@ export function buildPreviewAssetList(data) {
     assets.push(getKhodamCelebrationSrc(khodamKey));
   });
   return [...new Set(assets.filter(Boolean))];
-}
-
-export async function runEarlyCaching(data, showScreen) {
-  const assets = buildPreviewAssetList(data);
-  const total = assets.length || 1;
-  let loaded = 0;
-  showScreen("cache");
-  const BATCH_SIZE = 4;
-  for (let i = 0; i < assets.length; i += BATCH_SIZE) {
-    const batch = assets.slice(i, i + BATCH_SIZE);
-    await Promise.all(batch.map((asset) => queueAssetPreload(asset).then(() => {
-      loaded += 1;
-      const progress = Math.round((loaded / total) * 100);
-      elements.progressFill.style.width = `${progress}%`;
-      elements.progressText.textContent = String(progress);
-    })));
-  }
-  if (!assets.length) {
-    elements.progressFill.style.width = "100%";
-    elements.progressText.textContent = "100";
-  }
-  await delay(250);
 }
 
 export function applyImageSource(image, src) {

@@ -173,11 +173,7 @@ export async function initGame() {
 
   await runIntro();
 
-  const [khodamData, effectData, sfxData] = await Promise.all([
-    fetchKhodamData(),
-    fetchEffectData(),
-    fetchSfxData()
-  ]);
+  const { khodamData, effectData, sfxData } = await runEarlyCaching(showScreen);
 
   const customKhodams = loadCustomKhodams();
   state.data = { ...khodamData, ...customKhodams };
@@ -194,7 +190,6 @@ export async function initGame() {
   }
 
   await initializeAudioSystem();
-  await runEarlyCaching(state.data, showScreen);
   renderLobbySelection();
   renderSelectionCards();
   showScreen("lobby");

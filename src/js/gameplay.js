@@ -126,6 +126,10 @@ export async function playFullscreenAnimation(src, quote, options = {}) {
     pauseGameplayMusic && gameplayMusic && state.audio.activeMusic === gameplayMusic && !gameplayMusic.paused
   );
 
+  if (isVideoAsset(src) && !isAssetReady(src)) {
+    return;
+  }
+
   await queueAssetPreload(src);
   if (pauseGameplayMusic && gameplayMusic && !gameplayMusic.paused) gameplayMusic.pause();
 
@@ -446,7 +450,7 @@ function getParticipantActionAssets(participant) {
   return assets;
 }
 
-async function warmupBattleAssets(onProgress) {
+export async function warmupBattleAssets(onProgress) {
   const assets = [
     ...getParticipantActionAssets(state.battle?.player),
     ...getParticipantActionAssets(state.battle?.opponent)

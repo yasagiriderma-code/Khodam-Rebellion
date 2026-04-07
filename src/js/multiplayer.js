@@ -31,7 +31,8 @@ import {
   addOrRefreshEffect,
   getEffectDefinition,
   resolveTurnEffects,
-  getUsableActions
+  getUsableActions,
+  warmupBattleAssets
 } from "./gameplay.js";
 
 const firebaseConfig = {
@@ -300,7 +301,7 @@ export async function pushGameOverToFirebase(winner) {
   await update(ref(db, `rooms/${roomId}`), { gameOver: winner });
 }
 
-function enterOnlineBattle() {
+async function enterOnlineBattle() {
   state.battleMode = "online";
   state.battleSession += 1;
   state.turnOwner = state.online.mySide === "host" ? "player" : "opponent";
@@ -310,6 +311,8 @@ function enterOnlineBattle() {
   clearBotTurnTimeout();
   state.gameOver = false;
   state.isBattleBusy = false;
+
+  await warmupBattleAssets();
 
   syncBattleUi();
   showScreen("gameplay");
@@ -680,7 +683,7 @@ export async function startMatchmaking() {
         createdAt: Date.now()
       });
 
-      enterOnlineBattle();
+      await enterOnlineBattle();
     } else {
       state.battleMode = "online";
       state.online.mySide = "host";
@@ -720,7 +723,7 @@ export async function startMatchmaking() {
         };
         state.battle.opponent.displayName = guestInfo.playerName;
 
-        enterOnlineBattle();
+        await enterOnlineBattle();
       };
       state.online.matchmakingRef = roomRef;
       state.online.matchmakingCallback = matchmakingCallback;

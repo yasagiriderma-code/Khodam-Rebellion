@@ -144,6 +144,15 @@ p {
     position: relative;
 }
 
+@media (min-width: 1024px) {
+    .main-lobby {
+        max-width: 420px;
+        margin: 0 auto;
+        border-radius: 28px;
+        overflow: hidden;
+    }
+}
+
 .main-lobby-title-overlay {
     position: absolute;
     top: 0;
