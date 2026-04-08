@@ -1,184 +1,520 @@
 {
-  "banaspati": {
-    "preview": "asset/khodams/banaspati/banaspati.png",
-    "hp": 1050,
+  "affan": {
+    "preview": "asset/khodams/affan/affan.jpeg",
+    "hp": 1000,
     "critical": { "chance": 22, "multiplier": 1.6 },
     "effect":"burn",
     "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 104, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "ledakan tengkorak", "damage": 224, "preview": "asset/khodams/banaspati/banaspati-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "laser lava", "damage": 452, "preview": "asset/khodams/banaspati/banaspati-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 176, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/banaspati/banaspati-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "buto": {
-    "preview": "asset/khodams/butoijo/butoijo.png",
-    "hp": 1100,
-    "critical": { "chance": 28, "multiplier": 1.8 },
-    "effect":"stun",
-    "effectChance": {"attack": 0.1,"skill": 0.1,"ultimate": 1,"shield": 0},
-    "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 118, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "bantingan maskulin", "damage": 242, "preview": "asset/khodams/butoijo/butoijo-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "amukan brutal", "damage": 468, "preview": "asset/khodams/butoijo/butoijo-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 188, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    },
-    "selebrasi":"asset/khodams/butoijo/butoijo-selebrasi.mp4"
-  },
-  "garuda": {
-    "preview": "asset/khodams/garuda/garuda.png",
-    "hp": 1200,
-    "critical": { "chance": 30, "multiplier": 1.9 },
-    "effect":"burn",
-    "effectChance": {"attack": 0.1,"skill": 0.1,"ultimate": 1,"shield": 0},
-    "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 128, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "sayap api", "damage": 262, "preview": "asset/khodams/garuda/garuda-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "garuda agung", "damage": 498, "preview": "asset/khodams/garuda/garuda-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 198, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    },
-    "selebrasi":"asset/khodams/garuda/garuda-selebrasi.mp4"
-  },
-  "anoman": {
-    "preview": "asset/khodams/hanoman/hanoman.png",
-    "hp": 1020,
-    "critical": { "chance": 27, "multiplier": 1.7 },
-    "effect":"rage",
-    "effectChance": {"attack": 0.2,"skill": 0.2,"ultimate": 1,"shield": 0.3},
-    "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 114, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "gada petir", "damage": 245, "preview": "asset/khodams/hanoman/hanoman-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "peremuk tekad", "damage": 470, "preview": "asset/khodams/hanoman/hanoman-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 174, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
-    },
-    "selebrasi":"asset/khodams/hanoman/hanoman-selebrasi.mp4"
-  },
-  "kliwon": {
-    "preview": "asset/khodams/kliwon/kliwon.png",
+  "ajiz": {
+    "preview": "asset/khodams/ajiz/ajiz.jpeg",
     "hp": 1000,
-    "critical": { "chance": 25, "multiplier": 1.6 },
-    "effect":"poison",
-    "effectChance": {"attack": 0.1,"skill": 0.1,"ultimate": 1,"shield": 0},
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 112, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "racun hitam", "damage": 238, "preview": "asset/khodams/kliwon/kliwon-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "kliwon maut", "damage": 456, "preview": "asset/khodams/kliwon/kliwon-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 172, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/kliwon/kliwon-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "kuni": {
-    "preview": "asset/khodams/kuntilanak/kuntilanak.png",
-    "hp": 920,
-    "critical": { "chance": 26, "multiplier": 1.8 },
-    "effect":"bleed",
-    "effectChance": {"attack": 0.7,"skill": 0,"ultimate": 0,"shield": 0},
+  "alfi": {
+    "preview": "asset/khodams/alfi/alfi.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 108, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "cakar arwah", "damage": 231, "preview": "asset/khodams/kuntilanak/kuntilanak-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "amukan arwah", "damage": 463, "preview": "asset/khodams/kuntilanak/kuntilanak-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 174, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/kuntilanak/kuntilanak-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "nenek lampir": {
-    "preview": "asset/khodams/neneklampir/neneklampir.png",
-    "hp": 900,
-    "critical": { "chance": 27, "multiplier": 1.9 },
-    "effect":"poison",
-    "effectChance": {"attack": 0,"skill": 0.5,"ultimate": 1,"shield": 0},
+  "arshavin": {
+    "preview": "asset/khodams/arshavin/arshavin.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 116, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "bola racun", "damage": 248, "preview": "asset/khodams/neneklampir/neneklampir-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "ledakan racun", "damage": 469, "preview": "asset/khodams/neneklampir/neneklampir-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 186, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/neneklampir/neneklampir-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "hood": {
-    "preview": "asset/khodams/ninjapocong/ninjapocong.png",
-    "hp": 980,
-    "critical": { "chance": 23, "multiplier": 1.6 },
-    "effect":"berserk",
-    "effectChance": {"attack": 0.2,"skill": 0.5,"ultimate": 1,"shield": 0},
+  "bintang": {
+    "preview": "asset/khodams/bintang/bintang.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 102, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "jarum arwah", "damage": 220, "preview": "asset/khodams/ninjapocong/ninjapocong-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "tebasan jiwa", "damage": 447, "preview": "asset/khodams/ninjapocong/ninjapocong-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 169, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/ninjapocong/ninjapocong-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "roro": {
-    "preview": "asset/khodams/nyirorokidul/nyirorokidul.png",
-    "hp": 890,
-    "critical": { "chance": 30, "multiplier": 2.0 },
-    "effect":"blocked",
-    "effectChance": {"attack": 0,"skill": 0.1,"ultimate": 1,"shield": 0},
+  "damar": {
+    "preview": "asset/khodams/damar/damar.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 120, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "4 naga laut", "damage": 250, "preview": "asset/khodams/nyirorokidul/nyirorokidul-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "tsunami", "damage": 470, "preview": "asset/khodams/nyirorokidul/nyirorokidul-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 170, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/nyirorokidul/nyirorokidul-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "pitung": {
-    "preview": "asset/khodams/pitung/pitung.png",
-    "hp": 1080,
-    "critical": { "chance": 25, "multiplier": 1.7 },
-    "effect":"strength",
-    "effectChance": {"attack": 0,"skill": 0.5,"ultimate": 0,"shield": 1},
+  "devind": {
+    "preview": "asset/khodams/devind/devind.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 106, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "silat betawi", "damage": 228, "preview": "asset/khodams/pitung/pitung-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "golok terbang", "damage": 454, "preview": "asset/khodams/pitung/pitung-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 177, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/pitung/pitung-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "siliwangi": {
-    "preview": "asset/khodams/siliwangi/siliwangi.png",
-    "hp": 1100,
-    "critical": { "chance": 24, "multiplier": 1.8 },
-    "effect":"weakness",
-    "effectChance": {"attack": 0,"skill": 0.7,"ultimate": 0.3,"shield": 0},
+  "eri": {
+    "preview": "asset/khodams/eri/eri.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 112, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "gigitan macan", "damage": 239, "preview": "asset/khodams/siliwangi/siliwangi-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "manusia macan", "damage": 461, "preview": "asset/khodams/siliwangi/siliwangi-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 183, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/siliwangi/siliwangi-selebrasi.mp4"
+    "selebrasi":"none"
   },
-  "tuyul": {
-    "preview": "asset/khodams/tuyul/tuyul.png",
-    "hp": 970,
-    "critical": { "chance": 20, "multiplier": 1.5 },
-    "effect":"lucky",
-    "effectChance": {"attack": 0.5,"skill": 0.7,"ultimate": 1,"shield": 0},
+  "ervin": {
+    "preview": "asset/khodams/ervin/ervin.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 96, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "copet dompet", "damage": 210, "preview": "asset/khodams/tuyul/tuyul-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "rampok sekampung", "damage": 435, "preview": "asset/khodams/tuyul/tuyul-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 160, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/tuyul/tuyul-selebrasi.mp4"
+    "selebrasi":"none"
+  },
+  "fajar": {
+    "preview": "asset/khodams/fajar/fajar.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "fanesha": {
+    "preview": "asset/khodams/fanesha/fanesha.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "farel": {
+    "preview": "asset/khodams/farel/farel.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "fedrian": {
+    "preview": "asset/khodams/fedrian/fedrian.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "fito": {
+    "preview": "asset/khodams/fito/fito.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "ibnu": {
+    "preview": "asset/khodams/ibnu/ibnu.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "ika": {
+    "preview": "asset/khodams/ika/ika.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "imam": {
+    "preview": "asset/khodams/imam/imam.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "jendralkai": {
+    "preview": "asset/khodams/jendral kai/jendral kai.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "katon": {
+    "preview": "asset/khodams/katon/katon.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "kenzie": {
+    "preview": "asset/khodams/kenzie/kenzie.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "kenzo": {
+    "preview": "asset/khodams/kenzo/kenzo.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "laila": {
+    "preview": "asset/khodams/laila/laila.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "maura": {
+    "preview": "asset/khodams/maura/maura.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "nasya": {
+    "preview": "asset/khodams/nasya/nasya.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  }, 
+  "naufal": {
+    "preview": "asset/khodams/naufal/naufal.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "rafli": {
+    "preview": "asset/khodams/rafli/rafli.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "ramuda": {
+    "preview": "asset/khodams/ramuda/ramuda.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "rehan": {
+    "preview": "asset/khodams/rehan/rehan.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "rizky": {
+    "preview": "asset/khodams/rizky/rizky.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "soma": {
+    "preview": "asset/khodams/soma/soma.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "vanno": {
+    "preview": "asset/khodams/vanno/vanno.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "via": {
+    "preview": "asset/khodams/via/via.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "vicho": {
+    "preview": "asset/khodams/vicho/vicho.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "vio": {
+    "preview": "asset/khodams/vio/vio.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
   },
   "yasa": {
-    "preview": "asset/khodams/admin/admin.png",
-    "hp": 880,
-    "critical": { "chance": 30, "multiplier": 2.0 },
-    "effect":"dispel",
-    "effectChance": {"attack": 0,"skill": 0,"ultimate": 0.5,"shield": 1},
+    "preview": "asset/khodams/yasa/yasa.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
     "action": {
-      "attack": { "name": "Serang ⚔️", "damage": 119, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
-      "skill": { "name": "hack sistem", "damage": 249, "preview": "asset/khodams/admin/admin-skill.mp4", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
-      "ultimate": { "name": "ban player", "damage": 455, "preview": "asset/khodams/admin/admin-ultimate.mp4", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
-      "shield": { "name": "Bertahan 🛡️", "armor": 172, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
     },
-    "selebrasi":"asset/khodams/admin/admin-selebrasi.mp4"
+    "selebrasi":"none"
+  },
+  "zaid": {
+    "preview": "asset/khodams/zaid/zaid.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
+  },
+  "zaskia": {
+    "preview": "asset/khodams/zaskia/zaskia.jpeg",
+    "hp": 1000,
+    "critical": { "chance": 22, "multiplier": 1.6 },
+    "effect":"burn",
+    "effectChance": {"attack": 0.3,"skill": 0.3,"ultimate": 1,"shield": 0},
+    "action": {
+      "attack": { "name": "ATK ⚔️", "damage": 100, "preview": "none", "use": "unlimited", "energyCost": 0, "energyGain": 10, "cooldown": 0},
+      "skill": { "name": "SKILL ⭐", "damage": 200, "preview": "none", "use": 3, "energyCost": 100, "energyGain": 0, "cooldown": 2},
+      "ultimate": { "name": "ULTI 🔥", "damage": 500, "preview": "none", "use": 1, "energyCost": 300, "energyGain": 0, "cooldown": 4},
+      "shield": { "name": "DEF 🛡️", "armor": 180, "preview": "none", "use": 3, "energyCost": 0, "energyGain": 40, "cooldown": 0}
+    },
+    "selebrasi":"none"
   }
 }
