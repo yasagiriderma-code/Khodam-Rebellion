@@ -1,0 +1,77 @@
+@media (max-width: 768px) {
+    .khodam-selection-title-overlay {
+        min-height: 120px;
+    }
+
+    .khodam-selection-stats {
+        gap: 8px;
+    }
+
+    .stat-box {
+        min-width: calc(50% - 8px);
+        padding: 8px 10px;
+        font-size: 16px;
+    }
+
+    .stat-box span {
+        margin-top: 6px;
+        font-size: 20px;
+    }
+
+    .combatant {
+        width: 140px;
+    }
+
+    .status-card {
+        width: 142px;
+        padding: 12px;
+    }
+
+    .status-card .name {
+        font-size: 18px;
+    }
+
+    .battle-card {
+        width: 140px;
+        height: 200px;
+    }
+
+    .action-menu-overlay {
+        min-height: 132px;
+        gap: 8px;
+    }
+
+    .action-button {
+        padding: 16px;
+        font-size: 22px;
+    }
+
+    .khodam-option-button {
+        font-size: 24px;
+        padding: 16px;
+    }
+
+    .player-float {
+        top: 58%;
+        left: 31%;
+    }
+
+    .opponent-float {
+        top: 42%;
+        left: 69%;
+    }
+
+    .damage-float {
+        font-size: 42px;
+    }
+
+    .modal-overlay.result-layout .modal-actions {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .modal-overlay.result-layout .modal-button {
+        padding: 16px 14px;
+        font-size: 22px;
+    }
+}

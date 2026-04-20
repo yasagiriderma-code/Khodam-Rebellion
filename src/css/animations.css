@@ -1,0 +1,96 @@
+#background-video-main-lobby {
+    animation: lobby-float 5s infinite ease-in-out;
+}
+
+@keyframes lobby-float {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02) skewY(-0.8deg); }
+    100% { transform: scale(1); }
+}
+
+.battle-card .card-art {
+    animation: gameplay-float 4.5s infinite ease-in-out;
+}
+
+@keyframes gameplay-float {
+    0% { transform: scale(1); }
+    33% { transform: scale(1.03) skewX(1.2deg); }
+    66% { transform: scale(1.02) skewY(-0.8deg); }
+    100% { transform: scale(1); }
+}
+
+@keyframes drift1 {
+    0% { transform: scale(1) skewY(0deg); }
+    50% { transform: scale(1.05) skewY(-2deg); }
+    100% { transform: scale(1) skewY(0deg); }
+}
+
+@keyframes drift2 {
+    0% { transform: scale(1) skewX(0deg); }
+    50% { transform: scale(1.06) skewX(2.5deg); }
+    100% { transform: scale(1) skewX(0deg); }
+}
+
+@keyframes drift3 {
+    0% { transform: scale(1) scaleY(1); }
+    50% { transform: scale(1.04) scaleY(1.08); }
+    100% { transform: scale(1) scaleY(1); }
+}
+
+@keyframes idleNudge {
+    0% {
+        transform: translateX(0) rotate(0deg);
+    }
+    20% {
+        transform: translateX(-4px) rotate(-2deg);
+    }
+    40% {
+        transform: translateX(4px) rotate(2deg);
+    }
+    60% {
+        transform: translateX(-3px) rotate(-1.5deg);
+    }
+    80% {
+        transform: translateX(3px) rotate(1.5deg);
+    }
+    100% {
+        transform: translateX(0) rotate(0deg);
+    }
+}
+
+@keyframes celebrationBounce {
+    from {
+        transform: translateY(0) scale(1.16);
+    }
+    to {
+        transform: translateY(-16px) scale(1.24) rotate(-2deg);
+    }
+}
+
+@keyframes putarLoading {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes hitFloat {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -10%) scale(0.4);
+    }
+    18% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.08);
+    }
+    65% {
+        opacity: 1;
+        transform: translate(-50%, -88%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -132%) scale(0.9);
+    }
+}
